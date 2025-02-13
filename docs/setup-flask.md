@@ -37,6 +37,8 @@ pip install -r requirements.txt
 ## 4. Set Up the Database Connection String
 So in order to access the database, you will require to [**download the .env file**](https://drive.google.com/file/d/1vuFKdbHLn6MdlfHscSPd-qZvx7gsAypB/view?usp=sharing) (You will have to request access first, for safety reasons) and then add the downloaded file into your **backend** directory.
 
+If the file downloads as **env**, rename it to **.env**.
+
 ## 5. Post-Install Notes
 Here are some good-to-knows.
 
