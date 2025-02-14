@@ -1,4 +1,4 @@
-# Tensile Strength and Stress Tester
+# Compression and Tensile (CAT) Strength Tester
 ## Description of the project:
 The Tensile Strength and Stress Tester is made up of a pressure sensor for compression strength measurement and an IR sensor for measuring the stretchability of the material. These sensors are mounted to a motorized clamp. The sensors as well as a motor moving the press are attached to an Android mobile application via Bluetooth allowing one to plot how much a material can be compressed or stretched. The app will have the possibility to store this data and plot multiple data sets, allowing easy comparison between the different tested materials. The device also has a temperature sensor since a material's strength is temperature-dependent. 
 
