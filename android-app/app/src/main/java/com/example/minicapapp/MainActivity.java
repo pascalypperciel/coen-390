@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.os.AsyncTask;
+import android.view.MotionEvent;
+import android.view.View;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -20,6 +22,7 @@ import android.Manifest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.InputStream;
@@ -31,10 +34,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtResponse;
     private TextView txtBluetoothData;
     private Button btnFetch;
+    private Button btnLED;
+
     private static final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
+    private OutputStream outStream = null;
+
     private Thread btThread;
     private volatile boolean stopBTThread = false;
     private static final int REQUEST_BT_PERMISSIONS = 100;
@@ -48,8 +55,18 @@ public class MainActivity extends AppCompatActivity {
         txtBluetoothData = findViewById(R.id.txtBluetoothData);
         txtResponse = findViewById(R.id.txtResponse);
         btnFetch = findViewById(R.id.btnFetch);
+        btnLED = findViewById(R.id.btnLED);
 
         btnFetch.setOnClickListener(v -> new FetchDataTask().execute());
+
+        btnLED.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                sendBluetoothCommand("LED_ON");
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                sendBluetoothCommand("LED_OFF");
+            }
+            return true;
+        });
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
@@ -68,26 +85,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             startBluetoothThread();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_BT_PERMISSIONS) {
-            boolean allGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false;
-                    break;
-                }
-            }
-            if (allGranted) {
-                startBluetoothThread();
-            } else {
-                txtResponse.setText("Bluetooth permissions aren't allowed");
-            }
         }
     }
 
@@ -117,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
             btSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
             btSocket.connect();
 
+            outStream = btSocket.getOutputStream();
+
             InputStream inStream = btSocket.getInputStream();
             byte[] buffer = new byte[1024];
             while (!stopBTThread) {
@@ -132,6 +131,17 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             runOnUiThread(() -> txtResponse.setText("Error: " + e.getMessage()));
+        }
+    }
+
+    private void sendBluetoothCommand(String command) {
+        if (btSocket != null && outStream != null) {
+            try {
+                outStream.write((command + "\n").getBytes());
+                outStream.flush();
+            } catch (Exception e) {
+                Log.e("BT", "Error sending command: " + e.getMessage());
+            }
         }
     }
 

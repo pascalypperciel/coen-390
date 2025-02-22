@@ -16,6 +16,9 @@
 #define LOADCELL_DOUT_PIN 4
 #define LOADCELL_SCK_PIN  5
 
+// LED Control
+#define LED_PIN 2
+
 #define BAUD    115200
 
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
@@ -38,10 +41,23 @@ void setup() {
   // Distance Sensor
   HCSR04.begin(DIST_TRIG_PIN, DIST_ECHO_PIN);
 
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
   Serial.println("Sensors are ready to go!");
 }
 
 void loop() {
+  if (Bluetooth.available()) {
+    String command = Bluetooth.readStringUntil('\n');
+    command.trim();
+    if (command == "LED_ON") {
+      digitalWrite(LED_PIN, HIGH);
+    } else if (command == "LED_OFF") {
+      digitalWrite(LED_PIN, LOW);
+    }
+  }
+  
   // Distance Sensor
   double* distances = HCSR04.measureDistanceCm();
   Serial.printf("Distance: %.2f cm\n", distances[0]);
