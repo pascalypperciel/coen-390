@@ -17,3 +17,12 @@ To open the Arduino project files:
 1. In the Arduino IDE, navigate to **File** > **Open**.
 2. Browse to the directory where you cloned the GitHub repository.
 3. Select the desired `.ino` file and open it.
+
+## 4. Board and Serial Monitor Settings
+Once the microcontroller is plugged in, you can follow these instructions:
+
+1. Select Board > "ESP32 Dev Module" (It may ask you to download it first, accept) > Select your port.
+2. Download and install the [CP2102 drivers](https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads).
+3. Click on Tools > Select Serial Monitor > Set it to **115200 baud**. (Or whatever number is in the *Serial.begin(?)* line.)
+4. Click on Tools > Make sure that your settings are the same as the following:
+![ESP32 Arduino IDE](/docs/images/esp32_arduino_ide.png)
