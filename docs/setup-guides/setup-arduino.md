@@ -26,3 +26,12 @@ Once the microcontroller is plugged in, you can follow these instructions:
 3. Click on Tools > Select Serial Monitor > Set it to **115200 baud**. (Or whatever number is in the *Serial.begin(?)* line.)
 4. Click on Tools > Make sure that your settings are the same as the following:
 ![ESP32 Arduino IDE](/docs/images/esp32_arduino_ide.png)
+
+## 5. Libraries Installation
+On Arduino IDE, you can click on Tools > Manage Libraries, and then install the following libraries:
+
+1. **HC-SR04** by Dirk Sarodnick
+2. **Adafruit MLX90614 Library** by Adafruit
+3. **HX711** by Rob Tillart
+
+Download any requisites that these libraries required if the IDE prompts you.

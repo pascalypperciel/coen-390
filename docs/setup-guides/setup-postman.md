@@ -11,7 +11,7 @@ Download and install **Postman** by following the official instructions here:
 ## 2. How does it work?
 So, assuming that your API (backend) is up and running, you may make requests to the testing routes that I've created.
 
-![Postman Guide Visual Aid](images/postman-tuto.png)
+![Postman Guide Visual Aid](/docs/images/postman-tuto.png)
 
 Here's what you see in the picture above:
 1. Select your request type. (GET, POST, PUT, etc.)
@@ -19,7 +19,7 @@ Here's what you see in the picture above:
 3. Click **Send**.
 4. Make sure you get the success/error code you expected, and you can see the results down below.
 
-![Postman Guide Visual Aid 2](images/postman-tuto2.png)
+![Postman Guide Visual Aid 2](/docs/images/postman-tuto2.png)
 
 If you're testing a POST, PUT, or any other type of request that has a body, you can follow the instructions in the screenshot above.
 1. Select **Body** in the row of options. 
