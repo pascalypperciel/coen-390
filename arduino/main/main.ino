@@ -35,7 +35,7 @@ void setup() {
 
   // Weight Sensor
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  scale.set_scale(8); // scale calibration, tweak with it
+  scale.set_scale(8); // scale calibration, twerk with it
   scale.tare();
 
   // Distance Sensor
