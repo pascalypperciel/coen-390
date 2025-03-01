@@ -1,7 +1,14 @@
 package com.example.minicapapp;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.os.AsyncTask;
@@ -11,45 +18,76 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView txtResponse;
+    protected Button datab, controlsb, helpb, settingsb, infob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Button btnFetch;
 
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-        txtResponse = findViewById(R.id.txtResponse);
-        btnFetch = findViewById(R.id.btnFetch);
+        helpb=findViewById(R.id.help);
+        settingsb=findViewById(R.id.settings);
+        datab=findViewById(R.id.gotodata);
+        controlsb=findViewById(R.id.controls);
+        infob=findViewById(R.id.infob);
 
-        btnFetch.setOnClickListener(v -> new FetchDataTask().execute());
-    }
-
-    private class FetchDataTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                URL url = new URL("http://10.0.2.2:5000/get-all");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder result = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
-                }
-                reader.close();
-                return result.toString();
-            } catch (Exception e) {
-                return "Error: " + e.getMessage();
+        datab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotodataclass();
             }
-        }
+        });
+      /*  controlsb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotocontrolsclass();
+            }
+        });
+        settingsb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotosettingsclass();
+            }
+        });*/
 
-        @Override
-        protected void onPostExecute(String result) {
-            txtResponse.setText(result);
-        }
+       /* helpb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
+                getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
+
+            }
+        });
+        infob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
+                getSupportFragmentManager().beginTransaction().add(R.id.container, new infofrag()).commit();
+
+            }
+        });*/
+
     }
+
+    /*private void gotocontrolsclass() {
+        Intent cintent= new Intent(this, controls.class);
+        startActivity(cintent);
+    }*/
+
+    private void gotodataclass() {
+        Intent dintent= new Intent(this, data.class);
+        startActivity(dintent);
+    }
+
+    /*private void gotosettingsclass() {
+        Intent sintent= new Intent(this, settings.class);
+        startActivity(sintent);
+    }*/
 }
