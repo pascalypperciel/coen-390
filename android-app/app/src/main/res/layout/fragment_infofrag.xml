@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".infofrag">
+
+    <View
+        android:id="@+id/coverup"
+        android:background="#DC143C"
+        android:alpha="0.5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:layout_width="340dp"
+        android:layout_height="619dp"
+        android:background="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/helptxtview"
+            android:layout_width="178dp"
+            android:layout_height="48dp"
+            android:layout_above="@+id/helptext"
+            android:layout_marginBottom="141dp"
+            android:text="Info Page"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/closeb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="69dp"
+            android:layout_marginBottom="83dp"
+            android:text="close" />
+
+        <TextView
+            android:id="@+id/helptext"
+            android:layout_width="301dp"
+            android:layout_height="194dp"
+            android:layout_above="@+id/closeb"
+            android:layout_marginBottom="105dp"
+            android:text="info on compression and tensile strength for different materials." />
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

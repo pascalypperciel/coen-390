@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".helpfrag">
+
+    <View
+        android:id="@+id/coverup"
+        android:background="#FFFF00"
+        android:alpha="0.5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:layout_width="340dp"
+        android:layout_height="619dp"
+        android:background="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/helptxtview"
+            android:layout_width="178dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:text="Help/Instructions"
+            android:textSize="20sp" />
+
+
+        <Button
+            android:id="@+id/closeb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="41dp"
+            android:layout_marginBottom="36dp"
+            android:text="close" />
+
+        <ScrollView
+            android:id="@+id/textbox"
+            android:layout_width="327dp"
+            android:layout_height="480dp"
+            android:layout_marginStart="11dp"
+            android:layout_marginTop="40dp">
+            <RelativeLayout
+                android:id="@+id/textcontainer"
+                android:layout_width="327dp"
+                android:layout_height="480dp">
+                <TextView
+                    android:id="@+id/helptext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="10dp"
+                    android:text="What This App Does:"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="316dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/helptext"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="6dp"
+                    android:text="This android app is meant to be connected via bluetooth to the CAT Strength Tester, a physical device which stretches or compresses a material that is inserted into it. The CAT Strength Tester measures compression force, distance stretched or compressed as well as temperature of the inserted material/object. This data is recorded and can be seen in the recorded data page which can be accessed via the main/navigation page which appears when the app is first opened." />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Controls Page:"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="309dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView2"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="9dp"
+                    android:text="On this page(which can be accessed from the main/navigation page which appears when the app is first opened) is where all the buttons controlling the CAT Strength Tester are located." />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView3"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Description of Control Buttons:"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="302dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView4"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="19dp"
+                    android:text="-In the drop down menu the type of material can be selected. \n
+From this the app can calculate when the CAT Tester has to stop compressing or stretching to not break the inserted object.\n\n
+
+-drop down menu to select whether to compress or stretch the inserted object.\n\n
+
+-start recording button: this button starts willing the database with data from the sensors.\n\n
+
+-A text next to the start recording button shows if the app is properly connected to the CAT TESTER.\n\n
+
+-Stop: this button stops everything including the motor and the recording.\n\n
+
+-turn on motor(fwd) button: turns the motor forward (aka compression) until the stop button is pressed or the CAT Tester hits its failsafe.\n\n
+
+-turn on motor(bwd) button: turns the motor backward (aka stretching) until the stop button is pressed or the CAT Tester hits its failsafe.\n
+" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView5"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="15dp"
+                    android:text="Recorded Data &amp; Settings Pages:"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="307dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView6"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="20dp"
+                    android:text="On the Recorded data page all the data that the sensors of the CAT Tester have recorded is displayed. To change how and what is displayed, go to the settings page located under the 3 dots at the top right of the data page." />
+
+            </RelativeLayout>
+        </ScrollView>
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
