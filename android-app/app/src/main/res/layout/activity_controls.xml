@@ -82,13 +82,13 @@
 
     <TextView
         android:id="@+id/connectionstatus"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="76dp"
         android:text="Not connected"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.245"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/record"
         app:layout_constraintTop_toBottomOf="@+id/tspinner" />
 
@@ -111,6 +111,18 @@
         android:inputType="number"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tspinner" />
+
+    <Button
+        android:id="@+id/establishc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="connect to device"
+        app:layout_constraintBottom_toTopOf="@+id/connectionstatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.936"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.907" />
 
     <FrameLayout
         android:id="@+id/container"

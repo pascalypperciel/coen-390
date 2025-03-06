@@ -25,14 +25,16 @@ import com.google.android.material.navigation.NavigationBarView;
 
 public class controls extends AppCompatActivity {
 
-    protected Button bmotorfwd, bmotorbwd,stopb, recordb;
+    protected Button bmotorfwd, bmotorbwd,stopb,establishcb;
+    protected static Button recordb;
     protected Toolbar toolbar;
 
-    protected TextView  statusbth;
+    protected static TextView  statusbth;
     protected Spinner cspinner, tspinner;
     protected EditText thinput;
 
     protected String selectedtest, selectedmaterial;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +56,14 @@ public class controls extends AppCompatActivity {
         bmotorfwd = findViewById(R.id.motorfwd);
         stopb = findViewById(R.id.stop);
         recordb= findViewById(R.id.record);
+        establishcb= findViewById(R.id.establishc);
 
         thinput= findViewById(R.id.thinput);
         thinput.setVisibility(View.INVISIBLE);
 
         statusbth= findViewById(R.id.connectionstatus);
+        bluetoothhelper bluehelper = new bluetoothhelper();
+        //bluehelper.connectAndReadBT();
 
         cspinner= findViewById(R.id.cspinner);
         ArrayAdapter<CharSequence>adapter=ArrayAdapter.createFromResource(this, R.array.materials, android.R.layout.simple_spinner_item);
@@ -111,22 +116,34 @@ public class controls extends AppCompatActivity {
         });
 
 
+        establishcb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getApplicationContext(), "clicked connecting", Toast.LENGTH_LONG).show();
+                //bluehelper.startBluetoothThread();
+                bluehelper.connectAndReadBT();
+            }
+        });
+
         bmotorbwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "motor turning bwd", Toast.LENGTH_LONG).show();
+                bluehelper.sendBluetoothCommand("LED_ON");
             }
         });
         bmotorfwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "motor turning fwd", Toast.LENGTH_LONG).show();
+                bluehelper.sendBluetoothCommand("LED_ON");
             }
         });
         stopb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "STOP", Toast.LENGTH_LONG).show();
+                bluehelper.sendBluetoothCommand("LED_OFF");
             }
         });
         recordb.setOnClickListener(new View.OnClickListener() {
