@@ -43,7 +43,7 @@ import androidx.annotation.Nullable;
 //public class bluetoothhelper extends Application {
 public class bluetoothhelper extends AppCompatActivity{
 
-    //private void startBluetoothThread() {
+  /*  //private void startBluetoothThread() {
 
     private final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -56,7 +56,12 @@ public class bluetoothhelper extends AppCompatActivity{
     private static final int REQUEST_BT_PERMISSIONS = 100;
     private final List<String> lastThreeMessages = new LinkedList<>();
 
+    private TextView statusbthh, txtbtdata;
 
+    public bluetoothhelper(TextView statusbth, TextView txtbtdata){
+        this.statusbthh=statusbth;
+        this.txtbtdata=txtbtdata;
+    }
 
     @Override
     // public void onCreate() {
@@ -68,7 +73,7 @@ public class bluetoothhelper extends AppCompatActivity{
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
-            controls.statusbth.setText("Bluetooth don't work");
+            statusbthh.setText("Bluetooth don't work");
             return;
         }
 
@@ -77,7 +82,7 @@ public class bluetoothhelper extends AppCompatActivity{
             int connectPerm = ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
 
             if (scanPerm != PackageManager.PERMISSION_GRANTED || connectPerm != PackageManager.PERMISSION_GRANTED) {
-                controls.statusbth.setText("NEED PERMISSION!!!!!!!");
+                statusbthh.setText("NEED PERMISSION!!!!!!!");
                 // ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BT_PERMISSIONS);
             } else {
                 startBluetoothThread();
@@ -89,7 +94,7 @@ public class bluetoothhelper extends AppCompatActivity{
 
     public void startBluetoothThread() {
         if (!btAdapter.isEnabled()) {
-            controls.statusbth.setText("Must enable Bluetooth");
+            statusbthh.setText("Must enable Bluetooth");
             return;
         }
         btThread = new Thread(this::connectAndReadBT);
@@ -103,7 +108,7 @@ public class bluetoothhelper extends AppCompatActivity{
                     || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
 
                 Log.e("BT", "Bluetooth permissions aren't allowed");
-                runOnUiThread(() -> controls.statusbth.setText("Bluetooth permissions aren't allowed"));
+                runOnUiThread(() -> statusbthh.setText("Bluetooth permissions aren't allowed"));
                 return;
             }
         }
@@ -127,10 +132,10 @@ public class bluetoothhelper extends AppCompatActivity{
             }
         } catch (SecurityException se) {
             se.printStackTrace();
-            runOnUiThread(() -> controls.statusbth.setText("SecurityException: " + se.getMessage()));
+            runOnUiThread(() -> statusbthh.setText("SecurityException: " + se.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
-            runOnUiThread(() -> controls.statusbth.setText("Error: " + e.getMessage()));
+            runOnUiThread(() -> statusbthh.setText("Error: " + e.getMessage()));
         }
     }
 
@@ -152,11 +157,11 @@ public class bluetoothhelper extends AppCompatActivity{
         lastThreeMessages.add(newMessage);
 
         String displayedText = String.join("\n", lastThreeMessages);
-        controls.showbtmessages.setText(displayedText);
+        txtbtdata.setText(displayedText);
     }
 
 
-    private class FetchDataTask extends AsyncTask<Void, Void, String> {
+    public class FetchDataTask extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {
             try {
@@ -179,9 +184,9 @@ public class bluetoothhelper extends AppCompatActivity{
 
         @Override
         protected void onPostExecute(String result) {
-            String existingText = controls.statusbth.getText().toString();
+            String existingText = statusbthh.getText().toString();
             String newText = result + "\n\n" + existingText;
-            controls.statusbth.setText(newText);
+            statusbthh.setText(newText);
         }
     }
     @Override
@@ -200,6 +205,6 @@ public class bluetoothhelper extends AppCompatActivity{
                 outStream = null;
             }
         } catch (Exception ignored) {}
-    }
+    }*/
 }
 
