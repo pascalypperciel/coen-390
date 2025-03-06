@@ -29,7 +29,7 @@ public class controls extends AppCompatActivity {
     protected static Button recordb;
     protected Toolbar toolbar;
 
-    protected static TextView  statusbth;
+    protected static TextView  statusbth, showbtmessages;
     protected Spinner cspinner, tspinner;
     protected EditText thinput;
 
@@ -61,9 +61,11 @@ public class controls extends AppCompatActivity {
         thinput= findViewById(R.id.thinput);
         thinput.setVisibility(View.INVISIBLE);
 
+        showbtmessages= findViewById(R.id.showsbtmessages);
         statusbth= findViewById(R.id.connectionstatus);
         bluetoothhelper bluehelper = new bluetoothhelper();
-        //bluehelper.connectAndReadBT();
+        bluehelper.connectAndReadBT();
+
 
         cspinner= findViewById(R.id.cspinner);
         ArrayAdapter<CharSequence>adapter=ArrayAdapter.createFromResource(this, R.array.materials, android.R.layout.simple_spinner_item);

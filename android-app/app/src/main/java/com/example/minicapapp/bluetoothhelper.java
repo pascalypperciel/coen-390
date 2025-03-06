@@ -66,14 +66,6 @@ public class bluetoothhelper extends AppCompatActivity{
 
         //controls.recordb.setOnClickListener(v -> new FetchDataTask().execute());
 
-        if (!btAdapter.isEnabled()) {
-            controls.statusbth.setText("Must enable Bluetooth");
-            Toast.makeText(getApplicationContext(), "BLUE!!!!!!!!", Toast.LENGTH_LONG).show();
-            return;
-        }
-        btThread = new Thread(this::connectAndReadBT);
-        btThread.start();
-
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
             controls.statusbth.setText("Bluetooth don't work");
@@ -160,7 +152,7 @@ public class bluetoothhelper extends AppCompatActivity{
         lastThreeMessages.add(newMessage);
 
         String displayedText = String.join("\n", lastThreeMessages);
-        controls.statusbth.setText(displayedText);
+        controls.showbtmessages.setText(displayedText);
     }
 
 
@@ -202,6 +194,10 @@ public class bluetoothhelper extends AppCompatActivity{
         try {
             if (btSocket != null) {
                 btSocket.close();
+            }
+            if (outStream != null){
+                outStream.close();
+                outStream = null;
             }
         } catch (Exception ignored) {}
     }
