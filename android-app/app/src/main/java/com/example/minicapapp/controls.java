@@ -72,9 +72,12 @@ public class controls extends AppCompatActivity {
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
+    private InputStream inStream= null;
 
-    private Thread btThread;
-    private volatile boolean stopBTThread = false;
+    //private boolean isReadingInputStream=false;
+
+    private Thread inThread;
+    private volatile boolean stopinThread = true;
     private static final int REQUEST_BT_PERMISSIONS = 100;
     private final List<String> lastThreeMessages = new LinkedList<>();
 
@@ -151,7 +154,8 @@ public class controls extends AppCompatActivity {
 
         //btnFetch.setOnClickListener(v -> new FetchDataTask().execute());
 
-        setupbtstuff();
+        //setupbtstuff();
+        recordb.setVisibility(View.INVISIBLE);
 
 
 
@@ -177,7 +181,22 @@ public class controls extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setupbtstuff();
-                connectAndReadBT();
+            }
+        });
+
+        stopb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendBluetoothCommand("LED_OFF");
+                disableinputstream();
+
+            }
+        });
+        recordb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //sendBluetoothCommand("LED_OFF");
+                connectinputstream();
             }
         });
     }
@@ -196,21 +215,103 @@ public class controls extends AppCompatActivity {
             if (scanPerm != PackageManager.PERMISSION_GRANTED || connectPerm != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BT_PERMISSIONS);
             } else {
-                startBluetoothThread();
+                startBluetoothoutThread();
             }
         } else {
-            startBluetoothThread();
+            startBluetoothoutThread();
         }
     }
-    private void startBluetoothThread() {
+    private void startBluetoothoutThread() {
+        recordb.setVisibility(View.VISIBLE);
         if (!btAdapter.isEnabled()) {
             statusbth.setText("Must enable Bluetooth");
             return;
         }
-        btThread = new Thread(this::connectAndReadBT);
-        btThread.start();
+        connectoutputstream();
+        //btThread = new Thread(this::connectoutputstream);
+        //btThread.start();
     }
 
+    private void connectoutputstream(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+                    || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+                Log.e("BT", "Bluetooth permissions aren't allowed");
+                runOnUiThread(() -> statusbth.setText("Bluetooth permissions aren't allowed"));
+                return;
+            }
+        }
+
+        try {
+            btAdapter.cancelDiscovery();
+            BluetoothDevice device = btAdapter.getRemoteDevice(ESP32_MAC_ADDRESS);
+            btSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+            btSocket.connect();
+
+            outStream = btSocket.getOutputStream();
+            runOnUiThread(() -> statusbth.setText("connected to CAT tester"));
+            recordb.setVisibility(View.VISIBLE);
+
+            inStream = btSocket.getInputStream();
+
+        } catch (SecurityException se) {
+            se.printStackTrace();
+            runOnUiThread(() -> statusbth.setText("SecurityException: " + se.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(() -> statusbth.setText("Error: " + e.getMessage()));
+        }
+
+    }
+
+    private void connectinputstream(){
+        if(!stopinThread){
+            return;
+        }
+        stopinThread=false;
+        inThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while (!stopinThread) {
+                    try {
+                        bytesRead = inStream.read(buffer);
+                        if (bytesRead > 0) {
+                            final String incoming = new String(buffer, 0, bytesRead);
+                            runOnUiThread(() -> statusbth.setText("connected and getting data"));
+                            runOnUiThread(() -> updateBluetoothDisplay(incoming));
+                        }
+                    }catch (SecurityException se) {
+                        se.printStackTrace();
+                        runOnUiThread(() -> statusbth.setText("SecurityException: " + se.getMessage()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        runOnUiThread(() -> statusbth.setText("Error: " + e.getMessage()));
+                    }
+                }
+                runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
+                recordb.setVisibility(View.VISIBLE);
+            }
+        });
+
+        inThread.start();
+        runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
+        recordb.setVisibility(View.INVISIBLE);
+
+    }
+    private void disableinputstream(){
+        if(stopinThread){
+            return;
+        }
+        stopinThread=true;
+        if (inThread != null && inThread.isAlive()) {
+            inThread.interrupt();
+        }
+        runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
+        recordb.setVisibility(View.VISIBLE);
+    }
     private void connectAndReadBT() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
@@ -232,13 +333,15 @@ public class controls extends AppCompatActivity {
 
             InputStream inStream = btSocket.getInputStream();
             byte[] buffer = new byte[1024];
-            while (!stopBTThread) {
+            while (!stopinThread) {
                 int bytesRead = inStream.read(buffer);
                 if (bytesRead > 0) {
                     final String incoming = new String(buffer, 0, bytesRead);
-                    runOnUiThread(() -> statusbth.setText("connected to cattester"));
+                    runOnUiThread(() -> statusbth.setText("connected and getting data"));
                     runOnUiThread(() -> updateBluetoothDisplay(incoming));
                 }
+                runOnUiThread(() ->statusbth.setText("Connected to CAT Tester"));
+                recordb.setVisibility(View.VISIBLE);
             }
         } catch (SecurityException se) {
             se.printStackTrace();
@@ -303,9 +406,9 @@ public class controls extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopBTThread = true;
-        if (btThread != null && btThread.isAlive()) {
-            btThread.interrupt();
+        stopinThread = true;
+        if (inThread != null && inThread.isAlive()) {
+            inThread.interrupt();
         }
         try {
             if (btSocket != null) {

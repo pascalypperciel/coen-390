@@ -21,7 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-
 public class data extends AppCompatActivity {
     private TextView txtResponse;
     protected Toolbar toolbar;
@@ -89,14 +88,14 @@ public class data extends AppCompatActivity {
         MenuItem mbsettings = menu.findItem(R.id.mbsettings);
         int id=item.getItemId();
         if (mbhelp.getItemId()==id) {
-            //getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
-            Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
+            //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
 
         }
         else if(mbsettings.getItemId()==id) {
-            //Intent sintent= new Intent(this, settings.class);
-            //startActivity(sintent);
-            Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
+            Intent sintent= new Intent(this, settings.class);
+            startActivity(sintent);
+            //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
         }
 
         return super.onOptionsItemSelected(item);
