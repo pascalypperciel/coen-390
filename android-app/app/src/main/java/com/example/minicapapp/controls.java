@@ -222,11 +222,11 @@ public class controls extends AppCompatActivity {
         }
     }
     private void startBluetoothoutThread() {
-        recordb.setVisibility(View.VISIBLE);
         if (!btAdapter.isEnabled()) {
             statusbth.setText("Must enable Bluetooth");
             return;
         }
+        recordb.setVisibility(View.VISIBLE);
         connectoutputstream();
         //btThread = new Thread(this::connectoutputstream);
         //btThread.start();
