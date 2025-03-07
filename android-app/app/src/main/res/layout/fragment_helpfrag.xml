@@ -124,15 +124,18 @@ From this the app can calculate when the CAT Tester has to stop compressing or s
 
 -drop down menu to select whether to compress or stretch the inserted object.\n\n
 
--start recording button: this button starts willing the database with data from the sensors.\n\n
+-The connect to device button establishes a bluetooth connection with whatever device your phone is paired with.\n\n
 
--A text next to the start recording button shows if the app is properly connected to the CAT TESTER.\n\n
+-A text under the connect to device button shows if the app is properly connected to the CAT TESTER.\n\n
+
+-start recording button: this button starts filling the database with data from the sensors.\n\n
+
 
 -Stop: this button stops everything including the motor and the recording.\n\n
 
--turn on motor(fwd) button: turns the motor forward (aka compression) until the stop button is pressed or the CAT Tester hits its failsafe.\n\n
+-turn on motor(fwd) button: turns the motor forward (aka compression) while pressed.\n\n
 
--turn on motor(bwd) button: turns the motor backward (aka stretching) until the stop button is pressed or the CAT Tester hits its failsafe.\n
+-turn on motor(bwd) button: turns the motor backward (aka stretching) while pressed.\n
 " />
 
                 <TextView

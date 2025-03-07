@@ -258,9 +258,11 @@ public class controls extends AppCompatActivity {
         } catch (SecurityException se) {
             se.printStackTrace();
             runOnUiThread(() -> statusbth.setText("SecurityException: " + se.getMessage()));
+            recordb.setVisibility(View.INVISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
             runOnUiThread(() -> statusbth.setText("Error: " + e.getMessage()));
+            recordb.setVisibility(View.INVISIBLE);
         }
 
     }
@@ -275,6 +277,9 @@ public class controls extends AppCompatActivity {
             public void run() {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
+                //lastThreeMessages.clear();
+                //runOnUiThread(() -> txtBluetoothData.setText(" "));
+                clearInputSstream();
                 while (!stopinThread) {
                     try {
                         bytesRead = inStream.read(buffer);
@@ -373,6 +378,18 @@ public class controls extends AppCompatActivity {
         txtBluetoothData.setText(displayedText);
     }
 
+    private void clearInputSstream(){
+        byte[] buffer=new byte[1024];
+        int bytesRead;
+        try{
+            while(inStream.available()>0){
+                bytesRead=inStream.read(buffer);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            runOnUiThread(()->statusbth.setText("Error clearing inputstream" + e.getMessage()));
+        }
+    }
 
     private class FetchDataTask extends AsyncTask<Void, Void, String> {
         @Override
