@@ -35,19 +35,19 @@ public class MainActivity extends AppCompatActivity {
         datab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gotodataclass();
+                goToDataClass();
             }
         });
         controlsb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gotocontrolsclass();
+                goToControlsClass();
             }
         });
         settingsb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gotosettingsclass();
+                goToSettingsClass();
             }
         });
 
@@ -70,17 +70,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void gotocontrolsclass() {
+    private void goToControlsClass() {
         Intent cintent= new Intent(this, Controls.class);
         startActivity(cintent);
     }
 
-    private void gotodataclass() {
+    private void goToDataClass() {
         Intent dintent= new Intent(this, Data.class);
         startActivity(dintent);
     }
 
-    private void gotosettingsclass() {
+    private void goToSettingsClass() {
         Intent sintent= new Intent(this, Settings.class);
         startActivity(sintent);
     }
