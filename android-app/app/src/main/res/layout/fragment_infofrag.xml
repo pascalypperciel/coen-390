@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".InfoFrag">
+
+        <View
+            android:id="@+id/coverup"
+            android:background="#DC143C"
+            android:alpha="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RelativeLayout
+            android:layout_width="340dp"
+            android:layout_height="619dp"
+            android:background="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.492"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/helptxtview"
+                android:layout_width="178dp"
+                android:layout_height="48dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:text="INFO PAGE:"
+                android:textSize="20sp" />
+
+
+            <Button
+                android:id="@+id/closeb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="41dp"
+                android:layout_marginBottom="36dp"
+                android:text="close" />
+
+            <ScrollView
+                android:id="@+id/textbox"
+                android:layout_width="327dp"
+                android:layout_height="480dp"
+                android:layout_marginStart="11dp"
+                android:layout_marginTop="40dp">
+                <RelativeLayout
+                    android:id="@+id/textcontainer"
+                    android:layout_width="327dp"
+                    android:layout_height="480dp">
+                    <TextView
+                        android:id="@+id/helptext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Young's Modulus:"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="316dp"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/helptext"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="6dp"
+                        android:text="Different materials can support different amounts of pulling(tensile) and compression forces before the material is permanently deformed or even breaks. This breaking point is called Young's Modulus and it depends on temperature." />
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/textView"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="18dp"
+                        android:text="This app when connected to the CAT Tester can compress or stretch an inserted material. The user must select the type of material so that the device can stop right before the inserted materials break point. If the user wants to break the material or test a material not in the list, a threshold can be inputted at which the device stops. "/>
+
+                    <TextView
+                        android:id="@+id/textwithlink"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/textView2"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="18dp"
+                        android:autoLink="web"
+                        android:text="For more information on the physics of tensile and compressive strength of materials:\n\n
+https://docs.google.com/document/d/1Pl7Bslxeum8xehuXulgP-8ate_fqsROFkPggqTGNbSM/edit?tab=t.0
+" />
+                </RelativeLayout>
+            </ScrollView>
+
+        </RelativeLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

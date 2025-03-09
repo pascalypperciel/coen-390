@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">MinicapApp</string>
+    <string name="app_name">minicapApp</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="materials">
+        <item>Select a material</item>
+        <item>New material(manually set threshold)</item>
+        <item>Wood</item>
+        <item>Sponge</item>
+        <item>Cardboard</item>
+        <item>Plastic</item>
+        <item>Rubber band</item>
+    </string-array>
+
+    <string-array name="tests">
+        <item>Select a Test</item>
+        <item>Compression</item>
+        <item>Tensile(stretching)</item>
+    </string-array>
 </resources>
