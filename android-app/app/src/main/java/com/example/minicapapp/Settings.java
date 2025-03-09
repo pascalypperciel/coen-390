@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class settings extends AppCompatActivity {
+public class Settings extends AppCompatActivity {
 
     protected Toolbar toolbar;
 
@@ -50,7 +49,7 @@ public class settings extends AppCompatActivity {
         MenuItem mbhelp = smenu.findItem(R.id.mbhelp);
         int id=item.getItemId();
         if (mbhelp.getItemId()==id) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
             //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
 
         }else if(android.R.id.home==id){

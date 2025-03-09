@@ -10,12 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.os.AsyncTask;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     protected Button datab, controlsb, helpb, settingsb, infob;
@@ -61,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
-                getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
+                getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
 
             }
         });
@@ -69,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
-                getSupportFragmentManager().beginTransaction().add(R.id.container, new infofrag()).commit();
+                getSupportFragmentManager().beginTransaction().add(R.id.container, new InfoFrag()).commit();
 
             }
         });
@@ -77,17 +71,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotocontrolsclass() {
-        Intent cintent= new Intent(this, controls.class);
+        Intent cintent= new Intent(this, Controls.class);
         startActivity(cintent);
     }
 
     private void gotodataclass() {
-        Intent dintent= new Intent(this, data.class);
+        Intent dintent= new Intent(this, Data.class);
         startActivity(dintent);
     }
 
     private void gotosettingsclass() {
-        Intent sintent= new Intent(this, settings.class);
+        Intent sintent= new Intent(this, Settings.class);
         startActivity(sintent);
     }
 }

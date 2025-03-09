@@ -19,14 +19,14 @@
         android:theme="@style/Theme.MinicapApp"
         tools:targetApi="31">
         <activity
-            android:name=".settings"
+            android:name=".Settings"
             android:exported="false" />
         <activity
-            android:name=".controls"
+            android:name=".Controls"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".data"
+            android:name=".Data"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity

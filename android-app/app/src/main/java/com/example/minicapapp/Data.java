@@ -6,14 +6,12 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -21,7 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class data extends AppCompatActivity {
+public class Data extends AppCompatActivity {
     private TextView txtResponse;
     protected Toolbar toolbar;
 
@@ -88,12 +86,12 @@ public class data extends AppCompatActivity {
         MenuItem mbsettings = menu.findItem(R.id.mbsettings);
         int id=item.getItemId();
         if (mbhelp.getItemId()==id) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
             //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
 
         }
         else if(mbsettings.getItemId()==id) {
-            Intent sintent= new Intent(this, settings.class);
+            Intent sintent= new Intent(this, Settings.class);
             startActivity(sintent);
             //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
         }

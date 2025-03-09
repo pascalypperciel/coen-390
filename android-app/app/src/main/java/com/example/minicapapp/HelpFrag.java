@@ -8,19 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.text.method.ScrollingMovementMethod;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
-public class helpfrag extends Fragment {
+public class HelpFrag extends Fragment {
 
-    protected Button closefrag;
+    protected Button closeFrag;
     protected View coverup;
-    protected RelativeLayout textcontainer;
+    protected RelativeLayout textContainer;
     protected ScrollView textbox;
 
-    public helpfrag() {
+    public HelpFrag() {
         // Required empty public constructor
     }
 
@@ -30,18 +28,18 @@ public class helpfrag extends Fragment {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_helpfrag, container, false);
 
-        closefrag=rootView.findViewById(R.id.closeb);
+        closeFrag =rootView.findViewById(R.id.closeb);
         coverup=rootView.findViewById(R.id.coverup);
         coverup.setClickable(true);
         textbox = rootView.findViewById(R.id.textbox);
-        textcontainer = rootView.findViewById(R.id.textcontainer);
+        textContainer = rootView.findViewById(R.id.textcontainer);
 
-        textbox.smoothScrollTo(0,textcontainer.getBottom());
+        textbox.smoothScrollTo(0, textContainer.getBottom());
 
-        closefrag.setOnClickListener(new View.OnClickListener() {
+        closeFrag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().remove(helpfrag.this).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().remove(HelpFrag.this).commit();
             }
         });
         return rootView;

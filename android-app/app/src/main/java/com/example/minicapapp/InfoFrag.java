@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +12,16 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public class infofrag extends Fragment {
-    protected Button closefrag;
+public class InfoFrag extends Fragment {
+    protected Button closeFrag;
     protected View coverup;
 
-    protected RelativeLayout textcontainer;
+    protected RelativeLayout textContainer;
     protected ScrollView textbox;
 
-    protected TextView textwithlink;
+    protected TextView textWithLink;
 
-    public infofrag() {
+    public InfoFrag() {
         // Required empty public constructor
     }
 
@@ -32,22 +31,22 @@ public class infofrag extends Fragment {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_infofrag, container, false);
 
-        closefrag=rootView.findViewById(R.id.closeb);
+        closeFrag =rootView.findViewById(R.id.closeb);
         coverup=rootView.findViewById(R.id.coverup);
         coverup.setClickable(true);
 
         textbox = rootView.findViewById(R.id.textbox);
-        textcontainer = rootView.findViewById(R.id.textcontainer);
+        textContainer = rootView.findViewById(R.id.textcontainer);
 
-        textwithlink=rootView.findViewById(R.id.textwithlink);
+        textWithLink =rootView.findViewById(R.id.textwithlink);
         //textwithlink.setMovementMethod(LinkMovementMethod.getInstance());
 
-        textbox.smoothScrollTo(0,textcontainer.getBottom());
+        textbox.smoothScrollTo(0, textContainer.getBottom());
 
-        closefrag.setOnClickListener(new View.OnClickListener() {
+        closeFrag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().remove(infofrag.this).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().remove(InfoFrag.this).commit();
             }
         });
         return rootView;

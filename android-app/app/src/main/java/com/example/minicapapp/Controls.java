@@ -2,7 +2,6 @@ package com.example.minicapapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.annotation.NonNull;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -31,29 +30,18 @@ import java.util.List;
 import java.util.UUID;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.material.navigation.NavigationBarView;
-
-public class controls extends AppCompatActivity {
+public class Controls extends AppCompatActivity {
     //private TextView txtResponse;
     //private TextView txtBluetoothData;
     private Button btnFetch;
@@ -65,7 +53,7 @@ public class controls extends AppCompatActivity {
     protected Spinner cspinner, tspinner;
     protected EditText thinput;
 
-    protected String selectedtest, selectedmaterial;
+    protected String selectedTest, selectedMaterial;
 
     private static final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -118,9 +106,9 @@ public class controls extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                selectedmaterial= cspinner.getSelectedItem().toString();
-                Toast.makeText(getApplicationContext(), "you selected: " + selectedmaterial, Toast.LENGTH_LONG).show();
-                if("New material(manually set threshold)".equals(selectedmaterial)){
+                selectedMaterial = cspinner.getSelectedItem().toString();
+                Toast.makeText(getApplicationContext(), "you selected: " + selectedMaterial, Toast.LENGTH_LONG).show();
+                if("New material(manually set threshold)".equals(selectedMaterial)){
                     Toast.makeText(getApplicationContext(), "HAPPY BIRTHDAY TO NEW MATERIAL", Toast.LENGTH_LONG).show();
                     thinput.setVisibility(View.VISIBLE);
 
@@ -140,8 +128,8 @@ public class controls extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                selectedtest= tspinner.getSelectedItem().toString();
-                Toast.makeText(getApplicationContext(), "you selected: " + selectedtest, Toast.LENGTH_LONG).show();
+                selectedTest = tspinner.getSelectedItem().toString();
+                Toast.makeText(getApplicationContext(), "you selected: " + selectedTest, Toast.LENGTH_LONG).show();
 
             }
             @Override
@@ -451,12 +439,12 @@ public class controls extends AppCompatActivity {
         MenuItem mbsettings = menu.findItem(R.id.mbsettings);
         int id=item.getItemId();
         if (mbhelp.getItemId()==id) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new helpfrag()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
             //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
 
         }
         else if(mbsettings.getItemId()==id) {
-            Intent sintent= new Intent(this, settings.class);
+            Intent sintent= new Intent(this, Settings.class);
             startActivity(sintent);
             //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
         }
