@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // This method will be used to set up all of the UI elements in the Main Activity
         setupUI();
     }
 
