@@ -15,7 +15,7 @@ def batch_process_records():
         
         records = []
         for record in data:
-            if not all(key in record for key in ["Distance", "Temperature", "Pressure", "MaterialID", "SessionID"]):
+            if not all(key in record for key in ["Distance", "Temperature", "Pressure", "MaterialID", "SessionID", "Timestamp"]):
                 return jsonify({"error": "Missing required field(s)"}), 400 # bad request
             
             records.append((
@@ -23,14 +23,15 @@ def batch_process_records():
                 record["Temperature"],
                 record["Pressure"],
                 record["MaterialID"],
-                record["SessionID"]
+                record["SessionID"],
+                record["Timestamp"]
             ))
 
         conn = get_db_connection()
         cur = conn.cursor()
         
         insert_query = """
-            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID)
+            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID, Timestamp)
             VALUES %s
             RETURNING RecordID;
         """
@@ -41,5 +42,44 @@ def batch_process_records():
         conn.close()
 
         return jsonify({"message": "Records inserted successfully", "received_count": len(data), "inserted_count": len(records)}), 201 # created
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500 # internal server error
+
+# Route to request data from a whole session (batch)
+@app.route("/request-session-records", methods=["GET"])
+def request_session_records():
+    try:
+        session_id = request.args.get("SessionID")
+
+        if not session_id:
+            return jsonify({"error": "SessionID is required"}), 400 # bad request
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        select_query = """
+            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, Timestamp, SessionID FROM "Record"
+            WHERE SessionID = %s
+            ORDER BY Timestamp ASC;
+        """
+
+        cur.execute(select_query, (session_id))
+        records = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        result = []
+        for row in records:
+            result.append({
+                "RecordID": row[0],
+                "Distance": row[1],
+                "Temperature": row[2],
+                "Pressure": row[3],
+                "MaterialID": row[4],
+                "Timestamp": row[5],
+                "SessionID": row[6]
+            })
+
+        return jsonify({"records": result}), 200 # ok
     except Exception as e:
         return jsonify({"error": str(e)}), 500 # internal server error
