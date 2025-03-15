@@ -10,7 +10,7 @@ def batch_process_records():
 
         if isinstance(data, dict):
             data = [data] # dictionary to list when we only receive 1 record
-        if isinstance(data, list):
+        if not isinstance(data, list):
             return jsonify({"error": "Expected a JSON of a list of records"}), 400 # bad request
         
         records = []
@@ -31,7 +31,7 @@ def batch_process_records():
         cur = conn.cursor()
         
         insert_query = """
-            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID, Timestamp)
+            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID, "Timestamp")
             VALUES %s
             RETURNING RecordID;
         """
@@ -58,12 +58,12 @@ def request_session_records():
         cur = conn.cursor()
 
         select_query = """
-            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, Timestamp, SessionID FROM "Record"
+            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, "Timestamp", SessionID FROM "Record"
             WHERE SessionID = %s
-            ORDER BY Timestamp ASC;
+            ORDER BY "Timestamp" ASC;
         """
 
-        cur.execute(select_query, (session_id))
+        cur.execute(select_query, (session_id,))
         records = cur.fetchall()
         cur.close()
         conn.close()
