@@ -3,6 +3,7 @@
 #include "HX711.h"
 #include <HCSR04.h>
 #include <BluetoothSerial.h>
+#include <cmath>
 
 // Temperature Sensor
 #define TEMP_I2C_SDA      21
@@ -29,18 +30,16 @@ void TaskBluetooth(void *pvParameters) {
   while (1) {
     // Distance Sensor
     double* distances = HCSR04.measureDistanceCm(); // in cm
-    float distance = (distances != nullptr) ? distances[0] : -1.0;
+    float distance = (distances != nullptr) ? distances[0] : NAN;
 
     // Temperature Sensor
     float temperature = mlx.readObjectTempC(); // in C
-    if (isnan(temperature)) temperature = -1.0;
 
     // Weight Sensor
     float weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
-    if (isnan(weight)) weight = -1.0;
 
     // Format message in standardized format
-    char message[50];
+    char message[128];
     snprintf(message, sizeof(message), "%.2f;%.2f;%.2f", distance, temperature, weight);
     Bluetooth.println(message);
 
