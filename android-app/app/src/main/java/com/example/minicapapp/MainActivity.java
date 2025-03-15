@@ -12,7 +12,12 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-    protected Button datab, controlsb, helpb, settingsb, infob;
+    // The UI elements present on the Main Activity.
+    protected Button datab;
+    protected Button controlsb;
+    protected Button helpb;
+    protected Button settingsb;
+    protected Button infob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,31 +31,31 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        helpb=findViewById(R.id.help);
-        settingsb=findViewById(R.id.settings);
-        datab=findViewById(R.id.gotodata);
-        controlsb=findViewById(R.id.controls);
-        infob=findViewById(R.id.infob);
+        // This method will be used to set up all of the UI elements in the Main Activity
+        setupUI();
+    }
 
+    private void setupUI() {
+        // This button will navigate to the Recorded Data Class.
+        datab=findViewById(R.id.gotodata);
         datab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToDataClass();
             }
         });
+
+        // This button will navigate to the Controller Class.
+        controlsb=findViewById(R.id.controls);
         controlsb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToControlsClass();
             }
         });
-        settingsb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToSettingsClass();
-            }
-        });
 
+        // This button will open a dialogue fragment to explain the Activity's functionality.
+        helpb=findViewById(R.id.help);
         helpb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +64,18 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        // This button will navigate to the Settings Activity.
+        settingsb=findViewById(R.id.settings);
+        settingsb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToSettingsClass();
+            }
+        });
+
+        // This button will open a dialogue fragment to the Materials Information page.
+        infob=findViewById(R.id.infob);
         infob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void goToControlsClass() {
