@@ -15,7 +15,7 @@ def batch_process_records():
         
         records = []
         for record in data:
-            if not all(key in record for key in ["Distance", "Temperature", "Pressure", "MaterialID", "SessionID", "Timestamp"]):
+            if not all(key in record for key in ["Distance", "Temperature", "Pressure", "MaterialID", "SessionID", "Timestamp", "Valid"]):
                 return jsonify({"error": "Missing required field(s)"}), 400 # bad request
             
             records.append((
@@ -24,14 +24,15 @@ def batch_process_records():
                 record["Pressure"],
                 record["MaterialID"],
                 record["SessionID"],
-                record["Timestamp"]
+                record["Timestamp"],
+                record["Valid"]
             ))
 
         conn = get_db_connection()
         cur = conn.cursor()
         
         insert_query = """
-            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID, "Timestamp")
+            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID, "Timestamp", Valid)
             VALUES %s
             RETURNING RecordID;
         """
@@ -58,8 +59,8 @@ def request_session_records():
         cur = conn.cursor()
 
         select_query = """
-            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, "Timestamp", SessionID FROM "Record"
-            WHERE SessionID = %s
+            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, "Timestamp", SessionID, Valid FROM "Record"
+            WHERE SessionID = %s AND Valid = TRUE
             ORDER BY "Timestamp" ASC;
         """
 
@@ -77,7 +78,8 @@ def request_session_records():
                 "Pressure": row[3],
                 "MaterialID": row[4],
                 "Timestamp": row[5],
-                "SessionID": row[6]
+                "SessionID": row[6],
+                "Valid": row[7]
             })
 
         return jsonify({"records": result}), 200 # ok
