@@ -13,7 +13,6 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     // The UI elements present on the Main Activity.
-    // TODO: Refactor the names of the buttons
     protected Button datab;
     protected Button controlsb;
     protected Button helpb;
