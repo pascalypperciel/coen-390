@@ -41,6 +41,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+// For batch processing
+import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import java.time.LocalDateTime;
+import java.time.DateTimeFormatter;
+
 public class Controls extends AppCompatActivity {
     //private TextView txtResponse;
     //private TextView txtBluetoothData;
@@ -68,6 +74,11 @@ public class Controls extends AppCompatActivity {
     private volatile boolean stopinThread = true;
     private static final int REQUEST_BT_PERMISSIONS = 100;
     private final List<String> lastThreeMessages = new LinkedList<>();
+
+    private static final int BATCH_SIZE = 10;
+    private static final long BATCH_TIMEOUT_MS = 3000;
+    private final List<JSONObject> batchRecords = new ArrayList<>();
+    private long lastBatchSentTime = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,7 +195,9 @@ public class Controls extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //sendBluetoothCommand("LED_OFF");
-                connectinputstream();
+                String sessionID = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+
+                connectinputstream(sessionId);
             }
         });
     }
@@ -255,26 +268,26 @@ public class Controls extends AppCompatActivity {
 
     }
 
-    private void connectinputstream(){
+    private void connectinputstream(sessionID){
         if(!stopinThread){
             return;
         }
         stopinThread=false;
+
         inThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[128];
                 int bytesRead;
-                //lastThreeMessages.clear();
-                //runOnUiThread(() -> txtBluetoothData.setText(" "));
-                clearInputSstream();
+                clearInputStream();
                 while (!stopinThread) {
                     try {
                         bytesRead = inStream.read(buffer);
                         if (bytesRead > 0) {
-                            final String incoming = new String(buffer, 0, bytesRead);
-                            runOnUiThread(() -> statusbth.setText("connected and getting data"));
-                            runOnUiThread(() -> updateBluetoothDisplay(incoming));
+                            final String incoming = new String(buffer, 0, bytesRead).trim();
+                            processBluetoothData(incoming, sessionID);
+
+                            //
                         }
                     }catch (SecurityException se) {
                         se.printStackTrace();
@@ -294,6 +307,87 @@ public class Controls extends AppCompatActivity {
         recordb.setVisibility(View.INVISIBLE);
 
     }
+
+    private void processBluetoothData(String incoming, String sessionID) {
+        String[] values = incoming.split(";");
+        Record record = new Record();
+        ArrayList<Record> recordList = new ArrayList<Record>();
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+
+        if (values.length == 3) {
+            String valid = "True";
+            for(int i = 0; i < values.length; i++) {
+                if(isNaN(values[i])) {
+                    valid = "False";
+                }
+            }
+
+            record.valid = valid;
+            record.distance = values[0];
+            record.temperature = values[1];
+            record.pressure = values[2];
+            record.timestamp = timestamp;
+            // Material ID to be implemented later
+            record.materialID = 1;
+            record.sessionID = sessionID;
+            recordList.add(record);
+        }
+
+        long currentTime = System.currentTimeMillis();
+
+        if (recordList.size() >= BATCH_SIZE || (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
+            sendBatchData(recordList);
+            lastBatchSentTime = currentTime;
+        }
+    }
+
+    private void sendBatchData(ArrayList<Record> recordList) {
+        // Create a JSONArray to hold all the records
+        JSONArray jsonArray = new JSONArray();
+
+        for (Record record : recordList) {
+            // Convert each Record object to a JSONObject
+            JSONObject jsonRecord = new JSONObject();
+            jsonRecord.put("Distance", record.distance);
+            jsonRecord.put("Temperature", record.temperature);
+            jsonRecord.put("Pressure", record.pressure);
+            jsonRecord.put("MaterialID", record.materialID);
+            jsonRecord.put("SessionID", record.sessionID);
+            jsonRecord.put("Timestamp", record.timestamp);
+            jsonRecord.put("Valid", record.valid);
+
+            // Add the JSONObject to the JSONArray
+            jsonArray.put(jsonRecord);
+        }
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://10.0.2.2:5000/batch-process-records");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setDoOutput(true);
+
+                    OutputStream os = conn.getOutputStream();
+                    os.write(jsonArray.getBytes("UTF-8"));
+                    os.flush();
+                    os.close();
+
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                        System.err.println("Batch processing failed: " + responseCode);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
     private void disableinputstream(){
         if(stopinThread){
             return;
@@ -366,7 +460,7 @@ public class Controls extends AppCompatActivity {
         txtBluetoothData.setText(displayedText);
     }
 
-    private void clearInputSstream(){
+    private void clearInputStream(){
         byte[] buffer=new byte[1024];
         int bytesRead;
         try{
@@ -451,4 +545,14 @@ public class Controls extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+}
+
+class Record {
+    public String distance;
+    public String temperature;
+    public String timestamp;
+    public String sessionID;
+    public String memberID;
+    public String pressure;
+    public String valid;
 }
