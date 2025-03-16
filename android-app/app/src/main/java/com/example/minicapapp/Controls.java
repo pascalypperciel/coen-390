@@ -1,5 +1,7 @@
 package com.example.minicapapp;
 
+import static java.lang.Float.isNaN;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -25,8 +27,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import android.content.Intent;
@@ -40,12 +45,15 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.i18n.DateTimeFormatter;
 
 // For batch processing
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONArray;
 import java.time.LocalDateTime;
-import java.time.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Controls extends AppCompatActivity {
     //private TextView txtResponse;
@@ -195,9 +203,9 @@ public class Controls extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //sendBluetoothCommand("LED_OFF");
-                String sessionID = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
-
-                connectinputstream(sessionId);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                String sessionID = sdf.format(new Date());
+                connectinputstream(sessionID);
             }
         });
     }
@@ -268,7 +276,7 @@ public class Controls extends AppCompatActivity {
 
     }
 
-    private void connectinputstream(sessionID){
+    private void connectinputstream(String sessionID){
         if(!stopinThread){
             return;
         }
@@ -308,17 +316,19 @@ public class Controls extends AppCompatActivity {
 
     }
 
-    private void processBluetoothData(String incoming, String sessionID) {
+    private void processBluetoothData(String incoming, String sessionID) throws JSONException {
         String[] values = incoming.split(";");
         Record record = new Record();
         ArrayList<Record> recordList = new ArrayList<Record>();
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String timestamp = sdf.format(new Date());
 
         if (values.length == 3) {
             String valid = "True";
-            for(int i = 0; i < values.length; i++) {
-                if(isNaN(values[i])) {
+            for (String value : values) {
+                if (Objects.equals(value, "NaN")) {
                     valid = "False";
+                    break;
                 }
             }
 
@@ -328,7 +338,7 @@ public class Controls extends AppCompatActivity {
             record.pressure = values[2];
             record.timestamp = timestamp;
             // Material ID to be implemented later
-            record.materialID = 1;
+            record.materialID = String.valueOf(1);
             record.sessionID = sessionID;
             recordList.add(record);
         }
@@ -341,7 +351,7 @@ public class Controls extends AppCompatActivity {
         }
     }
 
-    private void sendBatchData(ArrayList<Record> recordList) {
+    private void sendBatchData(ArrayList<Record> recordList) throws JSONException {
         // Create a JSONArray to hold all the records
         JSONArray jsonArray = new JSONArray();
 
@@ -371,7 +381,7 @@ public class Controls extends AppCompatActivity {
                     conn.setDoOutput(true);
 
                     OutputStream os = conn.getOutputStream();
-                    os.write(jsonArray.getBytes("UTF-8"));
+                    os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
                     os.flush();
                     os.close();
 
@@ -552,7 +562,7 @@ class Record {
     public String temperature;
     public String timestamp;
     public String sessionID;
-    public String memberID;
     public String pressure;
     public String valid;
+    public String materialID;
 }
