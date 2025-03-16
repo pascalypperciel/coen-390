@@ -85,7 +85,7 @@ public class Controls extends AppCompatActivity {
 
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
-    private final List<JSONObject> batchRecords = new ArrayList<>();
+    ArrayList<Record> recordList = new ArrayList<Record>();
     private long lastBatchSentTime = System.currentTimeMillis();
 
     @Override
@@ -319,7 +319,6 @@ public class Controls extends AppCompatActivity {
     private void processBluetoothData(String incoming, String sessionID) throws JSONException {
         String[] values = incoming.split(";");
         Record record = new Record();
-        ArrayList<Record> recordList = new ArrayList<Record>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         String timestamp = sdf.format(new Date());
 
@@ -348,6 +347,7 @@ public class Controls extends AppCompatActivity {
         if (recordList.size() >= BATCH_SIZE || (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
             sendBatchData(recordList);
             lastBatchSentTime = currentTime;
+            recordList.clear();
         }
     }
 
