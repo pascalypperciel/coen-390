@@ -22,6 +22,7 @@ def get_db_connection():
     )
 
 from routes.db_testing_routes import *
+from routes.batch_processing_routes import *
 
 if __name__ == '__main__':
     app.run(debug=True)
