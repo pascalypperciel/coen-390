@@ -55,7 +55,7 @@ import java.time.LocalDateTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Controls extends AppCompatActivity {
+public class ControllerActivity extends AppCompatActivity {
     //private TextView txtResponse;
     //private TextView txtBluetoothData;
     private Button btnFetch;
@@ -168,18 +168,18 @@ public class Controls extends AppCompatActivity {
 
         bmotorbwd.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("LED_ON");
+                sendBluetoothCommand("Motor_BWD");
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("LED_OFF");
+                sendBluetoothCommand("Motor_OFF");
             }
             return true;
         });
 
         bmotorfwd.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("LED_ON");
+                sendBluetoothCommand("Motor_FWD");
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("LED_OFF");
+                sendBluetoothCommand("Motor_OFF");
             }
             return true;
         });
@@ -194,7 +194,7 @@ public class Controls extends AppCompatActivity {
         stopb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendBluetoothCommand("LED_OFF");
+                sendBluetoothCommand("Motor_OFF");
                 disableinputstream();
 
             }
@@ -202,7 +202,7 @@ public class Controls extends AppCompatActivity {
         recordb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //sendBluetoothCommand("LED_OFF");
+                //sendBluetoothCommand("Motor_OFF");
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 String sessionID = sdf.format(new Date());
                 connectinputstream(sessionID);
@@ -505,31 +505,31 @@ public class Controls extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.menu_appbar_resource, menu);
 
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Menu menu=toolbar.getMenu();
-
-        MenuItem mbhelp = menu.findItem(R.id.mbhelp);
-        MenuItem mbsettings = menu.findItem(R.id.mbsettings);
-        int id=item.getItemId();
-        if (mbhelp.getItemId()==id) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
-            //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
-
-        }
-        else if(mbsettings.getItemId()==id) {
-            Intent sintent= new Intent(this, Settings.class);
-            startActivity(sintent);
-            //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        Menu menu=toolbar.getMenu();
+//
+//        MenuItem mbhelp = menu.findItem(R.id.mbhelp);
+//        MenuItem mbsettings = menu.findItem(R.id.mbsettings);
+//        int id=item.getItemId();
+//        if (mbhelp.getItemId()==id) {
+//            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
+//            //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
+//
+//        }
+//        else if(mbsettings.getItemId()==id) {
+//            Intent sintent= new Intent(this, SettingsActivity.class);
+//            startActivity(sintent);
+//            //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 }
 
 class Record {

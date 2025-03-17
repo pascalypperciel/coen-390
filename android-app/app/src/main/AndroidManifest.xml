@@ -20,14 +20,22 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Settings"
-            android:exported="false" />
-        <activity
-            android:name=".Controls"
+            android:name=".MaterialsInformationPage"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Data"
+            android:name=".BluetoothActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ControllerActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".RecordedDataActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
