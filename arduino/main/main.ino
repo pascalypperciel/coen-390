@@ -86,3 +86,7 @@ void setup() {
   xTaskCreatePinnedToCore(TaskBluetooth, "Bluetooth Task", 10000, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(TaskIOControl, "I/O Control Task", 10000, NULL, 1, NULL, 0);
 }
+
+void loop() {
+  //unneeded
+}
