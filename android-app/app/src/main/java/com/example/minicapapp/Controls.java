@@ -374,11 +374,13 @@ public class Controls extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://10.0.2.2:5000/batch-process-records");
+                    URL url = new URL("http://127.0.0.1:5000/batch-process-records");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setDoOutput(true);
+
+                    Log.d("JSON_PAYLOAD", "Sending: " + jsonArray.toString());
 
                     OutputStream os = conn.getOutputStream();
                     os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
@@ -387,7 +389,7 @@ public class Controls extends AppCompatActivity {
 
                     int responseCode = conn.getResponseCode();
                     if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
-                        System.err.println("Batch processing failed: " + responseCode);
+                        System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                     }
 
                 } catch (Exception e) {
@@ -487,9 +489,23 @@ public class Controls extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
             try {
-                URL url = new URL("http://10.0.2.2:5000/get-all");
+                URL url = new URL("http://127.0.0.1:5000/get-all");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode >= 400) { // log error response
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    StringBuilder errorResult = new StringBuilder();
+                    String errorLine;
+                    while ((errorLine = errorReader.readLine()) != null) {
+                        errorResult.append(errorLine);
+                    }
+                    errorReader.close();
+                    Log.e("HTTP_ERROR", "Error " + responseCode + ": " + errorResult.toString());
+                    return "Error: " + responseCode;
+                }
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder result = new StringBuilder();
@@ -500,6 +516,7 @@ public class Controls extends AppCompatActivity {
                 reader.close();
                 return result.toString();
             } catch (Exception e) {
+                Log.e("HTTP_EXCEPTION", "Exception occurred: " + e.getMessage(), e);
                 return "Error: " + e.getMessage();
             }
         }
