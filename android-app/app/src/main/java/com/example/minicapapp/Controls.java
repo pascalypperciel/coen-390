@@ -1,5 +1,7 @@
 package com.example.minicapapp;
 
+import static java.lang.Float.isNaN;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -25,8 +27,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import android.content.Intent;
@@ -40,6 +45,15 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.i18n.DateTimeFormatter;
+
+// For batch processing
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Controls extends AppCompatActivity {
     //private TextView txtResponse;
@@ -68,6 +82,11 @@ public class Controls extends AppCompatActivity {
     private volatile boolean stopinThread = true;
     private static final int REQUEST_BT_PERMISSIONS = 100;
     private final List<String> lastThreeMessages = new LinkedList<>();
+
+    private static final int BATCH_SIZE = 10;
+    private static final long BATCH_TIMEOUT_MS = 3000;
+    ArrayList<Record> recordList = new ArrayList<Record>();
+    private long lastBatchSentTime = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,7 +203,9 @@ public class Controls extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //sendBluetoothCommand("LED_OFF");
-                connectinputstream();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                String sessionID = sdf.format(new Date());
+                connectinputstream(sessionID);
             }
         });
     }
@@ -255,26 +276,26 @@ public class Controls extends AppCompatActivity {
 
     }
 
-    private void connectinputstream(){
+    private void connectinputstream(String sessionID){
         if(!stopinThread){
             return;
         }
         stopinThread=false;
+
         inThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[128];
                 int bytesRead;
-                //lastThreeMessages.clear();
-                //runOnUiThread(() -> txtBluetoothData.setText(" "));
-                clearInputSstream();
+                clearInputStream();
                 while (!stopinThread) {
                     try {
                         bytesRead = inStream.read(buffer);
                         if (bytesRead > 0) {
-                            final String incoming = new String(buffer, 0, bytesRead);
-                            runOnUiThread(() -> statusbth.setText("connected and getting data"));
-                            runOnUiThread(() -> updateBluetoothDisplay(incoming));
+                            final String incoming = new String(buffer, 0, bytesRead).trim();
+                            processBluetoothData(incoming, sessionID);
+
+                            //
                         }
                     }catch (SecurityException se) {
                         se.printStackTrace();
@@ -294,6 +315,91 @@ public class Controls extends AppCompatActivity {
         recordb.setVisibility(View.INVISIBLE);
 
     }
+
+    private void processBluetoothData(String incoming, String sessionID) throws JSONException {
+        String[] values = incoming.split(";");
+        Record record = new Record();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String timestamp = sdf.format(new Date());
+
+        if (values.length == 3) {
+            String valid = "True";
+            for (String value : values) {
+                if (Objects.equals(value, "NaN")) {
+                    valid = "False";
+                    break;
+                }
+            }
+
+            record.valid = valid;
+            record.distance = values[0];
+            record.temperature = values[1];
+            record.pressure = values[2];
+            record.timestamp = timestamp;
+            // Material ID to be implemented later
+            record.materialID = String.valueOf(1);
+            record.sessionID = sessionID;
+            recordList.add(record);
+        }
+
+        long currentTime = System.currentTimeMillis();
+
+        if (recordList.size() >= BATCH_SIZE || (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
+            sendBatchData(recordList);
+            lastBatchSentTime = currentTime;
+            recordList.clear();
+        }
+    }
+
+    private void sendBatchData(ArrayList<Record> recordList) throws JSONException {
+        // Create a JSONArray to hold all the records
+        JSONArray jsonArray = new JSONArray();
+
+        for (Record record : recordList) {
+            // Convert each Record object to a JSONObject
+            JSONObject jsonRecord = new JSONObject();
+            jsonRecord.put("Distance", record.distance);
+            jsonRecord.put("Temperature", record.temperature);
+            jsonRecord.put("Pressure", record.pressure);
+            jsonRecord.put("MaterialID", record.materialID);
+            jsonRecord.put("SessionID", record.sessionID);
+            jsonRecord.put("Timestamp", record.timestamp);
+            jsonRecord.put("Valid", record.valid);
+
+            // Add the JSONObject to the JSONArray
+            jsonArray.put(jsonRecord);
+        }
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://127.0.0.1:5000/batch-process-records");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setDoOutput(true);
+
+                    Log.d("JSON_PAYLOAD", "Sending: " + jsonArray.toString());
+
+                    OutputStream os = conn.getOutputStream();
+                    os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
+                    os.flush();
+                    os.close();
+
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                        System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
     private void disableinputstream(){
         if(stopinThread){
             return;
@@ -366,7 +472,7 @@ public class Controls extends AppCompatActivity {
         txtBluetoothData.setText(displayedText);
     }
 
-    private void clearInputSstream(){
+    private void clearInputStream(){
         byte[] buffer=new byte[1024];
         int bytesRead;
         try{
@@ -383,9 +489,23 @@ public class Controls extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
             try {
-                URL url = new URL("http://10.0.2.2:5000/get-all");
+                URL url = new URL("http://127.0.0.1:5000/get-all");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode >= 400) { // log error response
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    StringBuilder errorResult = new StringBuilder();
+                    String errorLine;
+                    while ((errorLine = errorReader.readLine()) != null) {
+                        errorResult.append(errorLine);
+                    }
+                    errorReader.close();
+                    Log.e("HTTP_ERROR", "Error " + responseCode + ": " + errorResult.toString());
+                    return "Error: " + responseCode;
+                }
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder result = new StringBuilder();
@@ -396,6 +516,7 @@ public class Controls extends AppCompatActivity {
                 reader.close();
                 return result.toString();
             } catch (Exception e) {
+                Log.e("HTTP_EXCEPTION", "Exception occurred: " + e.getMessage(), e);
                 return "Error: " + e.getMessage();
             }
         }
@@ -451,4 +572,14 @@ public class Controls extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+}
+
+class Record {
+    public String distance;
+    public String temperature;
+    public String timestamp;
+    public String sessionID;
+    public String pressure;
+    public String valid;
+    public String materialID;
 }
