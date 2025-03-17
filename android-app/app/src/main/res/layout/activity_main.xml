@@ -5,77 +5,78 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Data">
+    tools:context=".RecordedDataActivity">
 
     <Button
-        android:id="@+id/settings"
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonRecordedData"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:text="settings"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="30dp"
+        android:text="Recorded Data"
+        app:layout_constraintBottom_toTopOf="@+id/buttonMaterialsInformationPage"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/help"
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonController"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:text="help"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:text="Controller"
+        app:layout_constraintBottom_toTopOf="@+id/buttonMaterialsInformationPage"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:id="@+id/gotodata"
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonMaterialsInformationPage"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:text="recorded data"
+        android:layout_marginBottom="125dp"
+        android:text="Materials Information Page"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.553" />
-
-    <Button
-        android:id="@+id/controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:text="Controls (run the CAT Tester)"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gotodata" />
-
-    <Button
-        android:id="@+id/infob"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="info page about materials"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/controls"
-        app:layout_constraintVertical_bias="0.244" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewAppIcon"
         android:layout_width="261dp"
         android:layout_height="262dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="120dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonMaterialsInformationPage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.166"
         app:srcCompat="@drawable/cattesterlogo" />
 
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="416dp"
-        android:layout_height="731dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarMain"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CAT Strength Tester"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewAppIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarMain"
+        app:layout_constraintVertical_bias="0.9" />
+
+<!--        <FrameLayout-->
+<!--        android:id="@+id/container"-->
+<!--        android:layout_width="416dp"-->
+<!--        android:layout_height="731dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"></FrameLayout>-->
 </androidx.constraintlayout.widget.ConstraintLayout>
