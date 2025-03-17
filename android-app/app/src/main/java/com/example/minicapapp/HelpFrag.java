@@ -13,9 +13,9 @@ import android.widget.ScrollView;
 
 public class HelpFrag extends Fragment {
 
-    protected Button closeFrag;
-    protected View coverup;
-    protected RelativeLayout textContainer;
+    protected Button btnCloseFrag;
+    protected View coverUp;
+    protected RelativeLayout rlTextContainer;
     protected ScrollView textbox;
 
     public HelpFrag() {
@@ -28,15 +28,15 @@ public class HelpFrag extends Fragment {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_helpfrag, container, false);
 
-        closeFrag =rootView.findViewById(R.id.closeb);
-        coverup=rootView.findViewById(R.id.coverup);
-        coverup.setClickable(true);
+        btnCloseFrag =rootView.findViewById(R.id.closeb);
+        coverUp =rootView.findViewById(R.id.coverup);
+        coverUp.setClickable(true);
         textbox = rootView.findViewById(R.id.textbox);
-        textContainer = rootView.findViewById(R.id.textcontainer);
+        rlTextContainer = rootView.findViewById(R.id.textcontainer);
 
-        textbox.smoothScrollTo(0, textContainer.getBottom());
+        textbox.smoothScrollTo(0, rlTextContainer.getBottom());
 
-        closeFrag.setOnClickListener(new View.OnClickListener() {
+        btnCloseFrag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().getSupportFragmentManager().beginTransaction().remove(HelpFrag.this).commit();

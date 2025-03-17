@@ -1,6 +1,5 @@
 package com.example.minicapapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,7 +7,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.os.AsyncTask;
@@ -77,25 +75,4 @@ public class RecordedDataActivity extends AppCompatActivity {
 
         return true;
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        Menu menu=toolbar.getMenu();
-//
-//        MenuItem mbhelp = menu.findItem(R.id.mbhelp);
-//        MenuItem mbsettings = menu.findItem(R.id.mbsettings);
-//        int id=item.getItemId();
-//        if (mbhelp.getItemId()==id) {
-//            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
-//            //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
-//
-//        }
-//        else if(mbsettings.getItemId()==id) {
-//            Intent sintent= new Intent(this, SettingsActivity.class);
-//            startActivity(sintent);
-//            //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 }

@@ -13,13 +13,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class InfoFrag extends Fragment {
-    protected Button closeFrag;
-    protected View coverup;
-
-    protected RelativeLayout textContainer;
+    protected Button btnCloseFrag;
+    protected View coverUp;
+    protected RelativeLayout rlTextContainer;
     protected ScrollView textbox;
 
-    protected TextView textWithLink;
+    protected TextView txtWithLink;
 
     public InfoFrag() {
         // Required empty public constructor
@@ -31,19 +30,18 @@ public class InfoFrag extends Fragment {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_infofrag, container, false);
 
-        closeFrag =rootView.findViewById(R.id.closeb);
-        coverup=rootView.findViewById(R.id.coverup);
-        coverup.setClickable(true);
+        btnCloseFrag =rootView.findViewById(R.id.closeb);
+        coverUp =rootView.findViewById(R.id.coverup);
+        coverUp.setClickable(true);
 
         textbox = rootView.findViewById(R.id.textbox);
-        textContainer = rootView.findViewById(R.id.textcontainer);
+        rlTextContainer = rootView.findViewById(R.id.textcontainer);
 
-        textWithLink =rootView.findViewById(R.id.textwithlink);
-        //textwithlink.setMovementMethod(LinkMovementMethod.getInstance());
+        txtWithLink =rootView.findViewById(R.id.textwithlink);
 
-        textbox.smoothScrollTo(0, textContainer.getBottom());
+        textbox.smoothScrollTo(0, rlTextContainer.getBottom());
 
-        closeFrag.setOnClickListener(new View.OnClickListener() {
+        btnCloseFrag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().getSupportFragmentManager().beginTransaction().remove(InfoFrag.this).commit();

@@ -12,3 +12,18 @@
 - File Naming: `PascalCase`
 - Class Naming: `PascalCase`
 - Functions/Methods and Variables: `camelCase`
+
+Additionally, we must follow the following prefixes for the major components:
+- Button - btn
+- Checkbox - chk
+- EditText - et
+- GalleryView - gv
+- LinearLayout -ll
+- ListView - lv
+- Menu - mnu
+- ProgressBar - pb
+- RadioButton - rb
+- RelativeLayout - rl
+- Spinner - spn
+- TextView - txt
+- ToggleButton - tb
