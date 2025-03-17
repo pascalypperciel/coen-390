@@ -88,7 +88,7 @@ void setup() {
   //Motor Controller
   pinMode(FWD, OUTPUT);
   digitalWrite(FWD, LOW);
-   pinMode(BWD, OUTPUT);
+  pinMode(BWD, OUTPUT);
   digitalWrite(BWD, LOW);
 
   // Dual-Threading
