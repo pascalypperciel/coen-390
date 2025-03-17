@@ -168,18 +168,18 @@ public class ControllerActivity extends AppCompatActivity {
 
         bmotorbwd.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("LED_ON");
+                sendBluetoothCommand("Motor_BWD");
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("LED_OFF");
+                sendBluetoothCommand("Motor_OFF");
             }
             return true;
         });
 
         bmotorfwd.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("LED_ON");
+                sendBluetoothCommand("Motor_FWD");
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("LED_OFF");
+                sendBluetoothCommand("Motor_OFF");
             }
             return true;
         });
@@ -194,7 +194,7 @@ public class ControllerActivity extends AppCompatActivity {
         stopb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendBluetoothCommand("LED_OFF");
+                sendBluetoothCommand("Motor_OFF");
                 disableinputstream();
 
             }
@@ -202,7 +202,7 @@ public class ControllerActivity extends AppCompatActivity {
         recordb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //sendBluetoothCommand("LED_OFF");
+                //sendBluetoothCommand("Motor_OFF");
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 String sessionID = sdf.format(new Date());
                 connectinputstream(sessionID);

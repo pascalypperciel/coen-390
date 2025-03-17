@@ -17,8 +17,9 @@
 #define LOADCELL_DOUT_PIN 4
 #define LOADCELL_SCK_PIN  5
 
-// LED Control
-#define LED_PIN 2
+// Motor Control
+#define FWD 2
+#define BWD 15
 
 #define BAUD    115200
 
@@ -52,10 +53,16 @@ void TaskIOControl(void *pvParameters) {
     if (Bluetooth.available()) {
       String command = Bluetooth.readStringUntil('\n');
       command.trim();
-      if (command == "LED_ON") {
-        digitalWrite(LED_PIN, HIGH);
-      } else if (command == "LED_OFF") {
-        digitalWrite(LED_PIN, LOW);
+      if (command == "Motor_FWD") {
+        digitalWrite(FWD, HIGH);
+        digitalWrite(BWD, LOW);
+      }else if(command == "Motor_BWD"){
+        digitalWrite(BWD, HIGH);
+        digitalWrite(FWD, LOW);
+      }
+      else if (command == "Motor_OFF") {
+        digitalWrite(FWD, LOW);
+        digitalWrite(BWD, LOW);
       }
     }
     vTaskDelay(100 / portTICK_PERIOD_MS); // non-blocking delay
@@ -78,9 +85,11 @@ void setup() {
   // Distance Sensor
   HCSR04.begin(DIST_TRIG_PIN, DIST_ECHO_PIN);
 
-  // LEDs, temporary
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  //Motor Controller
+  pinMode(FWD, OUTPUT);
+  digitalWrite(FWD, LOW);
+  pinMode(BWD, OUTPUT);
+  digitalWrite(BWD, LOW);
 
   // Dual-Threading
   xTaskCreatePinnedToCore(TaskBluetooth, "Bluetooth Task", 10000, NULL, 1, NULL, 1);
