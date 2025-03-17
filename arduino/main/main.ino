@@ -3,6 +3,7 @@
 #include "HX711.h"
 #include <HCSR04.h>
 #include <BluetoothSerial.h>
+#include <cmath>
 
 // Temperature Sensor
 #define TEMP_I2C_SDA      21
@@ -25,8 +26,44 @@ Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 HX711 scale;
 BluetoothSerial Bluetooth;
 
+void TaskBluetooth(void *pvParameters) {
+  while (1) {
+    // Distance Sensor
+    double* distances = HCSR04.measureDistanceCm(); // in cm
+    float distance = (distances != nullptr) ? distances[0] : NAN;
+
+    // Temperature Sensor
+    float temperature = mlx.readObjectTempC(); // in C
+
+    // Weight Sensor
+    float weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
+
+    // Format message in standardized format
+    char message[128];
+    snprintf(message, sizeof(message), "%.2f;%.2f;%.2f", distance, temperature, weight);
+    Bluetooth.println(message);
+
+    vTaskDelay(200 / portTICK_PERIOD_MS); // non-blocking delay
+  }
+}
+
+void TaskIOControl(void *pvParameters) {
+  while (1) {
+    if (Bluetooth.available()) {
+      String command = Bluetooth.readStringUntil('\n');
+      command.trim();
+      if (command == "LED_ON") {
+        digitalWrite(LED_PIN, HIGH);
+      } else if (command == "LED_OFF") {
+        digitalWrite(LED_PIN, LOW);
+      }
+    }
+    vTaskDelay(100 / portTICK_PERIOD_MS); // non-blocking delay
+  }
+}
+
 void setup() {
-  Serial.begin(BAUD);
+  // Bluetooth
   Bluetooth.begin("CAT_Tester");
 
   // Temperature Sensor
@@ -41,41 +78,15 @@ void setup() {
   // Distance Sensor
   HCSR04.begin(DIST_TRIG_PIN, DIST_ECHO_PIN);
 
+  // LEDs, temporary
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
-  Serial.println("Sensors are ready to go!");
+  // Dual-Threading
+  xTaskCreatePinnedToCore(TaskBluetooth, "Bluetooth Task", 10000, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(TaskIOControl, "I/O Control Task", 10000, NULL, 1, NULL, 0);
 }
 
 void loop() {
-  if (Bluetooth.available()) {
-    String command = Bluetooth.readStringUntil('\n');
-    command.trim();
-    if (command == "LED_ON") {
-      digitalWrite(LED_PIN, HIGH);
-    } else if (command == "LED_OFF") {
-      digitalWrite(LED_PIN, LOW);
-    }
-  }
-  
-  // Distance Sensor
-  double* distances = HCSR04.measureDistanceCm();
-  Serial.printf("Distance: %.2f cm\n", distances[0]);
-  Bluetooth.printf("Distance: %.2f cm\n", distances[0]);
-
-
-  // Temperature Sensor
-  float temperature = mlx.readObjectTempC();
-  Serial.printf("Temperature: %.2f °C\n", temperature);
-  Bluetooth.printf("Temperature: %.2f °C\n", temperature);
-
-
-  // Weight Sensor
-  float weight = scale.get_units(5);  // averages X readings, tweak with it
-  Serial.printf("Weight: %.2f g\n", weight);
-  Bluetooth.printf("Weight: %.2f g\n", weight);
-
-  Serial.println("-------------------------");
-
-  delay(1000);
+  //unneeded
 }
