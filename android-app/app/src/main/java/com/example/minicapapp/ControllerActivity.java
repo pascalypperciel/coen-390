@@ -340,7 +340,9 @@ public class ControllerActivity extends AppCompatActivity {
             record.materialID = String.valueOf(1);
             record.sessionID = sessionID;
             recordList.add(record);
+            runOnUiThread(() -> displayRecord(record));
         }
+
 
         long currentTime = System.currentTimeMillis();
 
@@ -411,45 +413,6 @@ public class ControllerActivity extends AppCompatActivity {
         runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
         recordb.setVisibility(View.VISIBLE);
     }
-    private void connectAndReadBT() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-                    || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-
-                Log.e("BT", "Bluetooth permissions aren't allowed");
-                runOnUiThread(() -> statusbth.setText("Bluetooth permissions aren't allowed"));
-                return;
-            }
-        }
-
-        try {
-            btAdapter.cancelDiscovery();
-            BluetoothDevice device = btAdapter.getRemoteDevice(ESP32_MAC_ADDRESS);
-            btSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
-            btSocket.connect();
-
-            outStream = btSocket.getOutputStream();
-
-            InputStream inStream = btSocket.getInputStream();
-            byte[] buffer = new byte[1024];
-            while (!stopinThread) {
-                int bytesRead = inStream.read(buffer);
-                if (bytesRead > 0) {
-                    final String incoming = new String(buffer, 0, bytesRead);
-                    runOnUiThread(() -> statusbth.setText("connected and getting data"));
-                    runOnUiThread(() -> updateBluetoothDisplay(incoming));
-                }
-                runOnUiThread(() ->statusbth.setText("Connected to CAT Tester"));
-                recordb.setVisibility(View.VISIBLE);
-            }
-        } catch (SecurityException se) {
-            se.printStackTrace();
-            runOnUiThread(() -> statusbth.setText("SecurityException: " + se.getMessage()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            runOnUiThread(() -> statusbth.setText("Error: " + e.getMessage()));
-        }
-    }
 
     private void sendBluetoothCommand(String command) {
         if (btSocket != null && outStream != null) {
@@ -462,14 +425,9 @@ public class ControllerActivity extends AppCompatActivity {
         }
     }
 
-    private void updateBluetoothDisplay(String newMessage) {
-        if (lastThreeMessages.size() >= 3) {
-            lastThreeMessages.remove(0);
-        }
-        lastThreeMessages.add(newMessage);
-
-        String displayedText = String.join("\n", lastThreeMessages);
-        txtBluetoothData.setText(displayedText);
+    private void displayRecord(Record newMessage) {
+        String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
+        txtBluetoothData.setText(displayText);
     }
 
     private void clearInputStream(){
