@@ -50,7 +50,6 @@ public class SettingsActivity extends AppCompatActivity {
         int id=item.getItemId();
         if (mbhelp.getItemId()==id) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
-            //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
 
         }else if(android.R.id.home==id){
             onBackPressed();

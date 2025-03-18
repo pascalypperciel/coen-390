@@ -17,15 +17,12 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     // The UI elements present on the Main Activity.
-    // TODO: Refactor button names
     // TODO: Create Behaviour for the Main Activity appbar
     protected Toolbar toolbarMain;
-    protected Button buttonRecordedData;
+    protected Button btnRecordedData;
     // TODO: Inject the behaviour of the Help and Settings button into the appbar
-    protected Button buttonController;
-    protected Button buttonHelp;
-    protected Button buttonSettings;
-    protected Button buttonMaterialsInformationPage;
+    protected Button btnController;
+    protected Button btnMaterialsInformationPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,18 +56,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if(R.id.toggle_profile_display == item.getItemId()) {
-//            profileListRecyclerViewAdapter.switchDisplayMode();
-//            displayNames = !displayNames;
-//            textViewMode(displayNames);
-//            Toast.makeText(this, "Display Mode Changed", Toast.LENGTH_LONG).show();
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
     private void setupUI() {
         // Toolbar
         toolbarMain = findViewById(R.id.toolbarMain);
@@ -79,10 +64,9 @@ public class MainActivity extends AppCompatActivity {
         // Change the title colour
         toolbarMain.setTitleTextColor(getResources().getColor(R.color.white, null));
 
-
         // This button will navigate to the Recorded Data Class.
-        buttonRecordedData =findViewById(R.id.buttonRecordedData);
-        buttonRecordedData.setOnClickListener(new View.OnClickListener() {
+        btnRecordedData =findViewById(R.id.buttonRecordedData);
+        btnRecordedData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToRecordedDataActivity();
@@ -90,38 +74,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // This button will navigate to the Controller Class.
-        buttonController =findViewById(R.id.buttonController);
-        buttonController.setOnClickListener(new View.OnClickListener() {
+        btnController =findViewById(R.id.buttonController);
+        btnController.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToControllerActivity();
             }
         });
 
-        // TODO: Clean this up
-//        // This button will open a dialogue fragment to explain the Activity's functionality.
-//        buttonHelp =findViewById(R.id.;
-//        buttonHelp.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
-//                getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
-//
-//            }
-//        });
-//
-//        // This button will navigate to the Settings Activity.
-//        buttonSettings =findViewById(R.id.settings);
-//        buttonSettings.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                goToSettingsActivity();
-//            }
-//        });
-
         // This button will open a dialogue fragment to the Materials Information page.
-        buttonMaterialsInformationPage =findViewById(R.id.buttonMaterialsInformationPage);
-        buttonMaterialsInformationPage.setOnClickListener(new View.OnClickListener() {
+        btnMaterialsInformationPage =findViewById(R.id.buttonMaterialsInformationPage);
+        btnMaterialsInformationPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();

@@ -1,7 +1,5 @@
 package com.example.minicapapp;
 
-import static java.lang.Float.isNaN;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -9,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-import android.os.AsyncTask;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -21,23 +18,17 @@ import android.util.Log;
 
 import android.Manifest;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -45,47 +36,33 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.i18n.DateTimeFormatter;
 
 // For batch processing
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import java.time.LocalDateTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ControllerActivity extends AppCompatActivity {
-    //private TextView txtResponse;
-    //private TextView txtBluetoothData;
-    private Button btnFetch;
-    protected Button bmotorfwd, bmotorbwd,stopb,establishcb;
-    protected static Button recordb;
+    protected Button btnMotorFwd, btnMotorBwd, btnStopB, btnEstablishConnectionBluetooth, btnRecordB;
     protected Toolbar toolbar;
-
-    protected TextView  statusbth, txtBluetoothData;
-    protected Spinner cspinner, tspinner;
-    protected EditText thinput;
-
+    protected TextView txtStatusBluetooth, txtBluetoothData;
+    protected Spinner spnC, spnT;
+    protected EditText etInput;
     protected String selectedTest, selectedMaterial;
-
     private static final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
     private InputStream inStream= null;
-
-    //private boolean isReadingInputStream=false;
-
     private Thread inThread;
-    private volatile boolean stopinThread = true;
+    private volatile boolean stopInThread = true;
     private static final int REQUEST_BT_PERMISSIONS = 100;
-    private final List<String> lastThreeMessages = new LinkedList<>();
-
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
-    ArrayList<Record> recordList = new ArrayList<Record>();
+    ArrayList<Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
 
     @Override
@@ -98,41 +75,41 @@ public class ControllerActivity extends AppCompatActivity {
         //enable back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        bmotorbwd = findViewById(R.id.motorbwd);
-        bmotorfwd = findViewById(R.id.motorfwd);
-        stopb = findViewById(R.id.stop);
-        recordb= findViewById(R.id.record);
-        establishcb= findViewById(R.id.establishc);
+        btnMotorBwd = findViewById(R.id.motorbwd);
+        btnMotorFwd = findViewById(R.id.motorfwd);
+        btnStopB = findViewById(R.id.stop);
+        btnRecordB = findViewById(R.id.record);
+        btnEstablishConnectionBluetooth = findViewById(R.id.establishc);
 
-        thinput= findViewById(R.id.thinput);
-        thinput.setVisibility(View.INVISIBLE);
+        etInput = findViewById(R.id.thinput);
+        etInput.setVisibility(View.INVISIBLE);
 
         txtBluetoothData= findViewById(R.id.showsbtmessages);
-        statusbth= findViewById(R.id.connectionstatus);
+        txtStatusBluetooth = findViewById(R.id.connectionstatus);
 
-        cspinner= findViewById(R.id.cspinner);
+        spnC = findViewById(R.id.cspinner);
         ArrayAdapter<CharSequence>adapter=ArrayAdapter.createFromResource(this, R.array.materials, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        cspinner.setAdapter(adapter);
+        spnC.setAdapter(adapter);
 
-        tspinner= findViewById(R.id.tspinner);
-        ArrayAdapter<CharSequence>testadapter=ArrayAdapter.createFromResource(this, R.array.tests, android.R.layout.simple_spinner_item);
+        spnT = findViewById(R.id.tspinner);
+        ArrayAdapter<CharSequence>testAdapter = ArrayAdapter.createFromResource(this, R.array.tests, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        tspinner.setAdapter(testadapter);
+        spnT.setAdapter(testAdapter);
 
-        cspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        spnC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                selectedMaterial = cspinner.getSelectedItem().toString();
+                selectedMaterial = spnC.getSelectedItem().toString();
                 Toast.makeText(getApplicationContext(), "you selected: " + selectedMaterial, Toast.LENGTH_LONG).show();
                 if("New material(manually set threshold)".equals(selectedMaterial)){
                     Toast.makeText(getApplicationContext(), "HAPPY BIRTHDAY TO NEW MATERIAL", Toast.LENGTH_LONG).show();
-                    thinput.setVisibility(View.VISIBLE);
+                    etInput.setVisibility(View.VISIBLE);
 
                 }else{
-                    thinput.setVisibility(View.INVISIBLE);
+                    etInput.setVisibility(View.INVISIBLE);
                 }
 
             }
@@ -142,12 +119,12 @@ public class ControllerActivity extends AppCompatActivity {
             }
         });
 
-        tspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        spnT.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                selectedTest = tspinner.getSelectedItem().toString();
+                selectedTest = spnT.getSelectedItem().toString();
                 Toast.makeText(getApplicationContext(), "you selected: " + selectedTest, Toast.LENGTH_LONG).show();
 
             }
@@ -156,17 +133,10 @@ public class ControllerActivity extends AppCompatActivity {
                 // your code here
             }
         });
+        
+        btnRecordB.setVisibility(View.INVISIBLE);
 
-
-
-        //btnFetch.setOnClickListener(v -> new FetchDataTask().execute());
-
-        //setupbtstuff();
-        recordb.setVisibility(View.INVISIBLE);
-
-
-
-        bmotorbwd.setOnTouchListener((v, event) -> {
+        btnMotorBwd.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 sendBluetoothCommand("Motor_BWD");
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -175,7 +145,7 @@ public class ControllerActivity extends AppCompatActivity {
             return true;
         });
 
-        bmotorfwd.setOnTouchListener((v, event) -> {
+        btnMotorFwd.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 sendBluetoothCommand("Motor_FWD");
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -184,36 +154,37 @@ public class ControllerActivity extends AppCompatActivity {
             return true;
         });
 
-        establishcb.setOnClickListener(new View.OnClickListener() {
+        btnEstablishConnectionBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setupbtstuff();
+                setupBluetoothStuff();
             }
         });
 
-        stopb.setOnClickListener(new View.OnClickListener() {
+        btnStopB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendBluetoothCommand("Motor_OFF");
-                disableinputstream();
+                disableInputStream();
 
             }
         });
-        recordb.setOnClickListener(new View.OnClickListener() {
+        
+        btnRecordB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //sendBluetoothCommand("Motor_OFF");
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 String sessionID = sdf.format(new Date());
-                connectinputstream(sessionID);
+                connectInputStream(sessionID);
             }
         });
     }
 
-    private void setupbtstuff(){
+    private void setupBluetoothStuff(){
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
-            txtBluetoothData.setText("Bluetooth don't work");
+            txtBluetoothData.setText(R.string.bluetooth_not_work);
             return;
         }
 
@@ -224,30 +195,28 @@ public class ControllerActivity extends AppCompatActivity {
             if (scanPerm != PackageManager.PERMISSION_GRANTED || connectPerm != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BT_PERMISSIONS);
             } else {
-                startBluetoothoutThread();
+                startBluetoothOutThread();
             }
         } else {
-            startBluetoothoutThread();
+            startBluetoothOutThread();
         }
     }
-    private void startBluetoothoutThread() {
+    private void startBluetoothOutThread() {
         if (!btAdapter.isEnabled()) {
-            statusbth.setText("Must enable Bluetooth");
+            txtStatusBluetooth.setText(R.string.bluetooth_not_enabled);
             return;
         }
-        recordb.setVisibility(View.VISIBLE);
-        connectoutputstream();
-        //btThread = new Thread(this::connectoutputstream);
-        //btThread.start();
+        btnRecordB.setVisibility(View.VISIBLE);
+        connectOutputStream();
     }
 
-    private void connectoutputstream(){
+    private void connectOutputStream(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
                     || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
 
                 Log.e("BT", "Bluetooth permissions aren't allowed");
-                runOnUiThread(() -> statusbth.setText("Bluetooth permissions aren't allowed"));
+                runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_permissions_not_allowed));
                 return;
             }
         }
@@ -259,28 +228,28 @@ public class ControllerActivity extends AppCompatActivity {
             btSocket.connect();
 
             outStream = btSocket.getOutputStream();
-            runOnUiThread(() -> statusbth.setText("connected to CAT tester"));
-            recordb.setVisibility(View.VISIBLE);
+            runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
+            btnRecordB.setVisibility(View.VISIBLE);
 
             inStream = btSocket.getInputStream();
 
         } catch (SecurityException se) {
             se.printStackTrace();
-            runOnUiThread(() -> statusbth.setText("SecurityException: " + se.getMessage()));
-            recordb.setVisibility(View.INVISIBLE);
+            runOnUiThread(() -> txtStatusBluetooth.setText("SecurityException: " + se.getMessage()));
+            btnRecordB.setVisibility(View.INVISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
-            runOnUiThread(() -> statusbth.setText("Error: " + e.getMessage()));
-            recordb.setVisibility(View.INVISIBLE);
+            runOnUiThread(() -> txtStatusBluetooth.setText("Error: " + e.getMessage()));
+            btnRecordB.setVisibility(View.INVISIBLE);
         }
 
     }
 
-    private void connectinputstream(String sessionID){
-        if(!stopinThread){
+    private void connectInputStream(String sessionID){
+        if(!stopInThread){
             return;
         }
-        stopinThread=false;
+        stopInThread =false;
 
         inThread = new Thread(new Runnable() {
             @Override
@@ -288,7 +257,7 @@ public class ControllerActivity extends AppCompatActivity {
                 byte[] buffer = new byte[128];
                 int bytesRead;
                 clearInputStream();
-                while (!stopinThread) {
+                while (!stopInThread) {
                     try {
                         bytesRead = inStream.read(buffer);
                         if (bytesRead > 0) {
@@ -299,20 +268,20 @@ public class ControllerActivity extends AppCompatActivity {
                         }
                     }catch (SecurityException se) {
                         se.printStackTrace();
-                        runOnUiThread(() -> statusbth.setText("SecurityException: " + se.getMessage()));
+                        runOnUiThread(() -> txtStatusBluetooth.setText("SecurityException: " + se.getMessage()));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        runOnUiThread(() -> statusbth.setText("Error: " + e.getMessage()));
+                        runOnUiThread(() -> txtStatusBluetooth.setText("Error: " + e.getMessage()));
                     }
                 }
-                runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
-                recordb.setVisibility(View.VISIBLE);
+                runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
+                btnRecordB.setVisibility(View.VISIBLE);
             }
         });
 
         inThread.start();
-        runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
-        recordb.setVisibility(View.INVISIBLE);
+        runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
+        btnRecordB.setVisibility(View.INVISIBLE);
 
     }
 
@@ -382,7 +351,7 @@ public class ControllerActivity extends AppCompatActivity {
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setDoOutput(true);
 
-                    Log.d("JSON_PAYLOAD", "Sending: " + jsonArray.toString());
+                    Log.d("JSON_PAYLOAD", "Sending: " + jsonArray);
 
                     OutputStream os = conn.getOutputStream();
                     os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
@@ -400,18 +369,17 @@ public class ControllerActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-
-    private void disableinputstream(){
-        if(stopinThread){
+    
+    private void disableInputStream(){
+        if(stopInThread){
             return;
         }
-        stopinThread=true;
+        stopInThread =true;
         if (inThread != null && inThread.isAlive()) {
             inThread.interrupt();
         }
-        runOnUiThread(() -> statusbth.setText("Connected to CAT Tester"));
-        recordb.setVisibility(View.VISIBLE);
+        runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
+        btnRecordB.setVisibility(View.VISIBLE);
     }
 
     private void sendBluetoothCommand(String command) {
@@ -432,65 +400,20 @@ public class ControllerActivity extends AppCompatActivity {
 
     private void clearInputStream(){
         byte[] buffer=new byte[1024];
-        int bytesRead;
         try{
             while(inStream.available()>0){
-                bytesRead=inStream.read(buffer);
+                inStream.read(buffer);
             }
         }catch(Exception e){
             e.printStackTrace();
-            runOnUiThread(()->statusbth.setText("Error clearing inputstream" + e.getMessage()));
-        }
-    }
-
-    private class FetchDataTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                URL url = new URL("http://127.0.0.1:5000/get-all");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                int responseCode = conn.getResponseCode();
-
-                if (responseCode >= 400) { // log error response
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-                    StringBuilder errorResult = new StringBuilder();
-                    String errorLine;
-                    while ((errorLine = errorReader.readLine()) != null) {
-                        errorResult.append(errorLine);
-                    }
-                    errorReader.close();
-                    Log.e("HTTP_ERROR", "Error " + responseCode + ": " + errorResult.toString());
-                    return "Error: " + responseCode;
-                }
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder result = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
-                }
-                reader.close();
-                return result.toString();
-            } catch (Exception e) {
-                Log.e("HTTP_EXCEPTION", "Exception occurred: " + e.getMessage(), e);
-                return "Error: " + e.getMessage();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            String existingText = statusbth.getText().toString();
-            String newText = result + "\n\n" + existingText;
-            statusbth.setText(newText);
+            runOnUiThread(()-> txtStatusBluetooth.setText("Error clearing inStream" + e.getMessage()));
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopinThread = true;
+        stopInThread = true;
         if (inThread != null && inThread.isAlive()) {
             inThread.interrupt();
         }
@@ -509,27 +432,6 @@ public class ControllerActivity extends AppCompatActivity {
 
         return true;
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        Menu menu=toolbar.getMenu();
-//
-//        MenuItem mbhelp = menu.findItem(R.id.mbhelp);
-//        MenuItem mbsettings = menu.findItem(R.id.mbsettings);
-//        int id=item.getItemId();
-//        if (mbhelp.getItemId()==id) {
-//            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
-//            //Toast.makeText(getApplicationContext(), "clicked on go to help", Toast.LENGTH_LONG).show();
-//
-//        }
-//        else if(mbsettings.getItemId()==id) {
-//            Intent sintent= new Intent(this, SettingsActivity.class);
-//            startActivity(sintent);
-//            //Toast.makeText(getApplicationContext(), "clicked on go to settings", Toast.LENGTH_LONG).show();
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 }
 
 class Record {
