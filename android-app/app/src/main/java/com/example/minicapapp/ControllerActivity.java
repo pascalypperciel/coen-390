@@ -345,7 +345,7 @@ public class ControllerActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://127.0.0.1:5000/batch-process-records");
+                    URL url = new URL("https://cat-tester-api.azurewebsites.net/batch-process-records");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty("Content-Type", "application/json");

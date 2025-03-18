@@ -44,7 +44,7 @@ public class RecordedDataActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
             try {
-                URL url = new URL("http://10.0.2.2:5000/get-all");
+                URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
 
