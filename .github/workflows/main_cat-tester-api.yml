@@ -24,27 +24,24 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Create and start virtual environment
+      - name: Create and start virtual environment. Install dependencies.
         run: |
           cd backend
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+          python -m venv antenv
+          source antenv/bin/activate
+          pip install -r backend/requirements.txt
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: |
+          cd backend
+          zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
+            cd backend
             release.zip
             !venv/
 
