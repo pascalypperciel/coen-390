@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
-        android:text="Controller"
+        android:text="Control Pannel"
         app:layout_constraintBottom_toTopOf="@+id/buttonMaterialsInformationPage"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -57,7 +57,8 @@
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="#FFC107" />
 
     <TextView
         android:id="@+id/textViewAppTitle"
@@ -71,12 +72,12 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbarMain"
         app:layout_constraintVertical_bias="0.9" />
 
-<!--        <FrameLayout-->
-<!--        android:id="@+id/container"-->
-<!--        android:layout_width="416dp"-->
-<!--        android:layout_height="731dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"></FrameLayout>-->
+       <FrameLayout
+       android:id="@+id/container"
+        android:layout_width="416dp"
+        android:layout_height="731dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -103,9 +103,9 @@ public class ControllerActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 selectedMaterial = spnC.getSelectedItem().toString();
-                Toast.makeText(getApplicationContext(), "you selected: " + selectedMaterial, Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "you selected: " + selectedMaterial, Toast.LENGTH_LONG).show();
                 if("New material(manually set threshold)".equals(selectedMaterial)){
-                    Toast.makeText(getApplicationContext(), "HAPPY BIRTHDAY TO NEW MATERIAL", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "HAPPY BIRTHDAY TO NEW MATERIAL", Toast.LENGTH_LONG).show();
                     etInput.setVisibility(View.VISIBLE);
 
                 }else{
@@ -125,7 +125,7 @@ public class ControllerActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 selectedTest = spnT.getSelectedItem().toString();
-                Toast.makeText(getApplicationContext(), "you selected: " + selectedTest, Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "you selected: " + selectedTest, Toast.LENGTH_LONG).show();
 
             }
             @Override
@@ -173,10 +173,19 @@ public class ControllerActivity extends AppCompatActivity {
         btnRecordB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //sendBluetoothCommand("Motor_OFF");
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                String sessionID = sdf.format(new Date());
-                connectInputStream(sessionID);
+                if(selectedTest.equals("Tensile(stretching)")) {
+                    sendBluetoothCommand("Motor_FWD");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    String sessionID = sdf.format(new Date());
+                    connectInputStream(sessionID);
+                }else if(selectedTest.equals("Compression")){
+                    sendBluetoothCommand("Motor_BWD");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    String sessionID = sdf.format(new Date());
+                    connectInputStream(sessionID);
+                }else{
+                    Toast.makeText(getApplicationContext(), "Please select what test to run", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -263,6 +272,7 @@ public class ControllerActivity extends AppCompatActivity {
                         if (bytesRead > 0) {
                             final String incoming = new String(buffer, 0, bytesRead).trim();
                             processBluetoothData(incoming, sessionID);
+                            runOnUiThread(() -> txtStatusBluetooth.setText("Connected and Fetching Data"));
 
                             //
                         }
@@ -310,6 +320,7 @@ public class ControllerActivity extends AppCompatActivity {
             record.sessionID = sessionID;
             recordList.add(record);
             runOnUiThread(() -> displayRecord(record));
+
         }
 
 
@@ -396,6 +407,14 @@ public class ControllerActivity extends AppCompatActivity {
     private void displayRecord(Record newMessage) {
         String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
         txtBluetoothData.setText(displayText);
+
+        //Toast.makeText(getApplicationContext(), Float.valueOf(newMessage.distance.trim()).toString(), Toast.LENGTH_SHORT).show();
+        //stop if us sensor says too close
+        if(Float.valueOf(newMessage.distance.trim())<3.0 || Float.valueOf(newMessage.distance.trim())>20.0){
+            Toast.makeText(getApplicationContext(), "Test Finished", Toast.LENGTH_LONG).show();
+            sendBluetoothCommand("Motor_OFF");
+            disableInputStream();
+        }
     }
 
     private void clearInputStream(){
