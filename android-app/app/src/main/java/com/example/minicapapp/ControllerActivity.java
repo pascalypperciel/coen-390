@@ -410,7 +410,7 @@ public class ControllerActivity extends AppCompatActivity {
 
         //Toast.makeText(getApplicationContext(), Float.valueOf(newMessage.distance.trim()).toString(), Toast.LENGTH_SHORT).show();
         //stop if us sensor says too close
-        if(Float.valueOf(newMessage.distance.trim())<3.0 || Float.valueOf(newMessage.distance.trim())>20.0){
+        if(Float.valueOf(newMessage.distance.trim())<2.0 || Float.valueOf(newMessage.distance.trim())>10.55){
             Toast.makeText(getApplicationContext(), "Test Finished", Toast.LENGTH_LONG).show();
             sendBluetoothCommand("Motor_OFF");
             disableInputStream();
