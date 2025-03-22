@@ -23,7 +23,7 @@
 
 #define BAUD    115200
 
-bool weightcnt =true;
+bool weight_cnt =true;
 
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 HX711 scale;
@@ -57,22 +57,22 @@ void TaskIOControl(void *pvParameters) {
       String command = Bluetooth.readStringUntil('\n');
       command.trim();
       if (command == "Motor_FWD") {
-        if(weightcnt){
+        if(weight_cnt){
          scale.tare();
-         weightcnt=false; 
+         weight_cnt=false; 
         }
         digitalWrite(FWD, HIGH);
         digitalWrite(BWD, LOW);
       }else if(command == "Motor_BWD"){
-          if(weightcnt){
+          if(weight_cnt){
          scale.tare();
-         weightcnt=false; 
+         weight_cnt=false; 
         }
         digitalWrite(BWD, HIGH);
         digitalWrite(FWD, LOW);
       }
       else if (command == "Motor_OFF") {
-        weightcnt=true; 
+        weight_cnt=true; 
         digitalWrite(FWD, LOW);
         digitalWrite(BWD, LOW);
       }

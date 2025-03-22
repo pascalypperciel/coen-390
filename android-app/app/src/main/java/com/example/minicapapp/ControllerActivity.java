@@ -103,9 +103,7 @@ public class ControllerActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 selectedMaterial = spnC.getSelectedItem().toString();
-                //Toast.makeText(getApplicationContext(), "you selected: " + selectedMaterial, Toast.LENGTH_LONG).show();
                 if("New material(manually set threshold)".equals(selectedMaterial)){
-                    //Toast.makeText(getApplicationContext(), "HAPPY BIRTHDAY TO NEW MATERIAL", Toast.LENGTH_LONG).show();
                     etInput.setVisibility(View.VISIBLE);
 
                 }else{
@@ -125,8 +123,6 @@ public class ControllerActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 selectedTest = spnT.getSelectedItem().toString();
-                //Toast.makeText(getApplicationContext(), "you selected: " + selectedTest, Toast.LENGTH_LONG).show();
-
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -408,7 +404,6 @@ public class ControllerActivity extends AppCompatActivity {
         String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
         txtBluetoothData.setText(displayText);
 
-        //Toast.makeText(getApplicationContext(), Float.valueOf(newMessage.distance.trim()).toString(), Toast.LENGTH_SHORT).show();
         //stop if us sensor says too close
         if(Float.valueOf(newMessage.distance.trim())<2.0 || Float.valueOf(newMessage.distance.trim())>10.55){
             Toast.makeText(getApplicationContext(), "Test Finished", Toast.LENGTH_LONG).show();
