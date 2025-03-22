@@ -23,6 +23,8 @@
 
 #define BAUD    115200
 
+bool weight_cnt =true;
+
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 HX711 scale;
 BluetoothSerial Bluetooth;
@@ -32,6 +34,7 @@ void TaskBluetooth(void *pvParameters) {
     // Distance Sensor
     double* distances = HCSR04.measureDistanceCm(); // in cm
     float distance = (distances != nullptr) ? distances[0] : NAN;
+    distance=10.55-distance;
 
     // Temperature Sensor
     float temperature = mlx.readObjectTempC(); // in C
@@ -54,13 +57,22 @@ void TaskIOControl(void *pvParameters) {
       String command = Bluetooth.readStringUntil('\n');
       command.trim();
       if (command == "Motor_FWD") {
+        if(weight_cnt){
+         scale.tare();
+         weight_cnt=false; 
+        }
         digitalWrite(FWD, HIGH);
         digitalWrite(BWD, LOW);
       }else if(command == "Motor_BWD"){
+          if(weight_cnt){
+         scale.tare();
+         weight_cnt=false; 
+        }
         digitalWrite(BWD, HIGH);
         digitalWrite(FWD, LOW);
       }
       else if (command == "Motor_OFF") {
+        weight_cnt=true; 
         digitalWrite(FWD, LOW);
         digitalWrite(BWD, LOW);
       }
@@ -79,7 +91,8 @@ void setup() {
 
   // Weight Sensor
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  scale.set_scale(8); // scale calibration, tweak with it
+  scale.set_scale(102.493248); // scale calibration, tweak with it
+  scale.set_offset(51322);
   scale.tare();
 
   // Distance Sensor

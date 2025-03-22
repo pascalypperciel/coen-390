@@ -44,7 +44,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.004"
-        app:title="Recorded Data" />
+        app:title="Recorded Data"
+        app:titleTextColor="#FFC107" />
 
     <FrameLayout
         android:id="@+id/container"

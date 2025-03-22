@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbarMain);
         getSupportActionBar().setTitle("Main Activity");
         // Change the title colour
-        toolbarMain.setTitleTextColor(getResources().getColor(R.color.white, null));
+        toolbarMain.setTitleTextColor(getResources().getColor(R.color.lightOrange, null));
 
         // This button will navigate to the Recorded Data Class.
         btnRecordedData =findViewById(R.id.buttonRecordedData);
