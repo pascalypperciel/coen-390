@@ -1,6 +1,7 @@
 package com.example.minicapapp;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -17,16 +18,14 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     // The UI elements present on the Main Activity.
-    // TODO: Create Behaviour for the Main Activity appbar
     protected Toolbar toolbarMain;
-    protected Button btnRecordedData;
-    // TODO: Inject the behaviour of the Help and Settings button into the appbar
-    protected Button btnController;
-    protected Button btnMaterialsInformationPage;
+    protected Button buttonController;
+    protected Button buttonBluetooth;
+    protected Button buttonRecordedData;
+    protected Button buttonMaterialsInformationPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -56,6 +55,19 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(R.id.action_settings == item.getItemId()) {
+            goToSettingsActivity();
+            return true;
+        } else if(R.id.action_help == item.getItemId()) {
+            HelpFrag helpDialogueFragment = new HelpFrag();
+            helpDialogueFragment.show(getSupportFragmentManager(), "Help");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setupUI() {
         // Toolbar
         toolbarMain = findViewById(R.id.toolbarMain);
@@ -64,27 +76,36 @@ public class MainActivity extends AppCompatActivity {
         // Change the title colour
         toolbarMain.setTitleTextColor(getResources().getColor(R.color.white, null));
 
-        // This button will navigate to the Recorded Data Class.
-        btnRecordedData =findViewById(R.id.buttonRecordedData);
-        btnRecordedData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToRecordedDataActivity();
-            }
-        });
-
-        // This button will navigate to the Controller Class.
-        btnController =findViewById(R.id.buttonController);
-        btnController.setOnClickListener(new View.OnClickListener() {
+        // This button will navigate to the Controller Activity.
+        buttonController = findViewById(R.id.buttonController);
+        buttonController.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToControllerActivity();
             }
         });
 
-        // This button will open a dialogue fragment to the Materials Information page.
-        btnMaterialsInformationPage =findViewById(R.id.buttonMaterialsInformationPage);
-        btnMaterialsInformationPage.setOnClickListener(new View.OnClickListener() {
+        // This button will navigate to the Bluetooth Activity.
+        buttonBluetooth = findViewById(R.id.buttonBluetooth);
+        buttonBluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToBluetoothActivity();
+            }
+        });
+
+        // This button will navigate to the Recorded Data Activity.
+        buttonRecordedData = findViewById(R.id.buttonRecordedData);
+        buttonRecordedData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToRecordedDataActivity();
+            }
+        });
+
+        // This button will open a dialogue fragment to the Materials Information Page Activity.
+        buttonMaterialsInformationPage = findViewById(R.id.buttonMaterialsInformationPage);
+        buttonMaterialsInformationPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
@@ -94,18 +115,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Internal methods to create and start the intents linked to the Main Activity
     private void goToControllerActivity() {
-        Intent controllerIntent= new Intent(this, ControllerActivity.class);
+        Intent controllerIntent = new Intent(this, ControllerActivity.class);
         startActivity(controllerIntent);
     }
 
     private void goToRecordedDataActivity() {
-        Intent recordedDataIntent= new Intent(this, RecordedDataActivity.class);
+        Intent recordedDataIntent = new Intent(this, RecordedDataActivity.class);
         startActivity(recordedDataIntent);
     }
 
     private void goToSettingsActivity() {
-        Intent settingsIntent= new Intent(this, SettingsActivity.class);
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivity(settingsIntent);
+    }
+
+    private void goToBluetoothActivity() {
+        Intent bluetoothIntent = new Intent(this, BluetoothActivity.class);
+        startActivity(bluetoothIntent);
     }
 }

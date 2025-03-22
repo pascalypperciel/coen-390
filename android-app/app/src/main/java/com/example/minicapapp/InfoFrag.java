@@ -30,8 +30,8 @@ public class InfoFrag extends Fragment {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_infofrag, container, false);
 
-        btnCloseFrag =rootView.findViewById(R.id.closeb);
-        coverUp =rootView.findViewById(R.id.coverup);
+        btnCloseFrag =rootView.findViewById(R.id.buttonClose);
+        coverUp =rootView.findViewById(R.id.viewCoverUp);
         coverUp.setClickable(true);
 
         textbox = rootView.findViewById(R.id.textbox);

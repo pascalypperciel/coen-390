@@ -7,7 +7,7 @@
         tools:context=".InfoFrag">
 
         <View
-            android:id="@+id/coverup"
+            android:id="@+id/viewCoverUp"
             android:background="#DC143C"
             android:alpha="0.5"
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
 
 
             <Button
-                android:id="@+id/closeb"
+                android:id="@+id/buttonClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"

@@ -2,6 +2,7 @@ package com.example.minicapapp;
 
 import android.os.Bundle;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -11,9 +12,9 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
-public class HelpFrag extends Fragment {
+public class HelpFrag extends DialogFragment {
 
-    protected Button btnCloseFrag;
+    protected Button buttonCloseDialogueFragment;
     protected View coverUp;
     protected RelativeLayout rlTextContainer;
     protected ScrollView textbox;
@@ -26,22 +27,22 @@ public class HelpFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView=inflater.inflate(R.layout.fragment_helpfrag, container, false);
+        View view = inflater.inflate(R.layout.fragment_helpfrag, container, false);
 
-        btnCloseFrag =rootView.findViewById(R.id.closeb);
-        coverUp =rootView.findViewById(R.id.coverup);
+        coverUp =view.findViewById(R.id.viewCoverUp);
         coverUp.setClickable(true);
-        textbox = rootView.findViewById(R.id.textbox);
-        rlTextContainer = rootView.findViewById(R.id.textcontainer);
+        rlTextContainer = view.findViewById(R.id.textcontainer);
+        textbox = view.findViewById(R.id.textbox);
 
         textbox.smoothScrollTo(0, rlTextContainer.getBottom());
 
-        btnCloseFrag.setOnClickListener(new View.OnClickListener() {
+        buttonCloseDialogueFragment =view.findViewById(R.id.buttonClose);
+        buttonCloseDialogueFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().remove(HelpFrag.this).commit();
+                dismiss();
             }
         });
-        return rootView;
+        return view;
     }
 }
