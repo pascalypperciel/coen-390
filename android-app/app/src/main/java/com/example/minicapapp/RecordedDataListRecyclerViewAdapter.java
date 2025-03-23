@@ -11,8 +11,7 @@ import java.util.List;
 public class RecordedDataListRecyclerViewAdapter {
     // Variables for the storage of objects to be displayed in the RecyclerView.
     private Context context; // The context of the activity housing the RecyclerView.
-    // TODO: Make the list take the correct object type.
-    private List<Integer> localRecordedDataList; // A list of the recorded data objects.
+    private List<RecordedDataItem> localRecordedDataList; // A list of the recorded data objects.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // UI elements present within the List Item Resource
@@ -26,7 +25,7 @@ public class RecordedDataListRecyclerViewAdapter {
         // TODO: Make getters for all of the items in the list item.
     }
 
-    public RecordedDataListRecyclerViewAdapter(Context context, List<Integer> localRecordedDataList) {
+    public RecordedDataListRecyclerViewAdapter(Context context, List<RecordedDataItem> localRecordedDataList) {
         this.context = context;
         this.localRecordedDataList = localRecordedDataList;
     }

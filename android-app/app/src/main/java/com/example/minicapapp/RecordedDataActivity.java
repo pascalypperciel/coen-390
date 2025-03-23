@@ -37,6 +37,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     protected Spinner spinnerFilter;
     protected TextView textViewSummary;
     protected RecyclerView recyclerViewRecordedDataList;
+    protected RecordedDataListRecyclerViewAdapter recordedDataListRecyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,22 +52,6 @@ public class RecordedDataActivity extends AppCompatActivity {
 
         // This method will be used to set up all of the UI elements in the Main Activity
         setupUI();
-
-        Button btnFetch;
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_data);
-
-        txtResponse = findViewById(R.id.txtResponse);
-        btnFetch = findViewById(R.id.btnFetch);
-
-        btnFetch.setOnClickListener(v -> new FetchDataTask().execute());
-
-        toolbar = findViewById(R.id.toolbarRecordedData);
-        setSupportActionBar(toolbar);
-        //enable back button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
 
     // Setup Functions for the Appbar
@@ -122,16 +107,17 @@ public class RecordedDataActivity extends AppCompatActivity {
     // TODO: Adapt this method to the context-specific
     protected void setupRecyclerView() {
         // Retrieve the recorded data list stored in the database.
-//        List<Profile> profileList = databaseHelper.getAllProfiles();
-//
-//        // Bind and organize the profile list items.
+        // TODO: Retrieve the information from the PB and create a list of RecordedDataItem objects
+//        List<RecordedDataItem> recordedDataList;
+
+        // Bind and organize the profile list items.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        profileListRecyclerViewAdapter = new ProfileListRecyclerViewAdapter(this, profileList);
-//
+//        recordedDataListRecyclerViewAdapter = new RecordedDataListRecyclerViewAdapter(this, recordedDataList);
+
         // Define and initialize the Recycler View.
         recyclerViewRecordedDataList = findViewById(R.id.recyclerViewRecordedDataList);
         recyclerViewRecordedDataList.setLayoutManager(linearLayoutManager);
-//        recyclerViewProfileList.setAdapter(profileListRecyclerViewAdapter);
+//        recyclerViewRecordedDataList.setAdapter(recordedDataListRecyclerViewAdapter);
 
         // Adding a border around each item.
         DividerItemDecoration border = new DividerItemDecoration(recyclerViewRecordedDataList.getContext(), linearLayoutManager.getOrientation());
