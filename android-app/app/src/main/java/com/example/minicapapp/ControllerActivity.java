@@ -185,6 +185,12 @@ public class ControllerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // The "finish()" will navigate back to the previous activity.
+        return true;
+    }
+
     createSession(session_id, session_name, initial_length, initial_area, test_type) {
         JSONObject initialData = new JSONObject();
         initialData.put("SessionID", session_id);
