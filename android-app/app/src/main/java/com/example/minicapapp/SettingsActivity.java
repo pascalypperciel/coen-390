@@ -1,5 +1,6 @@
 package com.example.minicapapp;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,8 +14,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class SettingsActivity extends AppCompatActivity {
-
-    protected Toolbar toolbar;
+    // The UI elements present on the Main Activity.
+    protected Toolbar toolbarSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,33 +28,45 @@ public class SettingsActivity extends AppCompatActivity {
             return insets;
         });
 
-        toolbar = findViewById(R.id.toolbar3);
-        setSupportActionBar(toolbar);
-        //enable back button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // This method will be used to set up all of the UI elements in the Settings Activity
+        setupUI();
     }
 
-    //for menu icon in the toolbar
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // The "finish()" will navigate back to the previous activity.
+        return true;
+    }
+
+    // Setup Functions for the Appbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.settingsmenu, menu);
+        // Load the main_appbar_resource as an object
+        getMenuInflater().inflate(R.menu.settings_menu_appbar_resource, menu);
+
+        // Define the Toolbar Items and change their colour
+        MenuItem helpItem = menu.findItem(R.id.action_help);
+        helpItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
 
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Menu smenu=toolbar.getMenu();
-
-        MenuItem mbhelp = smenu.findItem(R.id.mbhelp);
-        int id=item.getItemId();
-        if (mbhelp.getItemId()==id) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new HelpFrag()).commit();
-
-        }else if(android.R.id.home==id){
-            onBackPressed();
+        if(R.id.action_help == item.getItemId()) {
+            HelpFrag helpDialogueFragment = new HelpFrag();
+            helpDialogueFragment.show(getSupportFragmentManager(), "Help");
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setupUI() {
+        // Toolbar
+        toolbarSettings = findViewById(R.id.toolbarSettings);
+        setSupportActionBar(toolbarSettings);
+        getSupportActionBar().setTitle("Settings Activity");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }
