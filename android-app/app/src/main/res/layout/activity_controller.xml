@@ -69,17 +69,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.631" />
 
-<!--    TODO: Remove?-->
-<!--    <Spinner-->
-<!--        android:id="@+id/cspinner"-->
-<!--        android:layout_width="409dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="104dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/toolbarController"-->
-<!--        app:layout_constraintVertical_bias="0.0" />-->
-
     <TextView
         android:id="@+id/connectionstatus"
         android:layout_width="150dp"
@@ -89,27 +78,6 @@
         android:text="Not connected"
         app:layout_constraintBottom_toTopOf="@+id/motorbwd"
         app:layout_constraintStart_toEndOf="@+id/record" />
-
-<!--    TODO: Remove?-->
-<!--    <Spinner-->
-<!--        android:id="@+id/tspinner"-->
-<!--        android:layout_width="409dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="24dp"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/cspinner"-->
-<!--        tools:layout_editor_absoluteX="1dp" />-->
-
-    <EditText
-        android:id="@+id/editTextThresholdInput"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Enter Threshold"
-        android:inputType="number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tspinner" />
 
     <Button
         android:id="@+id/buttonEstablishBluetoothConnection"

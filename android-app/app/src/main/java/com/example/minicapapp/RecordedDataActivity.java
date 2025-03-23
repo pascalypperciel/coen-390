@@ -176,7 +176,7 @@ public class RecordedDataActivity extends AppCompatActivity {
             // Loop through each record in the JSON array
             for (int i = 0; i < records.length(); i++) {
                 JSONObject record = records.getJSONObject(i);
-                RecordedDataItem item = new RecordedDataItem(record.getLong("SessionID"), record.getString("SessionName"), record.getString("TestType"), (float) record.getDouble("InitialLength"), (float) record.getDouble("InitialArea"), record.getString("MaterialType"));
+                RecordedDataItem item = new RecordedDataItem(record.getLong("SessionID"), record.getString("SessionName"), record.getString("TestType"), (float) record.getDouble("InitialLength"), (float) record.getDouble("InitialArea"));
                 sessionList.add(item);
             }
         } catch (Exception e) {

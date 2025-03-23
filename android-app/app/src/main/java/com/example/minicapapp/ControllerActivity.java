@@ -57,9 +57,13 @@ public class ControllerActivity extends AppCompatActivity {
         public String sessionID;
         public String pressure;
         public String valid;
-        public String materialID;
     }
-    protected String selectedTest, selectedMaterial;
+    // Internal attributes
+    public static class Session {
+        public String sessionName;
+        public float initialLength;
+        public float initialArea;
+    }
     private static final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter bluetoothAdapter = null;
@@ -78,9 +82,7 @@ public class ControllerActivity extends AppCompatActivity {
     protected Toolbar toolbarController;
     protected Button buttonMotorForward, buttonMotorBackward, buttonStop, buttonEstablishBluetoothConnection, buttonRecord;
     protected TextView textViewBluetoothStatus, textViewBluetoothData;
-    // TODO: Remove?
-//    protected Spinner spnC, spnT;
-    protected EditText editTextThresholdInput;
+    protected EditText editTextInitialLength, editTextInitialArea, editTextSessionName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,10 +167,6 @@ public class ControllerActivity extends AppCompatActivity {
             }
         });
 
-        // Input Elements
-        editTextThresholdInput = findViewById(R.id.editTextThresholdInput);
-        editTextThresholdInput.setVisibility(View.INVISIBLE);
-
         // Controller Elements
         buttonMotorBackward = findViewById(R.id.motorbwd);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
@@ -190,6 +188,10 @@ public class ControllerActivity extends AppCompatActivity {
             return true;
         });
 
+//        editTextInitialLength = findViewById(R.id.??????); //Tyler, you can put the text fields and stuff here
+//        editTextInitialArea = findViewById(R.id.??????);
+//        editTextSessionName = findViewById(R.id.??????);
+
         buttonRecord = findViewById(R.id.record);
         buttonRecord.setVisibility(View.INVISIBLE);
         buttonRecord.setOnClickListener(new View.OnClickListener() {
@@ -198,15 +200,13 @@ public class ControllerActivity extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 String sessionID = sdf.format(new Date());
 
-                if (selectedTest.equals("Tensile(stretching)")) {
-                    sendBluetoothCommand("Motor_FWD");
-                    connectInputStream(sessionID);
-                } else if (selectedTest.equals("Compression")) {
-                    sendBluetoothCommand("Motor_BWD");
-                }
+                sendBluetoothCommand("Motor_BWD");
 
-                // TODO: Figure out what's going on here...
-                createSession(sessionID, sessionName, initialLength, initialArea, testType);
+                Session session = new Session();
+                session.initialArea = Float.parseFloat(editTextInitialArea.getText().toString());
+                session.initialLength = Float.parseFloat(editTextInitialLength.getText().toString());
+                session.sessionName = editTextSessionName.getText().toString();
+                createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea);
                 connectInputStream(sessionID);
             }
         });
@@ -220,48 +220,6 @@ public class ControllerActivity extends AppCompatActivity {
 
             }
         });
-
-        // TODO: Remove?
-//        spnC = findViewById(R.id.cspinner);
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.materials, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-//        spnC.setAdapter(adapter);
-//
-//        spnT = findViewById(R.id.tspinner);
-//        ArrayAdapter<CharSequence> testAdapter = ArrayAdapter.createFromResource(this, R.array.tests, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-//        spnT.setAdapter(testAdapter);
-//
-//        spnC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//                selectedMaterial = spnC.getSelectedItem().toString();
-//                if ("New material(manually set threshold)".equals(selectedMaterial)) {
-//                    editTextThresholdInput.setVisibility(View.VISIBLE);
-//
-//                } else {
-//                    editTextThresholdInput.setVisibility(View.INVISIBLE);
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//                // your code here
-//            }
-//        });
-//
-//        spnT.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//                selectedTest = spnT.getSelectedItem().toString();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//                // your code here
-//            }
-//        });
     }
 
     // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
@@ -396,8 +354,6 @@ public class ControllerActivity extends AppCompatActivity {
             record.temperature = values[1];
             record.pressure = values[2];
             record.timestamp = timestamp;
-            // Material ID to be implemented later
-            record.materialID = String.valueOf(1);
             record.sessionID = sessionID;
             recordList.add(record);
             runOnUiThread(() -> displayRecord(record));
@@ -425,7 +381,6 @@ public class ControllerActivity extends AppCompatActivity {
             jsonRecord.put("Distance", record.distance);
             jsonRecord.put("Temperature", record.temperature);
             jsonRecord.put("Pressure", record.pressure);
-            jsonRecord.put("MaterialID", record.materialID);
             jsonRecord.put("SessionID", record.sessionID);
             jsonRecord.put("Timestamp", record.timestamp);
             jsonRecord.put("Valid", record.valid);
@@ -434,31 +389,28 @@ public class ControllerActivity extends AppCompatActivity {
             jsonArray.put(jsonRecord);
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("https://cat-tester-api.azurewebsites.net/batch-process-records");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setDoOutput(true);
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://cat-tester-api.azurewebsites.net/batch-process-records");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
 
-                    Log.d("JSON_PAYLOAD", "Sending: " + jsonArray);
+                Log.d("JSON_PAYLOAD", "Sending: " + jsonArray);
 
-                    OutputStream os = conn.getOutputStream();
-                    os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
-                    os.flush();
-                    os.close();
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
 
-                    int responseCode = conn.getResponseCode();
-                    if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
-                        System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                int responseCode = conn.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                    System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -510,35 +462,40 @@ public class ControllerActivity extends AppCompatActivity {
         }
     }
 
-    private void createSession(long sessionID, String sessionName, float initialLength, float initialArea, String testType) throws JSONException {
-        JSONObject initialData = new JSONObject();
-        initialData.put("SessionID", sessionID);
-        initialData.put("SessionName", sessionName);
-        initialData.put("InitialLength", initialLength);
-        initialData.put("InitialArea", initialArea);
-        initialData.put("TestType", testType);
-
-        try {
-            URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-
-            Log.d("JSON_PAYLOAD", "Sending: " + initialData);
-
-            OutputStream os = conn.getOutputStream();
-            os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
-            os.flush();
-            os.close();
-
-            int responseCode = conn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
-                System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+    private void createSession(long sessionID, String sessionName, float initialLength, float initialArea) {
+        new Thread(() -> {
+            JSONObject initialData = new JSONObject();
+            try {
+                initialData.put("SessionID", sessionID);
+                initialData.put("SessionName", sessionName);
+                initialData.put("InitialLength", initialLength);
+                initialData.put("InitialArea", initialArea);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            try {
+                URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                Log.d("JSON_PAYLOAD", "Sending: " + initialData);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                    System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
