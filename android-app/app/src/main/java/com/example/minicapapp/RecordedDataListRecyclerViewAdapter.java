@@ -78,8 +78,8 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
         // Set the correct information for each Recorded Data Item.
         holder.getTextViewRecordedDataListItemName().setText(dataItem.getTestName());
         holder.getTextViewRecordedDataLisItemTimestamp().setText(dataItem.getTimestamp());
-        holder.getTextViewRecordedDataListItemTestType().setText(dataItem.getTestType());
-        holder.getTextViewRecordedDataListItemMaterialType().setText(dataItem.getMaterialType());
+        holder.getTextViewRecordedDataListItemTestType().setText("Compressive");
+        holder.getTextViewRecordedDataListItemMaterialType().setText(" ");
         holder.getButtonMoreDetails().setText("More Details >");
 
         // Go to the Data Item Activity if the "More Details" button is pressed.

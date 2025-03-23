@@ -1,10 +1,15 @@
 package com.example.minicapapp;
 
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.view.MotionEvent;
@@ -36,6 +41,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 // For batch processing
 import org.json.JSONException;
@@ -45,6 +53,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ControllerActivity extends AppCompatActivity {
+    // The UI elements present on the Controller Activity.
+    protected Toolbar toolbarController;
+
+
+
     protected Button btnMotorFwd, btnMotorBwd, btnStopB, btnEstablishConnectionBluetooth, btnRecordB;
     protected Toolbar toolbar;
     protected TextView txtStatusBluetooth, txtBluetoothData;
@@ -68,12 +81,18 @@ public class ControllerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_controls);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_controller);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        //enable back button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // This method will be used to set up all of the UI elements in the Main Activity
+        setupUI();
+
+
 
         btnMotorBwd = findViewById(R.id.motorbwd);
         btnMotorFwd = findViewById(R.id.motorfwd);
@@ -221,6 +240,48 @@ public class ControllerActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    // Setup Functions for the Appbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Load the main_appbar_resource as an object
+        getMenuInflater().inflate(R.menu.menu_appbar_resource, menu);
+
+        // Define the Toolbar Items and change their colour
+        MenuItem settingsItem = menu.findItem(R.id.action_settings);
+        settingsItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
+
+        MenuItem helpItem = menu.findItem(R.id.action_help);
+        helpItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(R.id.action_settings == item.getItemId()) {
+            goToSettingsActivity();
+            return true;
+        } else if(R.id.action_help == item.getItemId()) {
+            HelpFrag helpDialogueFragment = new HelpFrag();
+            helpDialogueFragment.show(getSupportFragmentManager(), "Help");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void setupUI() {
+        // Toolbar
+        toolbarController = findViewById(R.id.toolbarController);
+        setSupportActionBar(toolbarController);
+        getSupportActionBar().setTitle("Controller Activity");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
+    private void goToSettingsActivity() {
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
     }
 
     private void setupBluetoothStuff(){
@@ -474,15 +535,6 @@ public class ControllerActivity extends AppCompatActivity {
                 btSocket.close();
             }
         } catch (Exception ignored) {}
-    }
-
-    //for menu icon in the toolbar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.menu_appbar_resource, menu);
-
-        return true;
     }
 }
 
