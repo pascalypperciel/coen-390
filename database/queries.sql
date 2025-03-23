@@ -42,3 +42,12 @@ ADD COLUMN "Valid" BOOLEAN NOT NULL;
 
 -- March 17th 2025
 ALTER TABLE "Record" ALTER COLUMN sessionid TYPE BIGINT USING sessionid::BIGINT;
+
+-- March 22nd 2025
+CREATE TABLE Session (
+    SessionID INT PRIMARY KEY,
+    SessionName VARCHAR(255),
+    initialLength FLOAT,
+    initialArea FLOAT,
+    TestType INT
+);

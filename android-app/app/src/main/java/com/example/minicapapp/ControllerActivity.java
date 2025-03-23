@@ -103,9 +103,7 @@ public class ControllerActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 selectedMaterial = spnC.getSelectedItem().toString();
-                Toast.makeText(getApplicationContext(), "you selected: " + selectedMaterial, Toast.LENGTH_LONG).show();
                 if("New material(manually set threshold)".equals(selectedMaterial)){
-                    Toast.makeText(getApplicationContext(), "HAPPY BIRTHDAY TO NEW MATERIAL", Toast.LENGTH_LONG).show();
                     etInput.setVisibility(View.VISIBLE);
 
                 }else{
@@ -125,8 +123,6 @@ public class ControllerActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 selectedTest = spnT.getSelectedItem().toString();
-                Toast.makeText(getApplicationContext(), "you selected: " + selectedTest, Toast.LENGTH_LONG).show();
-
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -173,16 +169,23 @@ public class ControllerActivity extends AppCompatActivity {
         btnRecordB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(selectedTest.equals("Tensile(stretching)")) {
+                    sendBluetoothCommand("Motor_FWD");
+                    connectInputStream(sessionID);
+                }else if(selectedTest.equals("Compression")){
+                    sendBluetoothCommand("Motor_BWD");
+                }
+                
+                String sessionID = sdf.format(new Date());
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                String session_id = sdf.format(new Date());
 
-                testInitData(session_id, session_name, initial_length, initial_area, test_type);
+                createSession(session_id, session_name, initial_length, initial_area, test_type);
                 connectInputStream(session_id);
             }
         });
     }
 
-    testInitData(session_id, session_name, initial_length, initial_area, test_type) {
+    createSession(session_id, session_name, initial_length, initial_area, test_type) {
         JSONObject initialData = new JSONObject();
         initialData.put("SessionID", session_id);
         initialData.put("SessionName", session_name);
@@ -296,6 +299,7 @@ public class ControllerActivity extends AppCompatActivity {
                         if (bytesRead > 0) {
                             final String incoming = new String(buffer, 0, bytesRead).trim();
                             processBluetoothData(incoming, sessionID);
+                            runOnUiThread(() -> txtStatusBluetooth.setText("Connected and Fetching Data"));
 
                             //
                         }
@@ -343,6 +347,7 @@ public class ControllerActivity extends AppCompatActivity {
             record.sessionID = sessionID;
             recordList.add(record);
             runOnUiThread(() -> displayRecord(record));
+
         }
 
 
@@ -430,6 +435,13 @@ public class ControllerActivity extends AppCompatActivity {
     private void displayRecord(Record newMessage) {
         String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
         txtBluetoothData.setText(displayText);
+
+        //stop if us sensor says too close
+        if(Float.valueOf(newMessage.distance.trim())<2.0 || Float.valueOf(newMessage.distance.trim())>10.55){
+            Toast.makeText(getApplicationContext(), "Test Finished", Toast.LENGTH_LONG).show();
+            sendBluetoothCommand("Motor_OFF");
+            disableInputStream();
+        }
     }
 
     private void clearInputStream(){

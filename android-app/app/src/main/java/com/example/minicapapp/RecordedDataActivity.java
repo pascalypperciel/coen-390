@@ -41,6 +41,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     protected Spinner spinnerFilter;
     protected TextView textViewSummary;
     protected RecyclerView recyclerViewRecordedDataList;
+    protected RecordedDataListRecyclerViewAdapter recordedDataListRecyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,22 +56,13 @@ public class RecordedDataActivity extends AppCompatActivity {
 
         // This method will be used to set up all of the UI elements in the Main Activity
         setupUI();
+    }
 
-        Button btnFetch;
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_data);
-
-        txtResponse = findViewById(R.id.txtResponse);
-        btnFetch = findViewById(R.id.btnFetch);
-
-        btnFetch.setOnClickListener(v -> new FetchDataTask().execute());
-
-        toolbar = findViewById(R.id.toolbarRecordedData);
-        setSupportActionBar(toolbar);
-        //enable back button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUI();
     }
 
     // Setup Functions for the Appbar
@@ -113,29 +105,30 @@ public class RecordedDataActivity extends AppCompatActivity {
         spinnerFilter = findViewById(R.id.spinnerFilter);
         // TODO: Figure out how to handle the spinner
 
-        // Summary of the Recorded Data
-        textViewSummary = findViewById(R.id.textViewSummary);
-        textViewSummary.setText("This will be a summary of the recorded data...");
-        // TODO: Change the setText() so that it returns the number of recorded test and how they are filtered.
-
         // Recorded Data List
         setupRecyclerView();
+
+        // Summary of the Recorded Data
+        textViewSummary = findViewById(R.id.textViewSummary);
+        textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
+        // TODO: Change this summary once filtering has been integrated.
     }
 
     // Create and set up the list of profiles
     // TODO: Adapt this method to the context-specific
     protected void setupRecyclerView() {
         // Retrieve the recorded data list stored in the database.
-//        List<Profile> profileList = databaseHelper.getAllProfiles();
-//
-//        // Bind and organize the profile list items.
+        // TODO: Retrieve the information from the PB and create a list of RecordedDataItem objects
+        List<RecordedDataItem> recordedDataList = getData();
+
+        // Bind and organize the profile list items.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        profileListRecyclerViewAdapter = new ProfileListRecyclerViewAdapter(this, profileList);
-//
+        recordedDataListRecyclerViewAdapter = new RecordedDataListRecyclerViewAdapter(this, recordedDataList);
+
         // Define and initialize the Recycler View.
         recyclerViewRecordedDataList = findViewById(R.id.recyclerViewRecordedDataList);
         recyclerViewRecordedDataList.setLayoutManager(linearLayoutManager);
-//        recyclerViewProfileList.setAdapter(profileListRecyclerViewAdapter);
+        recyclerViewRecordedDataList.setAdapter(recordedDataListRecyclerViewAdapter);
 
         // Adding a border around each item.
         DividerItemDecoration border = new DividerItemDecoration(recyclerViewRecordedDataList.getContext(), linearLayoutManager.getOrientation());
@@ -160,7 +153,7 @@ public class RecordedDataActivity extends AppCompatActivity {
        }
    }
 
-   List<Map<String, Object>> getData() {
+   List<RecordedDataItem> getData() {
     try {
         List<RecordedDataItem> sessionList = new ArrayList<>();
 
@@ -192,4 +185,15 @@ public class RecordedDataActivity extends AppCompatActivity {
                  return "Error: " + e.getMessage();
              }
    }
+    // This method will update the UI
+    protected void updateUI() {
+        // Retrieve the Recorded Data List Stored in the database.
+        // TODO: Retrieve the information from the PB and create a list of RecordedDataItem objects
+        List<RecordedDataItem> recordedDataItemList = getData();
+
+        recordedDataListRecyclerViewAdapter.updateList(recordedDataItemList);
+
+        textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
+        // TODO: Change this summary once filtering has been integrated.
+    }
 }
