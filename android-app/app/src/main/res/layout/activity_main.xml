@@ -32,7 +32,7 @@
         android:id="@+id/buttonMaterialsInformationPage"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="30dp"
         android:text="Materials Information Page"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +43,6 @@
         android:id="@+id/imageViewAppIcon"
         android:layout_width="261dp"
         android:layout_height="262dp"
-        android:layout_marginBottom="40dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonController"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,15 +50,17 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarMain"
-        android:layout_width="409dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        app:layout_constraintBottom_toTopOf="@+id/textViewAppTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="#FFC107" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textViewAppTitle"
@@ -69,9 +70,7 @@
         android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/imageViewAppIcon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarMain"
-        app:layout_constraintVertical_bias="0.9" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/buttonBluetooth"

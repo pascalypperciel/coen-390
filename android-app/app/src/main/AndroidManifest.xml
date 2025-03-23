@@ -29,7 +29,8 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".SettingsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.SettingsActivity" />
         <activity
             android:name=".ControllerActivity"
             android:exported="false"
