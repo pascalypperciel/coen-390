@@ -369,7 +369,8 @@ public class ControllerActivity extends AppCompatActivity {
         if (values.length == 3) {
             String valid = "True";
             for (String value : values) {
-                if (Objects.equals(value, "NaN")) {
+                //empty or temp<0 or distance to big or to small
+                if (Objects.equals(value, "NaN") || (Float.valueOf(values[1])<0) || (Float.valueOf(values[0])>11) || (Float.valueOf(values[0])<0)) {
                     valid = "False";
                     break;
                 }
