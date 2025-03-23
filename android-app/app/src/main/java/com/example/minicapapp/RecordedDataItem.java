@@ -1,68 +1,66 @@
 package com.example.minicapapp;
 
 public class RecordedDataItem {
-    private long session_id; // The session_id associated with the subject's profile.
-    private String test_name; // The test's name.
-    private String timestamp; // The test's date.
-    private String test_type; // The type of test conducted (e.g., Compressive, Tensile, etc.)
-    private float initial_length; // The initial length of the test sample
-    private float initial_area; // The initial cross-sectional area of the test sample
-    private String material_type; // The type of material that was tested, if known (e.g., Wood, Steel, etc.)
+    private long sessionID; // The sessionID associated with the subject's profile.
+    private String sessionName; // The test's name.
+    private String sessionTimestamp; // The test's date.
+    private String testType; // The type of test conducted (e.g., Compressive, Tensile, etc.)
+    private float initialLength; // The initial length of the test sample
+    private float initialArea; // The initial cross-sectional area of the test sample
 
-    public RecordedDataItem(long session_id, String test_name, String test_type, String material_type, String initial_length, String intial_area) {
-        this.session_id = session_id;
-        this.test_name = test_name;
-        this.test_type = test_type;
-        this.initial_length = initial_length;
-        this.initial_area = initial_area;
-        this.material_type = material_type;
+    public RecordedDataItem(long sessionID, String sessionName, String testType, float initialLength, float initialArea) {
+        this.sessionID = sessionID;
+        this.sessionName = sessionName;
+        this.testType = testType;
+        this.initialLength = initialLength;
+        this.initialArea = initialArea;
     }
 
     public long getSessionID() {
-        return this.session_id;
+        return sessionID;
     }
 
-    public void setSessionID(long session_id) {
-        this.session_id = session_id;
+    public void setSessionID(long sessionID) {
+        this.sessionID = sessionID;
     }
 
-    public String getTestName() {
-        return this.test_name;
+    public String getSessionName() {
+        return sessionName;
     }
 
-    public void setTestName(String test_name) {
-        this.test_name = test_name;
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
+    }
+
+    public String getSessionTimestamp() {
+        return sessionTimestamp;
+    }
+
+    public void setSessionTimestamp(String sessionTimestamp) {
+        this.sessionTimestamp = sessionTimestamp;
     }
 
     public String getTestType() {
-        return this.test_type;
+        return testType;
     }
 
-    public void setTestType(String test_type) {
-        this.test_type = test_type;
+    public void setTestType(String testType) {
+        this.testType = testType;
     }
 
-    public String getMaterialType() {
-        return this.material_type;
+    public float getInitialLength() {
+        return initialLength;
     }
 
-    public void setMaterialType(String material_type) {
-        this.material_type = material_type;
+    public void setInitialLength(float initialLength) {
+        this.initialLength = initialLength;
     }
 
-    public long getInitialLength() {
-        return this.initial_length;
+    public float getInitialArea() {
+        return initialArea;
     }
 
-    public void setInitialLength(long initial_length) {
-        this.initial_length = initial_length;
-    }
-
-    public long getInitialArea() {
-        return this.initial_area;
-    }
-
-    public void setInitialArea(long initial_area) {
-        this.initial_area = initial_area;
+    public void setInitialArea(float initialArea) {
+        this.initialArea = initialArea;
     }
 }

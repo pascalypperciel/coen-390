@@ -76,8 +76,9 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
         RecordedDataItem dataItem = localRecordedDataList.get(position);
 
         // Set the correct information for each Recorded Data Item.
-        holder.getTextViewRecordedDataListItemName().setText(dataItem.getTestName());
-        holder.getTextViewRecordedDataLisItemTimestamp().setText(dataItem.getTimestamp());
+        // TODO: Make sure the other fields are set correctly once the Controller Activity is finished.
+        holder.getTextViewRecordedDataListItemName().setText(dataItem.getSessionName());
+        holder.getTextViewRecordedDataLisItemTimestamp().setText(dataItem.getSessionTimestamp());
         holder.getTextViewRecordedDataListItemTestType().setText("Compressive");
         holder.getTextViewRecordedDataListItemMaterialType().setText(" ");
         holder.getButtonMoreDetails().setText("More Details >");
@@ -87,7 +88,7 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
             @Override
             public void onClick(View v) {
                 Intent intent  = new Intent(context, DataItemActivity.class); // Explicit Intent.
-                intent.putExtra("data_item_session_id", dataItem.getId());
+                intent.putExtra("data_item_session_id", dataItem.getSessionID());
                 context.startActivity(intent);
             }
         });
