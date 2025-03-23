@@ -33,11 +33,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -53,23 +49,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ControllerActivity extends AppCompatActivity {
-    // The UI elements present on the Controller Activity.
-    protected Toolbar toolbarController;
-
-
-
-    protected Button btnMotorFwd, btnMotorBwd, btnStopB, btnEstablishConnectionBluetooth, btnRecordB;
-    protected Toolbar toolbar;
-    protected TextView txtStatusBluetooth, txtBluetoothData;
-    protected Spinner spnC, spnT;
-    protected EditText etInput;
+    // Internal attributes
+    public static class Record {
+        public String distance;
+        public String temperature;
+        public String timestamp;
+        public String sessionID;
+        public String pressure;
+        public String valid;
+        public String materialID;
+    }
     protected String selectedTest, selectedMaterial;
     private static final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private BluetoothAdapter btAdapter = null;
-    private BluetoothSocket btSocket = null;
+    private BluetoothAdapter bluetoothAdapter = null;
+    private BluetoothSocket bluetoothSocket = null;
     private OutputStream outStream = null;
-    private InputStream inStream= null;
+    private InputStream inStream = null;
     private Thread inThread;
     private volatile boolean stopInThread = true;
     private static final int REQUEST_BT_PERMISSIONS = 100;
@@ -77,6 +73,14 @@ public class ControllerActivity extends AppCompatActivity {
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
+
+    // The UI elements present on the Controller Activity.
+    protected Toolbar toolbarController;
+    protected Button buttonMotorForward, buttonMotorBackward, buttonStop, buttonEstablishBluetoothConnection, buttonRecord;
+    protected TextView textViewBluetoothStatus, textViewBluetoothData;
+    // TODO: Remove?
+//    protected Spinner spnC, spnT;
+    protected EditText editTextThresholdInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,117 +95,21 @@ public class ControllerActivity extends AppCompatActivity {
 
         // This method will be used to set up all of the UI elements in the Main Activity
         setupUI();
+    }
 
-
-
-        btnMotorBwd = findViewById(R.id.motorbwd);
-        btnMotorFwd = findViewById(R.id.motorfwd);
-        btnStopB = findViewById(R.id.stop);
-        btnRecordB = findViewById(R.id.record);
-        btnEstablishConnectionBluetooth = findViewById(R.id.establishc);
-
-        etInput = findViewById(R.id.thinput);
-        etInput.setVisibility(View.INVISIBLE);
-
-        txtBluetoothData= findViewById(R.id.showsbtmessages);
-        txtStatusBluetooth = findViewById(R.id.connectionstatus);
-
-        spnC = findViewById(R.id.cspinner);
-        ArrayAdapter<CharSequence>adapter=ArrayAdapter.createFromResource(this, R.array.materials, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spnC.setAdapter(adapter);
-
-        spnT = findViewById(R.id.tspinner);
-        ArrayAdapter<CharSequence>testAdapter = ArrayAdapter.createFromResource(this, R.array.tests, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spnT.setAdapter(testAdapter);
-
-        spnC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
-            {
-                selectedMaterial = spnC.getSelectedItem().toString();
-                if("New material(manually set threshold)".equals(selectedMaterial)){
-                    etInput.setVisibility(View.VISIBLE);
-
-                }else{
-                    etInput.setVisibility(View.INVISIBLE);
-                }
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopInThread = true;
+        if (inThread != null && inThread.isAlive()) {
+            inThread.interrupt();
+        }
+        try {
+            if (bluetoothSocket != null) {
+                bluetoothSocket.close();
             }
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-        });
-
-        spnT.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
-            {
-                selectedTest = spnT.getSelectedItem().toString();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-        });
-        
-        btnRecordB.setVisibility(View.INVISIBLE);
-
-        btnMotorBwd.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("Motor_BWD");
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("Motor_OFF");
-            }
-            return true;
-        });
-
-        btnMotorFwd.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("Motor_FWD");
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("Motor_OFF");
-            }
-            return true;
-        });
-
-        btnEstablishConnectionBluetooth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setupBluetoothStuff();
-            }
-        });
-
-        btnStopB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBluetoothCommand("Motor_OFF");
-                disableInputStream();
-
-            }
-        });
-        
-        btnRecordB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(selectedTest.equals("Tensile(stretching)")) {
-                    sendBluetoothCommand("Motor_FWD");
-                    connectInputStream(sessionID);
-                }else if(selectedTest.equals("Compression")){
-                    sendBluetoothCommand("Motor_BWD");
-                }
-                
-                String sessionID = sdf.format(new Date());
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-
-                createSession(session_id, session_name, initial_length, initial_area, test_type);
-                connectInputStream(session_id);
-            }
-        });
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -210,36 +118,6 @@ public class ControllerActivity extends AppCompatActivity {
         return true;
     }
 
-    createSession(session_id, session_name, initial_length, initial_area, test_type) {
-        JSONObject initialData = new JSONObject();
-        initialData.put("SessionID", session_id);
-        initialData.put("SessionName", session_name);
-        initialData.put("InitialLength", initial_length);
-        initialData.put("InitialArea", initial_area);
-        initialData.put("TestType", test_type);
-        
-        try {
-            URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-
-            Log.d("JSON_PAYLOAD", "Sending: " + initialData);
-
-            OutputStream os = conn.getOutputStream();
-            os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
-            os.flush();
-            os.close();
-
-            int responseCode = conn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
-                System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     // Setup Functions for the Appbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -258,10 +136,10 @@ public class ControllerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(R.id.action_settings == item.getItemId()) {
+        if (R.id.action_settings == item.getItemId()) {
             goToSettingsActivity();
             return true;
-        } else if(R.id.action_help == item.getItemId()) {
+        } else if (R.id.action_help == item.getItemId()) {
             HelpFrag helpDialogueFragment = new HelpFrag();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
@@ -269,13 +147,121 @@ public class ControllerActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     private void setupUI() {
         // Toolbar
         toolbarController = findViewById(R.id.toolbarController);
         setSupportActionBar(toolbarController);
         getSupportActionBar().setTitle("Controller Activity");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Bluetooth Elements
+        textViewBluetoothData = findViewById(R.id.showsbtmessages);
+        textViewBluetoothStatus = findViewById(R.id.connectionstatus);
+        buttonEstablishBluetoothConnection = findViewById(R.id.buttonEstablishBluetoothConnection);
+        buttonEstablishBluetoothConnection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setupBluetooth();
+            }
+        });
+
+        // Input Elements
+        editTextThresholdInput = findViewById(R.id.editTextThresholdInput);
+        editTextThresholdInput.setVisibility(View.INVISIBLE);
+
+        // Controller Elements
+        buttonMotorBackward = findViewById(R.id.motorbwd);
+        buttonMotorBackward.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                sendBluetoothCommand("Motor_BWD");
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                sendBluetoothCommand("Motor_OFF");
+            }
+            return true;
+        });
+
+        buttonMotorForward = findViewById(R.id.motorfwd);
+        buttonMotorForward.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                sendBluetoothCommand("Motor_FWD");
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                sendBluetoothCommand("Motor_OFF");
+            }
+            return true;
+        });
+
+        buttonRecord = findViewById(R.id.record);
+        buttonRecord.setVisibility(View.INVISIBLE);
+        buttonRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                String sessionID = sdf.format(new Date());
+
+                if (selectedTest.equals("Tensile(stretching)")) {
+                    sendBluetoothCommand("Motor_FWD");
+                    connectInputStream(sessionID);
+                } else if (selectedTest.equals("Compression")) {
+                    sendBluetoothCommand("Motor_BWD");
+                }
+
+                // TODO: Figure out what's going on here...
+                createSession(sessionID, sessionName, initialLength, initialArea, testType);
+                connectInputStream(sessionID);
+            }
+        });
+
+        buttonStop = findViewById(R.id.stop);
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendBluetoothCommand("Motor_OFF");
+                disableInputStream();
+
+            }
+        });
+
+        // TODO: Remove?
+//        spnC = findViewById(R.id.cspinner);
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.materials, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+//        spnC.setAdapter(adapter);
+//
+//        spnT = findViewById(R.id.tspinner);
+//        ArrayAdapter<CharSequence> testAdapter = ArrayAdapter.createFromResource(this, R.array.tests, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+//        spnT.setAdapter(testAdapter);
+//
+//        spnC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+//                selectedMaterial = spnC.getSelectedItem().toString();
+//                if ("New material(manually set threshold)".equals(selectedMaterial)) {
+//                    editTextThresholdInput.setVisibility(View.VISIBLE);
+//
+//                } else {
+//                    editTextThresholdInput.setVisibility(View.INVISIBLE);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parentView) {
+//                // your code here
+//            }
+//        });
+//
+//        spnT.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+//                selectedTest = spnT.getSelectedItem().toString();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parentView) {
+//                // your code here
+//            }
+//        });
     }
 
     // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
@@ -284,10 +270,10 @@ public class ControllerActivity extends AppCompatActivity {
         startActivity(settingsIntent);
     }
 
-    private void setupBluetoothStuff(){
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter == null) {
-            txtBluetoothData.setText(R.string.bluetooth_not_work);
+    private void setupBluetooth() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            textViewBluetoothData.setText(R.string.bluetooth_not_work);
             return;
         }
 
@@ -304,55 +290,56 @@ public class ControllerActivity extends AppCompatActivity {
             startBluetoothOutThread();
         }
     }
+
     private void startBluetoothOutThread() {
-        if (!btAdapter.isEnabled()) {
-            txtStatusBluetooth.setText(R.string.bluetooth_not_enabled);
+        if (!bluetoothAdapter.isEnabled()) {
+            textViewBluetoothStatus.setText(R.string.bluetooth_not_enabled);
             return;
         }
-        btnRecordB.setVisibility(View.VISIBLE);
+        buttonRecord.setVisibility(View.VISIBLE);
         connectOutputStream();
     }
 
-    private void connectOutputStream(){
+    private void connectOutputStream() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
                     || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
 
                 Log.e("BT", "Bluetooth permissions aren't allowed");
-                runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_permissions_not_allowed));
+                runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_permissions_not_allowed));
                 return;
             }
         }
 
         try {
-            btAdapter.cancelDiscovery();
-            BluetoothDevice device = btAdapter.getRemoteDevice(ESP32_MAC_ADDRESS);
-            btSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
-            btSocket.connect();
+            bluetoothAdapter.cancelDiscovery();
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(ESP32_MAC_ADDRESS);
+            bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+            bluetoothSocket.connect();
 
-            outStream = btSocket.getOutputStream();
-            runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
-            btnRecordB.setVisibility(View.VISIBLE);
+            outStream = bluetoothSocket.getOutputStream();
+            runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
+            buttonRecord.setVisibility(View.VISIBLE);
 
-            inStream = btSocket.getInputStream();
+            inStream = bluetoothSocket.getInputStream();
 
         } catch (SecurityException se) {
             se.printStackTrace();
-            runOnUiThread(() -> txtStatusBluetooth.setText("SecurityException: " + se.getMessage()));
-            btnRecordB.setVisibility(View.INVISIBLE);
+            runOnUiThread(() -> textViewBluetoothStatus.setText("SecurityException: " + se.getMessage()));
+            buttonRecord.setVisibility(View.INVISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
-            runOnUiThread(() -> txtStatusBluetooth.setText("Error: " + e.getMessage()));
-            btnRecordB.setVisibility(View.INVISIBLE);
+            runOnUiThread(() -> textViewBluetoothStatus.setText("Error: " + e.getMessage()));
+            buttonRecord.setVisibility(View.INVISIBLE);
         }
 
     }
 
-    private void connectInputStream(String sessionID){
-        if(!stopInThread){
+    private void connectInputStream(String sessionID) {
+        if (!stopInThread) {
             return;
         }
-        stopInThread =false;
+        stopInThread = false;
 
         inThread = new Thread(new Runnable() {
             @Override
@@ -366,26 +353,26 @@ public class ControllerActivity extends AppCompatActivity {
                         if (bytesRead > 0) {
                             final String incoming = new String(buffer, 0, bytesRead).trim();
                             processBluetoothData(incoming, sessionID);
-                            runOnUiThread(() -> txtStatusBluetooth.setText("Connected and Fetching Data"));
+                            runOnUiThread(() -> textViewBluetoothStatus.setText("Connected and Fetching Data"));
 
                             //
                         }
-                    }catch (SecurityException se) {
+                    } catch (SecurityException se) {
                         se.printStackTrace();
-                        runOnUiThread(() -> txtStatusBluetooth.setText("SecurityException: " + se.getMessage()));
+                        runOnUiThread(() -> textViewBluetoothStatus.setText("SecurityException: " + se.getMessage()));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        runOnUiThread(() -> txtStatusBluetooth.setText("Error: " + e.getMessage()));
+                        runOnUiThread(() -> textViewBluetoothStatus.setText("Error: " + e.getMessage()));
                     }
                 }
-                runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
-                btnRecordB.setVisibility(View.VISIBLE);
+                runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
+                buttonRecord.setVisibility(View.VISIBLE);
             }
         });
 
         inThread.start();
-        runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
-        btnRecordB.setVisibility(View.INVISIBLE);
+        runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
+        buttonRecord.setVisibility(View.INVISIBLE);
 
     }
 
@@ -446,7 +433,7 @@ public class ControllerActivity extends AppCompatActivity {
             // Add the JSONObject to the JSONArray
             jsonArray.put(jsonRecord);
         }
-        
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -475,21 +462,21 @@ public class ControllerActivity extends AppCompatActivity {
             }
         }).start();
     }
-    
-    private void disableInputStream(){
-        if(stopInThread){
+
+    private void disableInputStream() {
+        if (stopInThread) {
             return;
         }
-        stopInThread =true;
+        stopInThread = true;
         if (inThread != null && inThread.isAlive()) {
             inThread.interrupt();
         }
-        runOnUiThread(() -> txtStatusBluetooth.setText(R.string.bluetooth_connected));
-        btnRecordB.setVisibility(View.VISIBLE);
+        runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
+        buttonRecord.setVisibility(View.VISIBLE);
     }
 
     private void sendBluetoothCommand(String command) {
-        if (btSocket != null && outStream != null) {
+        if (bluetoothSocket != null && outStream != null) {
             try {
                 outStream.write((command + "\n").getBytes());
                 outStream.flush();
@@ -501,49 +488,57 @@ public class ControllerActivity extends AppCompatActivity {
 
     private void displayRecord(Record newMessage) {
         String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
-        txtBluetoothData.setText(displayText);
+        textViewBluetoothData.setText(displayText);
 
         //stop if us sensor says too close
-        if(Float.valueOf(newMessage.distance.trim())<2.0 || Float.valueOf(newMessage.distance.trim())>10.55){
+        if (Float.valueOf(newMessage.distance.trim()) < 2.0 || Float.valueOf(newMessage.distance.trim()) > 10.55) {
             Toast.makeText(getApplicationContext(), "Test Finished", Toast.LENGTH_LONG).show();
             sendBluetoothCommand("Motor_OFF");
             disableInputStream();
         }
     }
 
-    private void clearInputStream(){
-        byte[] buffer=new byte[1024];
-        try{
-            while(inStream.available()>0){
+    private void clearInputStream() {
+        byte[] buffer = new byte[1024];
+        try {
+            while (inStream.available() > 0) {
                 inStream.read(buffer);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            runOnUiThread(()-> txtStatusBluetooth.setText("Error clearing inStream" + e.getMessage()));
+            runOnUiThread(() -> textViewBluetoothStatus.setText("Error clearing inStream" + e.getMessage()));
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopInThread = true;
-        if (inThread != null && inThread.isAlive()) {
-            inThread.interrupt();
-        }
+    private void createSession(long sessionID, String sessionName, float initialLength, float initialArea, String testType) throws JSONException {
+        JSONObject initialData = new JSONObject();
+        initialData.put("SessionID", sessionID);
+        initialData.put("SessionName", sessionName);
+        initialData.put("InitialLength", initialLength);
+        initialData.put("InitialArea", initialArea);
+        initialData.put("TestType", testType);
+
         try {
-            if (btSocket != null) {
-                btSocket.close();
-            }
-        } catch (Exception ignored) {}
-    }
-}
+            URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
 
-class Record {
-    public String distance;
-    public String temperature;
-    public String timestamp;
-    public String sessionID;
-    public String pressure;
-    public String valid;
-    public String materialID;
+            Log.d("JSON_PAYLOAD", "Sending: " + initialData);
+
+            OutputStream os = conn.getOutputStream();
+            os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

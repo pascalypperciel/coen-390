@@ -20,6 +20,14 @@ import android.view.MenuItem;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Base64;
@@ -80,10 +88,10 @@ public class RecordedDataActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(R.id.action_settings == item.getItemId()) {
+        if (R.id.action_settings == item.getItemId()) {
             goToSettingsActivity();
             return true;
-        } else if(R.id.action_help == item.getItemId()) {
+        } else if (R.id.action_help == item.getItemId()) {
             HelpFrag helpDialogueFragment = new HelpFrag();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
@@ -111,11 +119,9 @@ public class RecordedDataActivity extends AppCompatActivity {
         // TODO: Change this summary once filtering has been integrated.
     }
 
-    // Create and set up the list of profiles
-    // TODO: Adapt this method to the context-specific
+    // Create and set up the list of recorded data items.
     protected void setupRecyclerView() {
         // Retrieve the recorded data list stored in the database.
-        // TODO: Retrieve the information from the PB and create a list of RecordedDataItem objects
         List<RecordedDataItem> recordedDataList = getData();
 
         // Bind and organize the profile list items.
@@ -132,65 +138,51 @@ public class RecordedDataActivity extends AppCompatActivity {
         recyclerViewRecordedDataList.addItemDecoration(border);
     }
 
-    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
-    private void goToSettingsActivity() {
-        Intent settingsIntent = new Intent(this, SettingsActivity.class);
-        startActivity(settingsIntent);
-    }
-
-   private class FetchDataTask extends AsyncTask<Void, Void, String> {
-       @Override
-       protected String doInBackground(Void... voids) {
-
-                }
-
-       @Override
-       protected void onPostExecute(String result) {
-           txtResponse.setText(result);
-       }
-   }
-
-   List<RecordedDataItem> getData() {
-    try {
-        List<RecordedDataItem> sessionList = new ArrayList<>();
-
-        URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all-sessions");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder result = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            result.append(line);
-        }
-        reader.close();
-        JSONObject responseJson = new JSONObject(result.toString());
-        JSONArray records = responseJson.getJSONArray("list of tests");
-
-        // Loop through each record in the JSON array
-         for (int i = 0; i < records.length(); i++) {
-             JSONObject record = records.getJSONObject(i);
-             RecordedDataItem item = new RecordedDataItem(record.getString("SessionID"), record.getString("SessionName"), 
-             record.getString("TestType"), record.getString("MaterialType"), record.getString("InitialLength"), record.getString("InitialArea")) 
-             sessionList.add(item);
-         }
-
-         // Return the list of sessions
-         return sessionList;
-             } catch (Exception e) {
-                 return "Error: " + e.getMessage();
-             }
-   }
     // This method will update the UI
     protected void updateUI() {
         // Retrieve the Recorded Data List Stored in the database.
-        // TODO: Retrieve the information from the PB and create a list of RecordedDataItem objects
         List<RecordedDataItem> recordedDataItemList = getData();
 
         recordedDataListRecyclerViewAdapter.updateList(recordedDataItemList);
 
         textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
         // TODO: Change this summary once filtering has been integrated.
+    }
+
+    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
+    private void goToSettingsActivity() {
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
+    }
+
+    // TODO: Make this asynchronous with a Service
+    List<RecordedDataItem> getData() {
+        List<RecordedDataItem> sessionList = new ArrayList<>();
+        try {
+            URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all-sessions");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder result = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                result.append(line);
+            }
+            reader.close();
+
+            JSONObject responseJson = new JSONObject(result.toString());
+            JSONArray records = responseJson.getJSONArray("list of tests");
+            // Loop through each record in the JSON array
+            for (int i = 0; i < records.length(); i++) {
+                JSONObject record = records.getJSONObject(i);
+                RecordedDataItem item = new RecordedDataItem(record.getLong("SessionID"), record.getString("SessionName"), record.getString("TestType"), (float) record.getDouble("InitialLength"), (float) record.getDouble("InitialArea"), record.getString("MaterialType"));
+                sessionList.add(item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Return the list of sessions
+        return sessionList;
     }
 }
