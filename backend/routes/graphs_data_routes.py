@@ -7,38 +7,36 @@ from graph_generator import create_graphs
 def build_graphs():
     try:
         session_id = request.args.get("SessionID")
-        graph_type = request.args.get("GraphType")
         
         offset = 0.05
 
         if not session_id:
-            return jsonify({"error": "Session Name is required"}), 400  # Bad request
-        if not graph_type:
-            return jsonify({"error": "Graph type is required"}), 400  # Bad request
-        if not offset:
-            return jsonify({"error": "Offset is required"}), 400  # Bad request        
+            return jsonify({"error": "Session Name is required"}), 400  # Bad request   
        
         conn = get_db_connection()
         cur = conn.cursor()
 
         select_query = """
-            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, "Timestamp", SessionID, Valid FROM "Record"
+            SELECT RecordID, Distance, Temperature, Pressure, "Timestamp", SessionID, Valid FROM "Record"
             WHERE SessionID = %s AND Valid = TRUE
             ORDER BY "Timestamp" ASC;
         """
-
         cur.execute(select_query, (session_id,))
         records = cur.fetchall()
-        cur.close()
-        
-        cur = conn.cursor()
-        select_query = """
+        # cur.close()
+        # conn.close()
+
+        # cur = conn.cursor()
+        # conn = get_db_connection()
+
+
+        select_query2 = """
             SELECT InitialLength, InitialArea FROM Session 
             WHERE SessionID = %s;
         """
-        cur.execute(select_query, (session_id))
-        initial_length, initial_area = cur.fetchall()
-        
+        cur.execute(select_query2, (session_id,))
+        (initial_length, initial_area) = cur.fetchall()[0]
+
         cur.close()
         conn.close()
 
@@ -49,23 +47,20 @@ def build_graphs():
                 "Distance": row[1],
                 "Temperature": row[2],
                 "Pressure": row[3],
-                "MaterialID": row[4],
-                "Timestamp": row[5],
-                "SessionID": row[6],
-                "Valid": row[7]
+                "Timestamp": row[4],
+                "SessionID": row[5],
+                "Valid": row[6]
             })
 
         if not records:
             return jsonify({"error": "No valid records found for this session"}), 404  # Not found
-
         # Extract relevant data
         distances = [row[1] for row in records]  # row[1] corresponds to Distance
         pressures = [row[3] for row in records]  # row[3] corresponds to Pressure
         temperatures = [row[2] for row in records]  # row[2] corresponds to Temperature
-        timestamps = [row[5] for row in records]  # row[5] corresponds to Timestamp
-
-        graphs_list = create_graphs(distances, pressures, temperatures, timestamps, session_id, initial_length, initial_area, offset, int(graph_type))
-
+        timestamps = [row[4] for row in records]  # row[5] corresponds to Timestamp
+        graphs_list = create_graphs(distances, pressures, temperatures, timestamps, session_id, initial_length, initial_area, offset)
+        print("Here3")
         # Return success response
         return jsonify({"Graph": graphs_list, "message": "Graphs generated successfully"}), 200
 
