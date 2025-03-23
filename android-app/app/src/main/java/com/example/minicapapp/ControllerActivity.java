@@ -186,6 +186,12 @@ public class ControllerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // The "finish()" will navigate back to the previous activity.
+        return true;
+    }
+
     private void setupBluetoothStuff(){
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {

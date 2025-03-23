@@ -32,7 +32,7 @@ import java.util.List;
 
 
 public class RecordedDataActivity extends AppCompatActivity {
-    // The UI elements present on the Main Activity.
+    // The UI elements present on the Recorded Data Activity.
     protected Toolbar toolbarRecordedData;
     protected Spinner spinnerFilter;
     protected TextView textViewSummary;
@@ -43,7 +43,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_data);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -54,11 +54,16 @@ public class RecordedDataActivity extends AppCompatActivity {
         setupUI();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         updateUI();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // The "finish()" will navigate back to the previous activity.
+        return true;
     }
 
     // Setup Functions for the Appbar
