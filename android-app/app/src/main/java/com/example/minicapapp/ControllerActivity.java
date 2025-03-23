@@ -389,31 +389,28 @@ public class ControllerActivity extends AppCompatActivity {
             jsonArray.put(jsonRecord);
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("https://cat-tester-api.azurewebsites.net/batch-process-records");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setDoOutput(true);
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://cat-tester-api.azurewebsites.net/batch-process-records");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
 
-                    Log.d("JSON_PAYLOAD", "Sending: " + jsonArray);
+                Log.d("JSON_PAYLOAD", "Sending: " + jsonArray);
 
-                    OutputStream os = conn.getOutputStream();
-                    os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
-                    os.flush();
-                    os.close();
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonArray.toString().getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
 
-                    int responseCode = conn.getResponseCode();
-                    if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
-                        System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                int responseCode = conn.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                    System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -466,37 +463,39 @@ public class ControllerActivity extends AppCompatActivity {
     }
 
     private void createSession(long sessionID, String sessionName, float initialLength, float initialArea) {
-        JSONObject initialData = new JSONObject();
-        try {
-            initialData.put("SessionID", sessionID);
-            initialData.put("SessionName", sessionName);
-            initialData.put("InitialLength", initialLength);
-            initialData.put("InitialArea", initialArea);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-
-            Log.d("JSON_PAYLOAD", "Sending: " + initialData);
-
-            OutputStream os = conn.getOutputStream();
-            os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
-            os.flush();
-            os.close();
-
-            int responseCode = conn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
-                System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+        new Thread(() -> {
+            JSONObject initialData = new JSONObject();
+            try {
+                initialData.put("SessionID", sessionID);
+                initialData.put("SessionName", sessionName);
+                initialData.put("InitialLength", initialLength);
+                initialData.put("InitialArea", initialArea);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            try {
+                URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                Log.d("JSON_PAYLOAD", "Sending: " + initialData);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                    System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
