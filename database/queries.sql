@@ -51,3 +51,12 @@ CREATE TABLE Session (
     initialArea FLOAT,
     TestType INT
 );
+
+-- March 23rd 2025
+ALTER TABLE "Record" 
+DROP COLUMN materialid;
+
+ALTER TABLE Session
+ADD COLUMN datecreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN datemodified TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
