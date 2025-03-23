@@ -173,12 +173,45 @@ public class ControllerActivity extends AppCompatActivity {
         btnRecordB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //sendBluetoothCommand("Motor_OFF");
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                String sessionID = sdf.format(new Date());
-                connectInputStream(sessionID);
+                String session_id = sdf.format(new Date());
+
+                testInitData(session_id, session_name, initial_length, initial_area, test_type);
+                connectInputStream(session_id);
             }
         });
+    }
+
+    testInitData(session_id, session_name, initial_length, initial_area, test_type) {
+        JSONObject initialData = new JSONObject();
+        initialData.put("SessionID", session_id);
+        initialData.put("SessionName", session_name);
+        initialData.put("InitialLength", initial_length);
+        initialData.put("InitialArea", initial_area);
+        initialData.put("TestType", test_type);
+        
+        try {
+            URL url = new URL("https://cat-tester-api.azurewebsites.net/initial-session-info");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+
+            Log.d("JSON_PAYLOAD", "Sending: " + initialData);
+
+            OutputStream os = conn.getOutputStream();
+            os.write(initialData.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupBluetoothStuff(){
@@ -319,6 +352,7 @@ public class ControllerActivity extends AppCompatActivity {
             sendBatchData(recordList);
             lastBatchSentTime = currentTime;
             recordList.clear();
+            // Right here do you check Jason
         }
     }
 

@@ -30,6 +30,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import java.util.Base64;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 
 public class RecordedDataActivity extends AppCompatActivity {
     // The UI elements present on the Main Activity.
@@ -144,31 +148,48 @@ public class RecordedDataActivity extends AppCompatActivity {
         startActivity(settingsIntent);
     }
 
-    // TODO: Zach fix this
-//    private class FetchDataTask extends AsyncTask<Void, Void, String> {
-//        @Override
-//        protected String doInBackground(Void... voids) {
-//            try {
-//                URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all");
-//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                conn.setRequestMethod("GET");
-//
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//                StringBuilder result = new StringBuilder();
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    result.append(line);
-//                }
-//                reader.close();
-//                return result.toString();
-//            } catch (Exception e) {
-//                return "Error: " + e.getMessage();
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            txtResponse.setText(result);
-//        }
-//    }
+   private class FetchDataTask extends AsyncTask<Void, Void, String> {
+       @Override
+       protected String doInBackground(Void... voids) {
+
+                }
+
+       @Override
+       protected void onPostExecute(String result) {
+           txtResponse.setText(result);
+       }
+   }
+
+   List<Map<String, Object>> getData() {
+    try {
+        List<RecordedDataItem> sessionList = new ArrayList<>();
+
+        URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all-sessions");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder result = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            result.append(line);
+        }
+        reader.close();
+        JSONObject responseJson = new JSONObject(result.toString());
+        JSONArray records = responseJson.getJSONArray("list of tests");
+
+        // Loop through each record in the JSON array
+         for (int i = 0; i < records.length(); i++) {
+             JSONObject record = records.getJSONObject(i);
+             RecordedDataItem item = new RecordedDataItem(record.getString("SessionID"), record.getString("SessionName"), 
+             record.getString("TestType"), record.getString("MaterialType"), record.getString("InitialLength"), record.getString("InitialArea")) 
+             sessionList.add(item);
+         }
+
+         // Return the list of sessions
+         return sessionList;
+             } catch (Exception e) {
+                 return "Error: " + e.getMessage();
+             }
+   }
 }
