@@ -42,13 +42,17 @@ void TaskBluetooth(void *pvParameters) {
     // Weight Sensor
     float weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
 
+    //Only starts to send the data when actually compressing the material. Also removes some noise. 
+    if (weight >5) { 
+      
     // Format message in standardized format
     char message[128];
     snprintf(message, sizeof(message), "%.2f;%.2f;%.2f", distance, temperature, weight);
     Bluetooth.println(message);
-
+    }
     vTaskDelay(200 / portTICK_PERIOD_MS); // non-blocking delay
   }
+
 }
 
 void TaskIOControl(void *pvParameters) {
