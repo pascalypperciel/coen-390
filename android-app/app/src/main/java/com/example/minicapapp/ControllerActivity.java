@@ -385,101 +385,107 @@ public class ControllerActivity extends AppCompatActivity {
         //this function takes the last few data points and uses them to see if there are dramatic changes in the data. 
         //If a dramatic change is detected, the test is stopped. Maybe find a more refined algorithm for this. 
         private void analyzeStopData() {
-        
-        // Extract the last 10 records
-        List<Record> lastTenRecords = recordList.subList(recordList.size() - 10, recordList.size());
+
+            // Extract the last 10 records
+            List<Record> lastTenRecords = recordList.subList(recordList.size() - 10, recordList.size());
     
-        double sumDistanceFirstFive = 0.0, sumDistanceLastFive = 0.0;
-        double sumPressureFirstFive = 0.0, sumPressureLastFive = 0.0;
+            double sumDistanceFirstFive = 0.0, sumDistanceLastFive = 0.0;
+            double sumPressureFirstFive = 0.0, sumPressureLastFive = 0.0;
     
-        for (int i = 0; i < 5; i++) {
-            try {
-                // Get distance and pressure for the first five records
-                sumDistanceFirstFive += Double.parseDouble(lastTenRecords.get(i).distance.trim());
-                sumPressureFirstFive += Double.parseDouble(lastTenRecords.get(i).pressure.trim());
+            for (int i = 0; i < 5; i++) {
+                try {
+                    // Get distance and pressure for the first five records
+                    sumDistanceFirstFive += Double.parseDouble(lastTenRecords.get(i).distance.trim());
+                    sumPressureFirstFive += Double.parseDouble(lastTenRecords.get(i).pressure.trim());
     
-                // Get distance and pressure for the last five records
-                sumDistanceLastFive += Double.parseDouble(lastTenRecords.get(i + 5).distance.trim());
-                sumPressureLastFive += Double.parseDouble(lastTenRecords.get(i + 5).pressure.trim());
-            } catch (NumberFormatException e) {
-                Log.e("ANALYZE", "Invalid number format in record: " + e.getMessage());
-                return; // Exit if invalid data is encountered
+                    // Get distance and pressure for the last five records
+                    sumDistanceLastFive += Double.parseDouble(lastTenRecords.get(i + 5).distance.trim());
+                    sumPressureLastFive += Double.parseDouble(lastTenRecords.get(i + 5).pressure.trim());
+                } catch (NumberFormatException e) {
+                    Log.e("ANALYZE", "Invalid number format in record: " + e.getMessage());
+                    return; // Exit if invalid data is encountered
+                }
+            }
+    
+            // Calculate averages & differences
+            double avgDistanceFirstFive = sumDistanceFirstFive / 5;
+            double avgDistanceLastFive = sumDistanceLastFive / 5;
+            double avgPressureFirstFive = sumPressureFirstFive / 5;
+            double avgPressureLastFive = sumPressureLastFive / 5;
+    
+            double distanceDifference = Math.abs(avgDistanceLastFive - avgDistanceFirstFive);
+            double pressureDifference = Math.abs(avgPressureLastFive - avgPressureFirstFive);
+    
+            // Define thresholds for stopping the test (tweak this with testing)
+            double distanceThreshold = 5.0;
+            double pressureThreshold = 100.0;
+    
+            // Check if differences exceed thresholds. otherwise nothing happens
+            if (distanceDifference > distanceThreshold || pressureDifference > pressureThreshold) {
+                Toast.makeText(getApplicationContext(), "Test stopped due to large data variation", Toast.LENGTH_LONG).show();
+                sendBluetoothCommand("Motor_OFF");
+                disableInputStream();
             }
         }
     
-        // Calculate averages & differences
-        double avgDistanceFirstFive = sumDistanceFirstFive / 5;
-        double avgDistanceLastFive = sumDistanceLastFive / 5;
-        double avgPressureFirstFive = sumPressureFirstFive / 5;
-        double avgPressureLastFive = sumPressureLastFive / 5;
-    
-        double distanceDifference = Math.abs(avgDistanceLastFive - avgDistanceFirstFive);
-        double pressureDifference = Math.abs(avgPressureLastFive - avgPressureFirstFive);
-    
-        // Define thresholds for stopping the test (tweak this with testing)
-        double distanceThreshold = 5.0; 
-        double pressureThreshold = 100.0; 
-    
-        // Check if differences exceed thresholds. otherwise nothing happens
-        if (distanceDifference > distanceThreshold || pressureDifference > pressureThreshold) {
-            Toast.makeText(getApplicationContext(), "Test stopped due to large data variation", Toast.LENGTH_LONG).show();
-            sendBluetoothCommand("Motor_OFF");
-            disableInputStream();
-        }
-    }
-
-    private void monitorYoungModulus() {
-        if(recordList.size() < 10) {
-            youngModulus = calculateYoungModulus(recordList.subList(0,10));
-            if (youngModulus == -1) {
+        private void monitorYoungModulus() {
+            if(recordList.size() < 10) {
+                youngModulus = calculateYoungModulus(recordList.subList(0,10));
+                if (youngModulus == -1) {
+                    Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
+                    return;
+                }
+            }
+            double currentYoungModulus = calculateYoungModulus(recordList.subList(recordList.size()-10, recordList.size()));
+            if (currentYoungModulus == -1) {
                 Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
                 return;
             }
-        }
-        double currentYoungModulus = calculateYoungModulus(recordList.subList(recordList.size()-10, recordList.size()));
-        if (currentYoungModulus == -1) {
-            Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
-            return;
-        }
+    
+            double percDiff = Math.abs((youngModulus - currentYoungModulus)/youngModulus) * 100;
+            if (percDiff > 5) {
+                Toast.makeText(getApplicationContext(), "Test stopped due to large Young Modulus variation", Toast.LENGTH_LONG).show();
+                sendBluetoothCommand("Motor_OFF");
+                disableInputStream();
+            }
 
-        double percDiff = Math.abs((youngModulus - currentYoungModulus)/youngModulus) * 100;
-        if (difference > 5) {
-            Toast.makeText(getApplicationContext(), "Test stopped due to large Young Modulus variation", Toast.LENGTH_LONG).show();
-            sendBluetoothCommand("Motor_OFF");
-            disableInputStream();
         }
     
-    }
-
-    private double calculateYoungModulus(List<Record> records) { 
-        try {
-            double totalStress = 0.0;
-            double totalStrain = 0.0;
-
-            for (Record record : records){
-                double pressure = Double.parseDouble(record.pressure);
-                double distance = Double.parseDouble(record.distance);
-                double originalLength = Double.parseDouble(records.get(0).distance);
-                double force = pressure/1000 * GRAVITY 
-
-                double stress = force / area; //need to get the area still 
-                double strain = (distance - originalLength) / originalLength;
-                totalStress += stress;
-                totalStrain += strain;
-
+        private double calculateYoungModulus(List<Record> records) {
+            try {
+                double totalStress = 0.0;
+                double totalStrain = 0.0;
+    
+                // Calculate total stress and strain
+                double originalLength = Double.parseDouble(records.get(0).distance); // Calculate once
+                for (Record record : records) {
+                    double pressure = Double.parseDouble(record.pressure);
+                    double distance = Double.parseDouble(record.distance);
+                    double force = pressure / 1000 * GRAVITY;
+    
+                    double stress = force / area; // Stress = Force / Area
+                    double strain = (distance - originalLength) / originalLength; // Strain = ΔL / L₀
+                    totalStress += stress;
+                    totalStrain += strain;
+                }
+    
+                // Calculate averages
                 double avgStress = totalStress / records.size();
                 double avgStrain = totalStrain / records.size();
-
+    
+                // Check for division by zero
+                if (avgStrain == 0) {
+                    Log.e("YOUNG_MODULUS", "Strain is zero, cannot calculate Young's modulus.");
+                    return -1; // Return -1 to indicate failure
+                }
+    
                 // Calculate Young's modulus (Stress / Strain)
                 return avgStress / avgStrain;
             } catch (Exception e) {
                 Log.e("YOUNG_MODULUS", "Error calculating Young's modulus: " + e.getMessage());
                 return -1; // Return -1 to indicate failure
-    }
-
             }
         }
-    }
 
 
     private void disableInputStream(){
