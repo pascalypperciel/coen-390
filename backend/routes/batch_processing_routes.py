@@ -44,7 +44,6 @@ def batch_process_records():
 
         return jsonify({"message": "Records inserted successfully", "received_count": len(data), "inserted_count": len(records)}), 201 # created
     except Exception as e:
-        print("ERROR: " + str(e))
         return jsonify({"error": str(e)}), 500 # internal server error
 
 # Route to request data from a whole session (batch)
