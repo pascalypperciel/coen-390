@@ -54,6 +54,13 @@ public class RecordedDataActivity extends AppCompatActivity {
         setupUI();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     // Setup Functions for the Appbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -94,13 +101,13 @@ public class RecordedDataActivity extends AppCompatActivity {
         spinnerFilter = findViewById(R.id.spinnerFilter);
         // TODO: Figure out how to handle the spinner
 
-        // Summary of the Recorded Data
-        textViewSummary = findViewById(R.id.textViewSummary);
-        textViewSummary.setText("This will be a summary of the recorded data...");
-        // TODO: Change the setText() so that it returns the number of recorded test and how they are filtered.
-
         // Recorded Data List
         setupRecyclerView();
+
+        // Summary of the Recorded Data
+        textViewSummary = findViewById(R.id.textViewSummary);
+        textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
+        // TODO: Change this summary once filtering has been integrated.
     }
 
     // Create and set up the list of profiles
@@ -130,31 +137,15 @@ public class RecordedDataActivity extends AppCompatActivity {
         startActivity(settingsIntent);
     }
 
-    // TODO: Zach fix this
-//    private class FetchDataTask extends AsyncTask<Void, Void, String> {
-//        @Override
-//        protected String doInBackground(Void... voids) {
-//            try {
-//                URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all");
-//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                conn.setRequestMethod("GET");
-//
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//                StringBuilder result = new StringBuilder();
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    result.append(line);
-//                }
-//                reader.close();
-//                return result.toString();
-//            } catch (Exception e) {
-//                return "Error: " + e.getMessage();
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            txtResponse.setText(result);
-//        }
-//    }
+    // This method will update the UI
+    protected void updateUI() {
+        // Retrieve the Recorded Data List Stored in the database.
+        // TODO: Retrieve the information from the PB and create a list of RecordedDataItem objects
+        List<RecordedDataItem> recordedDataItemList;
+
+//        recordedDataListRecyclerViewAdapter.updateList(recordedDataItemList);
+
+        textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
+        // TODO: Change this summary once filtering has been integrated.
+    }
 }

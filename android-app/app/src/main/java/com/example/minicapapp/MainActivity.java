@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbarMain);
         getSupportActionBar().setTitle("Main Activity");
         // Change the title colour
-        toolbarMain.setTitleTextColor(getResources().getColor(R.color.lightOrange, null));
+        toolbarMain.setTitleTextColor(getResources().getColor(R.color.white, null));
 
         // This button will navigate to the Controller Activity.
         buttonController = findViewById(R.id.buttonController);
