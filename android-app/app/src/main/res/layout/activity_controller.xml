@@ -8,8 +8,8 @@
     tools:context=".ControllerActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="409dp"
+        android:id="@+id/toolbarController"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
@@ -18,9 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:title="Controls"
-        app:titleTextColor="#FFC107" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/record"
@@ -78,7 +76,7 @@
         android:layout_marginTop="104dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="@+id/toolbarController"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -146,15 +144,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stop"
         app:layout_constraintVertical_bias="0.666" />
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="407dp"
-        android:layout_height="728dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"></FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
