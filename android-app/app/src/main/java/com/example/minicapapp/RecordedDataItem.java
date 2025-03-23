@@ -1,57 +1,48 @@
 package com.example.minicapapp;
 
 public class RecordedDataItem {
-    private long id; // The ID associated with the subject's profile.
-    private String testName; // The test's name.
+    private long session_id; // The session_id associated with the subject's profile.
+    private String test_name; // The test's name.
     private String timestamp; // The test's date.
-    private String testType; // The type of test conducted (e.g., Compressive, Tensile, etc.)
-    private String materialType; // The type of material that was tested, if known (e.g., Wood, Steel, etc.)
+    private String test_type; // The type of test conducted (e.g., Compressive, Tensile, etc.)
+    private String material_type; // The type of material that was tested, if known (e.g., Wood, Steel, etc.)
 
-    public RecordedDataItem(long id, String testName, String timestamp, String testType, String materialType) {
-        this.id = id;
-        this.testName = testName;
-        this.timestamp = timestamp;
-        this.testType = testType;
-        this.materialType = materialType;
+    public RecordedDataItem(long session_id, String test_name, String test_type, String material_type, String initial_length, String intial_area) {
+        this.session_id = session_id;
+        this.test_name = test_name;
+        this.test_type = test_type;
+        this.material_type = material_type;
     }
 
-    public long getId() {
-        return id;
+    public long getSessionID() {
+        return session_id;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setSessionId(long session_id) {
+        this.session_id = session_id;
     }
 
     public String getTestName() {
-        return testName;
+        return test_name;
     }
 
-    public void setTestName(String testName) {
-        this.testName = testName;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setTestName(String test_name) {
+        this.test_name = test_name;
     }
 
     public String getTestType() {
-        return testType;
+        return test_type;
     }
 
-    public void setTestType(String testType) {
-        this.testType = testType;
+    public void setTestType(String test_type) {
+        this.test_type = test_type;
     }
 
     public String getMaterialType() {
-        return materialType;
+        return material_type;
     }
 
-    public void setMaterialType(String materialType) {
-        this.materialType = materialType;
+    public void setMaterialType(String material_type) {
+        this.material_type = material_type;
     }
 }
