@@ -41,6 +41,7 @@ void TaskBluetooth(void *pvParameters) {
 
     // Weight Sensor
     float weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
+    weight = (weight < 5) ? NAN : weight;
 
     // Format message in standardized format
     char message[128];
