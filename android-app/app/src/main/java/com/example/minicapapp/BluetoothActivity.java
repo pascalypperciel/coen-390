@@ -1,14 +1,22 @@
 package com.example.minicapapp;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class BluetoothActivity extends AppCompatActivity {
+    // The UI elements present on the Bluetooth Activity.
+    protected Toolbar toolbarBluetooth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +28,57 @@ public class BluetoothActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // This method will be used to set up all of the UI elements in the Main Activity
+        setupUI();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // The "finish()" will navigate back to the previous activity.
+        return true;
+    }
+
+    // Setup Functions for the Appbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Load the main_appbar_resource as an object
+        getMenuInflater().inflate(R.menu.menu_appbar_resource, menu);
+
+        // Define the Toolbar Items and change their colour
+        MenuItem settingsItem = menu.findItem(R.id.action_settings);
+        settingsItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
+
+        MenuItem helpItem = menu.findItem(R.id.action_help);
+        helpItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (R.id.action_settings == item.getItemId()) {
+            goToSettingsActivity();
+            return true;
+        } else if (R.id.action_help == item.getItemId()) {
+            HelpFrag helpDialogueFragment = new HelpFrag();
+            helpDialogueFragment.show(getSupportFragmentManager(), "Help");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupUI() {
+        // Toolbar
+        toolbarBluetooth = findViewById(R.id.toolbarBluetooth);
+        setSupportActionBar(toolbarBluetooth);
+        getSupportActionBar().setTitle("Bluetooth Connection");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
+    private void goToSettingsActivity() {
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
     }
 }

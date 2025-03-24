@@ -73,7 +73,7 @@ public class DataItemActivity extends AppCompatActivity {
         // Toolbar
         toolbarDataItem = findViewById(R.id.toolbarDataItem);
         setSupportActionBar(toolbarDataItem);
-        getSupportActionBar().setTitle("Data Item Activity");
+        getSupportActionBar().setTitle("Data Item");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
