@@ -15,14 +15,13 @@ def batch_process_records():
         
         records = []
         for record in data:
-            if not all(key in record for key in ["Distance", "Temperature", "Pressure", "MaterialID", "SessionID", "Timestamp", "Valid"]):
+            if not all(key in record for key in ["Distance", "Temperature", "Pressure", "SessionID", "Timestamp", "Valid"]):
                 return jsonify({"error": "Missing required field(s)"}), 400 # bad request
             
             records.append((
                 record["Distance"],
                 record["Temperature"],
                 record["Pressure"],
-                record["MaterialID"],
                 record["SessionID"],
                 record["Timestamp"],
                 record["Valid"]
@@ -32,7 +31,7 @@ def batch_process_records():
         cur = conn.cursor()
         
         insert_query = """
-            INSERT INTO "Record" (Distance, Temperature, Pressure, MaterialID, SessionID, "Timestamp", Valid)
+            INSERT INTO "Record" (Distance, Temperature, Pressure, SessionID, "Timestamp", Valid)
             VALUES %s
             RETURNING RecordID;
         """
@@ -59,7 +58,7 @@ def request_session_records():
         cur = conn.cursor()
 
         select_query = """
-            SELECT RecordID, Distance, Temperature, Pressure, MaterialID, "Timestamp", SessionID, Valid FROM "Record"
+            SELECT RecordID, Distance, Temperature, Pressure, "Timestamp", SessionID, Valid FROM "Record"
             WHERE SessionID = %s AND Valid = TRUE
             ORDER BY "Timestamp" ASC;
         """
@@ -76,10 +75,9 @@ def request_session_records():
                 "Distance": row[1],
                 "Temperature": row[2],
                 "Pressure": row[3],
-                "MaterialID": row[4],
-                "Timestamp": row[5],
-                "SessionID": row[6],
-                "Valid": row[7]
+                "Timestamp": row[4],
+                "SessionID": row[5],
+                "Valid": row[6]
             })
 
         return jsonify({"records": result}), 200 # ok
