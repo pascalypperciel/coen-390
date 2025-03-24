@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.list;
 import java.util.UUID;
 
 import android.view.Menu;
@@ -77,6 +78,10 @@ public class ControllerActivity extends AppCompatActivity {
     ArrayList<Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
     private boolean showMotorControls = false; // If this value is true, the motor controls will appear below the preliminary session parameters.
+    private double youngModulus = -1;
+    private static final double GRAVITY = 9.81;
+    private float initialLength = 0.0f;
+    private float initialArea = 0.0f;
 
     // The UI elements present on the Controller Activity.
     protected Toolbar toolbarController;
@@ -575,8 +580,8 @@ public class ControllerActivity extends AppCompatActivity {
                 double distance = Double.parseDouble(record.distance);
                 double force = pressure / 1000 * GRAVITY;
     
-                double stress = force / area; // Stress = Force / Area
-                double strain = (distance - originalLength) / originalLength; // Strain = ΔL / L₀
+                double stress = force / initialArea; // Stress = Force / Area
+                double strain = (distance - initialLength) / initialLength; // Strain = ΔL / L₀
                 totalStress += stress;
                 totalStrain += strain;
             }
@@ -647,6 +652,9 @@ public class ControllerActivity extends AppCompatActivity {
                 // Verify that the conditions for the length and area variables are met.
                 if ((length > 0.0f) && (area > 0.0f)) {
                     showMotorControls = true;
+
+                    initialLength = length;
+                    initialArea = area;
 
                     // Make the motor controls section visible.
                     textViewMotorControls.setVisibility(View.VISIBLE);
