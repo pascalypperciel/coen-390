@@ -72,7 +72,7 @@ public class MaterialsInformationPageActivity extends AppCompatActivity {
         // Toolbar
         toolbarMaterialsInformationPage = findViewById(R.id.toolbarMaterialsInformationPage);
         setSupportActionBar(toolbarMaterialsInformationPage);
-        getSupportActionBar().setTitle("Materials Information Page");
+        getSupportActionBar().setTitle("Materials Information");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

@@ -76,7 +76,6 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
         RecordedDataItem dataItem = localRecordedDataList.get(position);
 
         // Set the correct information for each Recorded Data Item.
-        // TODO: Make sure the other fields are set correctly once the Controller Activity is finished.
         holder.getTextViewRecordedDataListItemName().setText(dataItem.getSessionName());
         holder.getTextViewRecordedDataLisItemTimestamp().setText(dataItem.getSessionTimestamp());
         holder.getTextViewRecordedDataListItemTestType().setText("Compressive");

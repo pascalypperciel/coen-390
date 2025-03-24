@@ -170,12 +170,15 @@ public class ControllerActivity extends AppCompatActivity {
         // Session Parameters
         // Session Name
         editTextSessionName = findViewById(R.id.editTextSessionName);
+        editTextSessionName.setTextColor(getResources().getColor(R.color.black, null));
         editTextSessionName.setVisibility(View.INVISIBLE);
         // Initial Length of the Material Object
         editTextInitialLength = findViewById(R.id.editTextInitialLength);
+        editTextInitialLength.setTextColor(getResources().getColor(R.color.black, null));
         editTextInitialLength.setVisibility(View.INVISIBLE);
         // Initial Cross-Sectional Area of the Material Object
         editTextInitialArea = findViewById(R.id.editTextInitialArea);
+        editTextInitialArea.setTextColor(getResources().getColor(R.color.black, null));
         editTextInitialArea.setVisibility(View.INVISIBLE);
 
         // The button that will allow the session to commence
