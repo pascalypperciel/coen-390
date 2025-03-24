@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Toolbar
         toolbarSettings = findViewById(R.id.toolbarSettings);
         setSupportActionBar(toolbarSettings);
-        getSupportActionBar().setTitle("Settings Activity");
+        getSupportActionBar().setTitle("Settings");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }

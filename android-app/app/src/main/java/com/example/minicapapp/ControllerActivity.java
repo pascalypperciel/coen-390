@@ -192,7 +192,7 @@ public class ControllerActivity extends AppCompatActivity {
 //        editTextInitialArea = findViewById(R.id.??????);
 //        editTextSessionName = findViewById(R.id.??????);
 
-        buttonRecord = findViewById(R.id.record);
+        buttonRecord = findViewById(R.id.buttonRecord);
         buttonRecord.setVisibility(View.INVISIBLE);
         buttonRecord.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -103,7 +103,7 @@ public class RecordedDataActivity extends AppCompatActivity {
         // Toolbar
         toolbarRecordedData = findViewById(R.id.toolbarRecordedData);
         setSupportActionBar(toolbarRecordedData);
-        getSupportActionBar().setTitle("Recorded Data Activity");
+        getSupportActionBar().setTitle("Recorded Data");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Filter

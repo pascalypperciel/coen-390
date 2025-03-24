@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         // Toolbar
         toolbarMain = findViewById(R.id.toolbarMain);
         setSupportActionBar(toolbarMain);
-        getSupportActionBar().setTitle("Main Activity");
+        getSupportActionBar().setTitle("Main Menu");
         // Change the title colour
         toolbarMain.setTitleTextColor(getResources().getColor(R.color.white, null));
 
@@ -108,17 +108,27 @@ public class MainActivity extends AppCompatActivity {
         buttonMaterialsInformationPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getApplicationContext(),"add profile", Toast.LENGTH_LONG).show();
-                getSupportFragmentManager().beginTransaction().add(R.id.container, new InfoFrag()).commit();
-
+                goToMaterialsInformationPageActivity();
             }
         });
     }
 
+
+
     // Internal methods to create and start the intents linked to the Main Activity
+    private void goToSettingsActivity() {
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
+    }
+
     private void goToControllerActivity() {
         Intent controllerIntent = new Intent(this, ControllerActivity.class);
         startActivity(controllerIntent);
+    }
+
+    private void goToBluetoothActivity() {
+        Intent bluetoothIntent = new Intent(this, BluetoothActivity.class);
+        startActivity(bluetoothIntent);
     }
 
     private void goToRecordedDataActivity() {
@@ -126,13 +136,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(recordedDataIntent);
     }
 
-    private void goToSettingsActivity() {
-        Intent settingsIntent = new Intent(this, SettingsActivity.class);
-        startActivity(settingsIntent);
-    }
-
-    private void goToBluetoothActivity() {
-        Intent bluetoothIntent = new Intent(this, BluetoothActivity.class);
-        startActivity(bluetoothIntent);
+    private void goToMaterialsInformationPageActivity() {
+        Intent materialsInformationPageIntent = new Intent(this, MaterialsInformationPageActivity.class);
+        startActivity(materialsInformationPageIntent);
     }
 }
