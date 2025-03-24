@@ -112,8 +112,8 @@ def initial_session_info():
         cur = conn.cursor()
 
         insert_query = """
-            INSERT INTO Session (SessionID, SessionName, InitialLength, TestType, InitialArea)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO Session (SessionID, SessionName, InitialLength, InitialArea)
+            VALUES (%s, %s, %s, %s)
             RETURNING SessionID;
         """
 
