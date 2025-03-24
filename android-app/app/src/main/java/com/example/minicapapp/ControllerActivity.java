@@ -58,7 +58,6 @@ public class ControllerActivity extends AppCompatActivity {
         public String pressure;
         public String valid;
     }
-    // Internal attributes
     public static class Session {
         public String sessionName;
         public float initialLength;
@@ -77,12 +76,13 @@ public class ControllerActivity extends AppCompatActivity {
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
+    private boolean showMotorControls = false; // If this value is true, the motor controls will appear below the preliminary session parameters.
 
     // The UI elements present on the Controller Activity.
     protected Toolbar toolbarController;
-    protected Button buttonMotorForward, buttonMotorBackward, buttonStop, buttonEstablishBluetoothConnection, buttonRecord;
-    protected TextView textViewBluetoothStatus, textViewBluetoothData;
-    protected EditText editTextInitialLength, editTextInitialArea, editTextSessionName;
+    protected Button buttonEstablishBluetoothConnection, buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop;
+    protected TextView textViewBluetoothStatus, textViewMotorControls, textViewSensorData;
+    protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,28 +157,52 @@ public class ControllerActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Bluetooth Elements
-        textViewBluetoothData = findViewById(R.id.showsbtmessages);
-        textViewBluetoothStatus = findViewById(R.id.connectionstatus);
         buttonEstablishBluetoothConnection = findViewById(R.id.buttonEstablishBluetoothConnection);
+        buttonEstablishBluetoothConnection.setText("Connect Device");
         buttonEstablishBluetoothConnection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setupBluetooth();
             }
         });
+        textViewBluetoothStatus = findViewById(R.id.textViewBluetoothConnectionStatus);
 
-        // Controller Elements
-        buttonMotorBackward = findViewById(R.id.motorbwd);
-        buttonMotorBackward.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("Motor_BWD");
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("Motor_OFF");
+        // Session Parameters
+        // Session Name
+        editTextSessionName = findViewById(R.id.editTextSessionName);
+        editTextSessionName.setVisibility(View.INVISIBLE);
+        // Initial Length of the Material Object
+        editTextInitialLength = findViewById(R.id.editTextInitialLength);
+        editTextInitialLength.setVisibility(View.INVISIBLE);
+        // Initial Cross-Sectional Area of the Material Object
+        editTextInitialArea = findViewById(R.id.editTextInitialArea);
+        editTextInitialArea.setVisibility(View.INVISIBLE);
+
+        // The button that will allow the session to commence
+        buttonStartSession = findViewById(R.id.buttonStartSession);
+        buttonStartSession.setText("Start Session");
+        buttonStartSession.setVisibility(View.INVISIBLE);
+        buttonStartSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!bluetoothAdapter.isEnabled()) {
+                    Toast.makeText(ControllerActivity.this, "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Check the parameters input by the user.
+                    checkSessionParameters(editTextSessionName.getText().toString(), editTextInitialLength.getText().toString(), editTextInitialArea.getText().toString());
+                }
+
             }
-            return true;
         });
 
-        buttonMotorForward = findViewById(R.id.motorfwd);
+        // Motor Control Elements
+        textViewMotorControls = findViewById(R.id.textViewMotorControls);
+        textViewMotorControls.setText("Motor Controls");
+        textViewMotorControls.setVisibility(View.INVISIBLE);
+
+        buttonMotorForward = findViewById(R.id.buttonMotorForward);
+        buttonMotorForward.setText("Move Forward");
+        buttonMotorForward.setVisibility(View.INVISIBLE);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 sendBluetoothCommand("Motor_FWD");
@@ -188,30 +212,21 @@ public class ControllerActivity extends AppCompatActivity {
             return true;
         });
 
-//        editTextInitialLength = findViewById(R.id.??????); //Tyler, you can put the text fields and stuff here
-//        editTextInitialArea = findViewById(R.id.??????);
-//        editTextSessionName = findViewById(R.id.??????);
-
-        buttonRecord = findViewById(R.id.buttonRecord);
-        buttonRecord.setVisibility(View.INVISIBLE);
-        buttonRecord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                String sessionID = sdf.format(new Date());
-
+        buttonMotorBackward = findViewById(R.id.buttonMotorBackward);
+        buttonMotorBackward.setText("Move Backward");
+        buttonMotorBackward.setVisibility(View.INVISIBLE);
+        buttonMotorBackward.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 sendBluetoothCommand("Motor_BWD");
-
-                Session session = new Session();
-                session.initialArea = Float.parseFloat(editTextInitialArea.getText().toString());
-                session.initialLength = Float.parseFloat(editTextInitialLength.getText().toString());
-                session.sessionName = editTextSessionName.getText().toString();
-                createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea);
-                connectInputStream(sessionID);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                sendBluetoothCommand("Motor_OFF");
             }
+            return true;
         });
 
-        buttonStop = findViewById(R.id.stop);
+        buttonStop = findViewById(R.id.buttonStop);
+        buttonStop.setText("STOP");
+        buttonStop.setVisibility(View.INVISIBLE);
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,6 +235,10 @@ public class ControllerActivity extends AppCompatActivity {
 
             }
         });
+
+        // Real-Time Session Sensor Data
+        textViewSensorData = findViewById(R.id.textViewSensorData);
+        textViewSensorData.setVisibility(View.INVISIBLE);
     }
 
     // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
@@ -231,7 +250,7 @@ public class ControllerActivity extends AppCompatActivity {
     private void setupBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
-            textViewBluetoothData.setText(R.string.bluetooth_not_work);
+            textViewSensorData.setText(R.string.bluetooth_not_work);
             return;
         }
 
@@ -254,7 +273,13 @@ public class ControllerActivity extends AppCompatActivity {
             textViewBluetoothStatus.setText(R.string.bluetooth_not_enabled);
             return;
         }
-        buttonRecord.setVisibility(View.VISIBLE);
+
+        // Update the Visibility of the Session Parameters
+        editTextSessionName.setVisibility(View.VISIBLE);
+        editTextInitialLength.setVisibility(View.VISIBLE);
+        editTextInitialArea.setVisibility(View.VISIBLE);
+        buttonStartSession.setVisibility(View.VISIBLE);
+
         connectOutputStream();
     }
 
@@ -277,27 +302,29 @@ public class ControllerActivity extends AppCompatActivity {
 
             outStream = bluetoothSocket.getOutputStream();
             runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
-            buttonRecord.setVisibility(View.VISIBLE);
+            buttonStartSession.setVisibility(View.VISIBLE);
 
             inStream = bluetoothSocket.getInputStream();
 
         } catch (SecurityException se) {
             se.printStackTrace();
             runOnUiThread(() -> textViewBluetoothStatus.setText("SecurityException: " + se.getMessage()));
-            buttonRecord.setVisibility(View.INVISIBLE);
+            buttonStartSession.setVisibility(View.INVISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
             runOnUiThread(() -> textViewBluetoothStatus.setText("Error: " + e.getMessage()));
-            buttonRecord.setVisibility(View.INVISIBLE);
+            buttonStartSession.setVisibility(View.INVISIBLE);
         }
 
     }
 
     private void connectInputStream(String sessionID) {
-        if (!stopInThread) {
-            return;
+        synchronized (this ) {
+            if (!stopInThread) {
+                return;
+            }
+            stopInThread = false;
         }
-        stopInThread = false;
 
         inThread = new Thread(new Runnable() {
             @Override
@@ -312,8 +339,6 @@ public class ControllerActivity extends AppCompatActivity {
                             final String incoming = new String(buffer, 0, bytesRead).trim();
                             processBluetoothData(incoming, sessionID);
                             runOnUiThread(() -> textViewBluetoothStatus.setText("Connected and Fetching Data"));
-
-                            //
                         }
                     } catch (SecurityException se) {
                         se.printStackTrace();
@@ -324,13 +349,13 @@ public class ControllerActivity extends AppCompatActivity {
                     }
                 }
                 runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
-                buttonRecord.setVisibility(View.VISIBLE);
+                buttonStartSession.setVisibility(View.VISIBLE);
             }
         });
 
         inThread.start();
         runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
-        buttonRecord.setVisibility(View.INVISIBLE);
+        buttonStartSession.setVisibility(View.INVISIBLE);
 
     }
 
@@ -357,9 +382,7 @@ public class ControllerActivity extends AppCompatActivity {
             record.sessionID = sessionID;
             recordList.add(record);
             runOnUiThread(() -> displayRecord(record));
-
         }
-
 
         long currentTime = System.currentTimeMillis();
 
@@ -408,7 +431,6 @@ public class ControllerActivity extends AppCompatActivity {
                 if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK) {
                     System.err.println("Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -424,7 +446,7 @@ public class ControllerActivity extends AppCompatActivity {
             inThread.interrupt();
         }
         runOnUiThread(() -> textViewBluetoothStatus.setText(R.string.bluetooth_connected));
-        buttonRecord.setVisibility(View.VISIBLE);
+        buttonStartSession.setVisibility(View.VISIBLE);
     }
 
     private void sendBluetoothCommand(String command) {
@@ -440,7 +462,7 @@ public class ControllerActivity extends AppCompatActivity {
 
     private void displayRecord(Record newMessage) {
         String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
-        textViewBluetoothData.setText(displayText);
+        textViewSensorData.setText(displayText);
 
         //stop if us sensor says too close
         if (Float.valueOf(newMessage.distance.trim()) < 2.0 || Float.valueOf(newMessage.distance.trim()) > 10.55) {
@@ -497,5 +519,47 @@ public class ControllerActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    // This method will check the parameters entered by the user and throw an error if it is invalid.
+    private void checkSessionParameters(String nameString, String lengthString, String areaString) {
+        if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {
+            try {
+                // Convert the length and area parameters to float variables.
+                float length = Float.parseFloat(lengthString);
+                float area = Float.parseFloat(areaString);
+
+                // Verify that the conditions for the length and area variables are met.
+                if ((length > 0.0f) && (area > 0.0f)) {
+                    showMotorControls = true;
+
+                    // Make the motor controls section visible.
+                    textViewMotorControls.setVisibility(View.VISIBLE);
+                    buttonMotorForward.setVisibility(View.VISIBLE);
+                    buttonMotorBackward.setVisibility(View.VISIBLE);
+                    buttonStop.setVisibility(View.VISIBLE);
+                    textViewSensorData.setVisibility(View.VISIBLE);
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    String sessionID = sdf.format(new Date());
+
+                    sendBluetoothCommand("Motor_BWD");
+
+                    Session session = new Session();
+                    session.initialArea = Float.parseFloat(editTextInitialArea.getText().toString());
+                    session.initialLength = Float.parseFloat(editTextInitialLength.getText().toString());
+                    session.sessionName = editTextSessionName.getText().toString();
+                    createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea);
+                    connectInputStream(sessionID);
+                } else {
+                    Toast.makeText(this, "Length and Area cannot be 0", Toast.LENGTH_LONG).show();
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid Input", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(ControllerActivity.this, "All fields must be filled", Toast.LENGTH_LONG).show();
+        }
+
     }
 }
