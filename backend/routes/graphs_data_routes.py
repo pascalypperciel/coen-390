@@ -104,21 +104,20 @@ def initial_session_info():
         session_name = data.get("SessionName")
         initial_length = data.get("InitialLength")
         initial_area = data.get("InitialArea")
-        test_type = data.get("TestType")
 
-        if not all([session_id, session_name, initial_length, initial_area, test_type]):
+        if not all([session_id, session_name, initial_length, initial_area]):
             return jsonify({"error": "All fields are required"}), 400  # Bad request
         
         conn = get_db_connection()
         cur = conn.cursor()
 
         insert_query = """
-            INSERT INTO Session (SessionID, SessionName, InitialLength, TestType, InitialArea)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO Session (SessionID, SessionName, InitialLength, InitialArea)
+            VALUES (%s, %s, %s, %s)
             RETURNING SessionID;
         """
 
-        cur.execute(insert_query, (session_id, session_name, initial_length, test_type, initial_area))
+        cur.execute(insert_query, (session_id, session_name, initial_length, initial_area))
         inserted_id = cur.fetchone()[0]
         conn.commit()
         cur.close()
