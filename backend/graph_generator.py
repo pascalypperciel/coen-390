@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 import base64
+import math
 
 def create_graphs(distances, weights, temperatures, timestamps, session_id, initial_length, initial_area, offset):
     graphs_list = []
@@ -33,21 +34,24 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     graphs_list.append(displacement_force)
 
     # --- Stress vs Strain Plot ---
-    coef = np.polyfit(engineering_strain, engineering_stress, 1)
-    poly1d_fn = np.poly1d(coef)
-    strain_subset = engineering_strain[:25]
-    offset_line_coef = offset * (strain_subset.max() - strain_subset.min())
-    strain_offset = np.array([i + offset_line_coef for i in engineering_strain])
-    stress_offset = poly1d_fn(strain_offset)
+
+    test_sample_size = int(math.floor(len(engineering_strain)/10))
+
+    strain_subset = engineering_strain[:test_sample_size]
+    stress_subset = engineering_stress[:test_sample_size]
+    slope, intercept = np.polyfit(strain_subset, stress_subset, 1)
+
+    actual_offset = offset * (strain_subset.max() - strain_subset.min())
+    offset_intercept = intercept + actual_offset
+
+    range = np.linspace(0, engineering_strain.max(), len(engineering_stress))
+
+    offset_line = slope * (range - offset_intercept)
 
     fig, ax = plt.subplots()
     ax.plot(engineering_strain, engineering_stress, 'o-', label="Stress vs Strain")
-    ax.plot(strain_offset, stress_offset, '--k', label="Offset Line")
-    stress_diff = engineering_stress - stress_offset[:len(engineering_stress)]
-    intersection_idx = np.argmin(np.abs(stress_diff))
-    intersection_strain = engineering_strain[intersection_idx]
-    intersection_stress = engineering_stress[intersection_idx]
-    ax.plot(intersection_strain, intersection_stress, 'ro', label="Intersection Point")
+    ax.plot(range, offset_line, '--k', label="Offset Line")
+
     ax.text(0.95, 0.05, f"Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
     ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
     ax.set_xlabel("Strain")
@@ -93,4 +97,3 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     graphs_list.append(displacement_time)
 
     return graphs_list
-
