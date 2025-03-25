@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -42,6 +45,8 @@ public class RecordedDataActivity extends AppCompatActivity {
     protected TextView textViewSummary;
     protected RecyclerView recyclerViewRecordedDataList;
     protected RecordedDataListRecyclerViewAdapter recordedDataListRecyclerViewAdapter;
+    private List<RecordedDataItem> allSessions = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,53 +105,67 @@ public class RecordedDataActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
-        // Toolbar
         toolbarRecordedData = findViewById(R.id.toolbarRecordedData);
         setSupportActionBar(toolbarRecordedData);
         getSupportActionBar().setTitle("Recorded Data");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Filter
         spinnerFilter = findViewById(R.id.spinnerFilter);
-        // TODO: Figure out how to handle the spinner
-
-        // Recorded Data List
-        setupRecyclerView();
-
-        // Summary of the Recorded Data
         textViewSummary = findViewById(R.id.textViewSummary);
-        textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
-        // TODO: Change this summary once filtering has been integrated.
-    }
-
-    // Create and set up the list of recorded data items.
-    protected void setupRecyclerView() {
-        // Retrieve the recorded data list stored in the database.
-        List<RecordedDataItem> recordedDataList = getData();
-
-        // Bind and organize the profile list items.
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recordedDataListRecyclerViewAdapter = new RecordedDataListRecyclerViewAdapter(this, recordedDataList);
-
-        // Define and initialize the Recycler View.
         recyclerViewRecordedDataList = findViewById(R.id.recyclerViewRecordedDataList);
-        recyclerViewRecordedDataList.setLayoutManager(linearLayoutManager);
-        recyclerViewRecordedDataList.setAdapter(recordedDataListRecyclerViewAdapter);
 
-        // Adding a border around each item.
-        DividerItemDecoration border = new DividerItemDecoration(recyclerViewRecordedDataList.getContext(), linearLayoutManager.getOrientation());
-        recyclerViewRecordedDataList.addItemDecoration(border);
+        getData(sessions -> {
+            allSessions = sessions;
+
+            // Setup spinner
+            List<String> sessionNames = new ArrayList<>();
+            for (RecordedDataItem session : sessions) {
+                sessionNames.add(session.getSessionName());
+            }
+
+            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sessionNames);
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerFilter.setAdapter(spinnerAdapter);
+
+            // Setup RecyclerView
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+            recordedDataListRecyclerViewAdapter = new RecordedDataListRecyclerViewAdapter(this, sessions);
+            recyclerViewRecordedDataList.setLayoutManager(linearLayoutManager);
+            recyclerViewRecordedDataList.setAdapter(recordedDataListRecyclerViewAdapter);
+            recyclerViewRecordedDataList.addItemDecoration(new DividerItemDecoration(this, linearLayoutManager.getOrientation()));
+
+            textViewSummary.setText(sessions.size() + " Sessions, filtered by...");
+
+            // Spinner filtering logic
+            spinnerFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedSessionName = sessionNames.get(position);
+                    List<RecordedDataItem> filteredList = new ArrayList<>();
+                    for (RecordedDataItem item : allSessions) {
+                        if (item.getSessionName().equals(selectedSessionName)) {
+                            filteredList.add(item);
+                        }
+                    }
+                    recordedDataListRecyclerViewAdapter.updateList(filteredList);
+                    textViewSummary.setText("1 Session: " + selectedSessionName);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    recordedDataListRecyclerViewAdapter.updateList(allSessions);
+                    textViewSummary.setText(allSessions.size() + " Sessions");
+                }
+            });
+        });
     }
 
-    // This method will update the UI
     protected void updateUI() {
-        // Retrieve the Recorded Data List Stored in the database.
-        List<RecordedDataItem> recordedDataItemList = getData();
-
-        recordedDataListRecyclerViewAdapter.updateList(recordedDataItemList);
-
-        textViewSummary.setText(Integer.toString(recordedDataListRecyclerViewAdapter.getItemCount()) + " Sessions, filtered by...");
-        // TODO: Change this summary once filtering has been integrated.
+        getData(sessions -> {
+            allSessions = sessions;
+            recordedDataListRecyclerViewAdapter.updateList(sessions);
+            textViewSummary.setText(sessions.size() + " Sessions, filtered by...");
+        });
     }
 
     // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
@@ -155,34 +174,46 @@ public class RecordedDataActivity extends AppCompatActivity {
         startActivity(settingsIntent);
     }
 
-    // TODO: Make this asynchronous with a Service
-    List<RecordedDataItem> getData() {
+    void getData(DataCallback callback) {
         List<RecordedDataItem> sessionList = new ArrayList<>();
-        try {
-            URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all-sessions");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder result = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-            reader.close();
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://cat-tester-api.azurewebsites.net/get-all-sessions");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
 
-            JSONObject responseJson = new JSONObject(result.toString());
-            JSONArray records = responseJson.getJSONArray("list of tests");
-            // Loop through each record in the JSON array
-            for (int i = 0; i < records.length(); i++) {
-                JSONObject record = records.getJSONObject(i);
-                RecordedDataItem item = new RecordedDataItem(record.getLong("SessionID"), record.getString("SessionName"), record.getString("TestType"), (float) record.getDouble("InitialLength"), (float) record.getDouble("InitialArea"));
-                sessionList.add(item);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                reader.close();
+
+                JSONObject responseJson = new JSONObject(result.toString());
+                JSONArray records = responseJson.getJSONArray("list of tests");
+                // Loop through each record in the JSON array
+                for (int i = 0; i < records.length(); i++) {
+                    JSONObject record = records.getJSONObject(i);
+                    RecordedDataItem item = new RecordedDataItem(
+                            record.getLong("sessionid"),
+                            record.getString("sessionname"),
+                            (float) record.getDouble("initiallength"),
+                            (float) record.getDouble("initialarea")
+                    );
+                    sessionList.add(item);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // Return the list of sessions
-        return sessionList;
+
+            runOnUiThread(() -> callback.onDataFetched(sessionList));
+        }).start();
+    }
+
+    interface DataCallback {
+        void onDataFetched(List<RecordedDataItem> sessionList);
     }
 }
+
