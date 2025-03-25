@@ -66,6 +66,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateUI();
     }
 
     @Override
@@ -156,6 +157,14 @@ public class RecordedDataActivity extends AppCompatActivity {
                     textViewSummary.setText(allSessions.size() + " Sessions");
                 }
             });
+        });
+    }
+
+    protected void updateUI() {
+        getData(sessions -> {
+            allSessions = sessions;
+            recordedDataListRecyclerViewAdapter.updateList(sessions);
+            textViewSummary.setText(sessions.size() + " Sessions, filtered by...");
         });
     }
 
