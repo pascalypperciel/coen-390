@@ -68,3 +68,8 @@ ADD CONSTRAINT fk_record_session
 FOREIGN KEY (sessionid)
 REFERENCES session(sessionid)
 ON DELETE CASCADE;
+
+-- March 26th 2025
+ALTER TABLE Session
+ADD COLUMN yieldstress FLOAT NULL,
+ADD COLUMN yieldstrain FLOAT NULL;
