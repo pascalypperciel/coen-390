@@ -60,7 +60,7 @@ def build_graphs():
         temperatures = [row[2] for row in records]  # row[2] corresponds to Temperature
         timestamps = [row[4] for row in records]  # row[5] corresponds to Timestamp
         graphs_list = create_graphs(distances, pressures, temperatures, timestamps, session_id, initial_length, initial_area, offset)
-        print("Here3")
+        
         # Return success response
         return jsonify({"Graph": graphs_list, "message": "Graphs generated successfully"}), 200
 
