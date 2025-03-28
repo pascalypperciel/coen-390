@@ -1,0 +1,40 @@
+name: Android Espresso Tests
+
+on:
+  pull_request:
+    paths:
+      - 'android-app/**'
+  push:
+    paths:
+      - 'android-app/**'
+  workflow_dispatch:
+
+jobs:
+  androidTest:
+    name: Run Espresso Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android-app/gradlew
+      
+      - name: Create AVD and start emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel
+          script: ./gradlew connectedDebugAndroidTest
