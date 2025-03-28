@@ -1,13 +1,14 @@
 name: Build and deploy Python app to Azure Web App - cat-tester-api
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Backend Tests"]
+    types:
+      - completed
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,19 +27,6 @@ jobs:
           python -m venv antenv
           source antenv/bin/activate
           pip install -r requirements.txt
-          
-      - name: Check for syntax errors
-        run: |
-          cd backend
-          python -m compileall .
-
-      - name: Run basic Flask startup test
-        env:
-          FLASK_ENV: testing
-        run: |
-          cd backend
-          source antenv/bin/activate
-          python -c "from app import app; print('success')"
 
       - name: Zip artifact for deployment
         run: |
