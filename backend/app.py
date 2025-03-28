@@ -21,7 +21,7 @@ def get_db_connection():
         database=DB_NAME
     )
 
-from backend.routes.session_routes import *
+from routes.session_routes import *
 from routes.batch_processing_routes import *
 
 if __name__ == '__main__':
