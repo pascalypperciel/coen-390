@@ -75,6 +75,9 @@ def request_session_records():
         cur.close()
         conn.close()
 
+        if not records:
+            return jsonify({"error": "This SessionID doesn't exist or has no records"}), 400 # bad request
+        
         result = []
         for row in records:
             result.append({

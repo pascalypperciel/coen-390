@@ -1,6 +1,7 @@
 import datetime
 
 session_id = -1 # This is the sessionid I added in the db dedicated to this
+wrong_session_id = -999999999999999999 # This is sessionid isn't in db. (never add it)
 
 def test_post_batch_valid(client):
     # Good, valid payload
@@ -88,3 +89,20 @@ def test_post_batch_invalid_timestamp(client):
     assert response.status_code == 400 # expect bad request
     data = response.get_json()
     assert "Invalid data type in record" in data["error"]
+
+def test_get_batch_simple(client):
+    # Can we recover a session's records?
+    response = client.get(f"/request-session-records?SessionID={session_id}")
+    assert response.status_code == 200
+
+def test_get_batch_wrong_input(client):
+    # Mispelled "SessionID" in URL
+    response = client.get(f"/request-session-records?SessionPascalWasHereID={session_id}")
+    assert response.status_code == 400
+
+def test_get_batch_inexisting_session(client):
+    # Request a wrong SessionID
+    response = client.get(f"/request-session-records?SessionID={wrong_session_id}")
+    data = response.get_json()
+    assert response.status_code == 400
+    assert data["error"] == "This SessionID doesn't exist or has no records"
