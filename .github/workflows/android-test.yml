@@ -4,9 +4,6 @@ on:
   pull_request:
     paths:
       - 'android-app/**'
-  push:
-    paths:
-      - 'android-app/**'
   workflow_dispatch:
 
 jobs:
