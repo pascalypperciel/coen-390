@@ -2,6 +2,9 @@ from flask import Flask
 import psycopg2
 import os
 from dotenv import load_dotenv
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 load_dotenv()
 app = Flask(__name__)
