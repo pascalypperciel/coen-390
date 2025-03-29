@@ -1,16 +1,12 @@
 name: Backend Tests
 
 on:
+  pull_request:
+    paths:
+      - 'backend/**'
   push:
     branches:
       - main
-    paths:
-      - 'backend/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'backend/**'
   workflow_dispatch:
 
 jobs:

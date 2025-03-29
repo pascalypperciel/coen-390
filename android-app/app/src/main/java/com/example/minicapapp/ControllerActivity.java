@@ -30,7 +30,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.list;
+import java.util.List;
 import java.util.UUID;
 
 import android.view.Menu;

@@ -1,4 +1,4 @@
-name: Build and deploy Python app to Azure Web App - cat-tester-api
+name: Build and deploy Flask API to Azure Web App
 
 on:
   workflow_run:
