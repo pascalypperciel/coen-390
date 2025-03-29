@@ -1,5 +1,6 @@
+from datetime import datetime
 from flask import request, jsonify
-from app import app, get_db_connection
+from backend.app import app, get_db_connection
 from psycopg2.extras import execute_values
 
 # Route to send batched records data to database 
@@ -18,14 +19,20 @@ def batch_process_records():
             if not all(key in record for key in ["Distance", "Temperature", "Pressure", "SessionID", "Timestamp", "Valid"]):
                 return jsonify({"error": "Missing required field(s)"}), 400 # bad request
             
-            records.append((
-                record["Distance"],
-                record["Temperature"],
-                record["Pressure"],
-                record["SessionID"],
-                record["Timestamp"],
-                record["Valid"]
-            ))
+            try:
+                distance = float(record["Distance"])
+                temperature = float(record["Temperature"])
+                pressure = float(record["Pressure"])
+                session_id = int(record["SessionID"])
+                
+                parsed_timestamp = datetime.fromisoformat(record["Timestamp"])
+                timestamp_str = parsed_timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3] 
+                
+                valid = bool(record["Valid"])
+            except (ValueError, TypeError) as e:
+                return jsonify({"error": f"Invalid data type in record: {str(e)}"}), 400
+
+            records.append((distance, temperature, pressure, session_id, timestamp_str, valid))
 
         conn = get_db_connection()
         cur = conn.cursor()
@@ -68,6 +75,9 @@ def request_session_records():
         cur.close()
         conn.close()
 
+        if not records:
+            return jsonify({"error": "This SessionID doesn't exist or has no records"}), 400 # bad request
+        
         result = []
         for row in records:
             result.append({
