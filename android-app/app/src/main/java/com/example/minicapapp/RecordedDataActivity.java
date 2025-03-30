@@ -105,13 +105,15 @@ public class RecordedDataActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
+        // Toolbar
         toolbarRecordedData = findViewById(R.id.toolbarRecordedData);
         setSupportActionBar(toolbarRecordedData);
         getSupportActionBar().setTitle("Recorded Data");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Recorded Data
         spinnerFilter = findViewById(R.id.spinnerFilter);
-        textViewSummary = findViewById(R.id.textViewSummary);
+        textViewSummary = findViewById(R.id.recyclerViewRecordedDataList);
         recyclerViewRecordedDataList = findViewById(R.id.recyclerViewRecordedDataList);
 
         getData(sessions -> {
@@ -160,6 +162,7 @@ public class RecordedDataActivity extends AppCompatActivity {
         });
     }
 
+    // This method will update the UI
     protected void updateUI() {
         getData(sessions -> {
             allSessions = sessions;
@@ -216,4 +219,3 @@ public class RecordedDataActivity extends AppCompatActivity {
         void onDataFetched(List<RecordedDataItem> sessionList);
     }
 }
-
