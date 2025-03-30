@@ -51,3 +51,8 @@ py app.py
 ```
 pip freeze > requirements.txt
 ```
+
+**Run tests?**: Please run the following command in the root directory. Executing that command in `/backend` will throw import errors.
+```
+pytest
+```
