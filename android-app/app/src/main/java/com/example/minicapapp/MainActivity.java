@@ -83,15 +83,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // This button will navigate to the Bluetooth Activity.
-        buttonBluetooth = findViewById(R.id.buttonBluetooth);
-        buttonBluetooth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToBluetoothActivity();
-            }
-        });
-
         // This button will navigate to the Recorded Data Activity.
         buttonRecordedData = findViewById(R.id.buttonRecordedData);
         buttonRecordedData.setOnClickListener(new View.OnClickListener() {
@@ -122,11 +113,6 @@ public class MainActivity extends AppCompatActivity {
     private void goToControllerActivity() {
         Intent controllerIntent = new Intent(this, ControllerActivity.class);
         startActivity(controllerIntent);
-    }
-
-    private void goToBluetoothActivity() {
-        Intent bluetoothIntent = new Intent(this, BluetoothActivity.class);
-        startActivity(bluetoothIntent);
     }
 
     private void goToRecordedDataActivity() {

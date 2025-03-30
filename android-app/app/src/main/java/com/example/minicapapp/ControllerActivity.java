@@ -82,6 +82,7 @@ public class ControllerActivity extends AppCompatActivity {
     private static final double GRAVITY = 9.81;
     private float initialLength = 0.0f;
     private float initialArea = 0.0f;
+    private boolean bluetoothConnected = false; // This will keep track fo the Bluetooth connection between the CAT Tester and the user's mobile device.
 
     // The UI elements present on the Controller Activity.
     protected Toolbar toolbarController;
@@ -129,9 +130,12 @@ public class ControllerActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Load the main_appbar_resource as an object
-        getMenuInflater().inflate(R.menu.menu_appbar_resource, menu);
+        getMenuInflater().inflate(R.menu.controller_menu_appbar_resource, menu);
 
         // Define the Toolbar Items and change their colour
+        MenuItem bluetoothItem = menu.findItem(R.id.state_bluetooth);
+        bluetoothItem.getIcon().setColorFilter(getResources().getColor(R.color.red, null), PorterDuff.Mode.SRC_IN);
+
         MenuItem settingsItem = menu.findItem(R.id.action_settings);
         settingsItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
 
@@ -143,7 +147,20 @@ public class ControllerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (R.id.action_settings == item.getItemId()) {
+        if (R.id.state_bluetooth == item.getItemId()) {
+            bluetoothConnected = !bluetoothConnected;
+
+            // Change the colour of the Bluetooth icon
+            if(bluetoothConnected) { // Bluetooth is connected
+                item.getIcon().setColorFilter(getResources().getColor(R.color.green, null), PorterDuff.Mode.SRC_IN);
+                Toast.makeText(this, "Bluetooth Connected", Toast.LENGTH_LONG).show();
+            } else { // Bluetooth is not connected
+                item.getIcon().setColorFilter(getResources().getColor(R.color.red, null), PorterDuff.Mode.SRC_IN);
+                Toast.makeText(this, "Bluetooth Disconnected", Toast.LENGTH_LONG).show();
+            }
+
+            return true;
+        } else if (R.id.action_settings == item.getItemId()) {
             goToSettingsActivity();
             return true;
         } else if (R.id.action_help == item.getItemId()) {
