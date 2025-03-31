@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/menu">
+
+    <item
+        android:id="@+id/action_load_controller"
+        android:title="Controller"
+        android:icon="@drawable/outline_gamepad_24" />
+
+    <item
+        android:id="@+id/action_load_recorded_data"
+        android:title="Recorded Data"
+        android:icon="@drawable/outline_dataset_24" />
+
+    <item
+        android:id="@+id/action_load_settings"
+        android:title="Settings"
+        android:icon="@drawable/outline_settings_24" />
+
+    <item
+        android:id="@+id/action_load_materials_information_page"
+        android:title="Materials Info"
+        android:icon="@drawable/outline_info_24" />
+</menu>

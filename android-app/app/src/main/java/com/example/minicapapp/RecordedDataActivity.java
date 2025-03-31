@@ -69,12 +69,6 @@ public class RecordedDataActivity extends AppCompatActivity {
         updateUI();
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish(); // The "finish()" will navigate back to the previous activity.
-        return true;
-    }
-
     // Setup Functions for the Appbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,9 +76,6 @@ public class RecordedDataActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_appbar_resource, menu);
 
         // Define the Toolbar Items and change their colour
-        MenuItem settingsItem = menu.findItem(R.id.action_settings);
-        settingsItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
-
         MenuItem helpItem = menu.findItem(R.id.action_help);
         helpItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
 
@@ -93,10 +84,7 @@ public class RecordedDataActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (R.id.action_settings == item.getItemId()) {
-            goToSettingsActivity();
-            return true;
-        } else if (R.id.action_help == item.getItemId()) {
+        if (R.id.action_help == item.getItemId()) {
             HelpFrag helpDialogueFragment = new HelpFrag();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
@@ -109,11 +97,10 @@ public class RecordedDataActivity extends AppCompatActivity {
         toolbarRecordedData = findViewById(R.id.toolbarRecordedData);
         setSupportActionBar(toolbarRecordedData);
         getSupportActionBar().setTitle("Recorded Data");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Recorded Data
         spinnerFilter = findViewById(R.id.spinnerFilter);
-        textViewSummary = findViewById(R.id.recyclerViewRecordedDataList);
+        textViewSummary = findViewById(R.id.textViewSummary);
         recyclerViewRecordedDataList = findViewById(R.id.recyclerViewRecordedDataList);
 
         getData(sessions -> {
@@ -169,12 +156,6 @@ public class RecordedDataActivity extends AppCompatActivity {
             recordedDataListRecyclerViewAdapter.updateList(sessions);
             textViewSummary.setText(sessions.size() + " Sessions, filtered by...");
         });
-    }
-
-    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
-    private void goToSettingsActivity() {
-        Intent settingsIntent = new Intent(this, SettingsActivity.class);
-        startActivity(settingsIntent);
     }
 
     void getData(DataCallback callback) {

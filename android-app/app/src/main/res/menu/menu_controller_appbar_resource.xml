@@ -4,6 +4,12 @@
     android:id="@+id/menu">
 
     <item
+        android:title="Bluetooth"
+        android:icon="@drawable/baseline_bluetooth_24"
+        android:id="@+id/state_bluetooth"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:title="help"
         android:icon="@drawable/baseline_help_outline_24"
         android:id="@+id/action_help"

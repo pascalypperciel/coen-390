@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
@@ -120,24 +119,15 @@ public class ControllerActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish(); // The "finish()" will navigate back to the previous activity.
-        return true;
-    }
-
     // Setup Functions for the Appbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Load the main_appbar_resource as an object
-        getMenuInflater().inflate(R.menu.controller_menu_appbar_resource, menu);
+        getMenuInflater().inflate(R.menu.menu_controller_appbar_resource, menu);
 
         // Define the Toolbar Items and change their colour
         MenuItem bluetoothItem = menu.findItem(R.id.state_bluetooth);
         bluetoothItem.getIcon().setColorFilter(getResources().getColor(R.color.red, null), PorterDuff.Mode.SRC_IN);
-
-        MenuItem settingsItem = menu.findItem(R.id.action_settings);
-        settingsItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
 
         MenuItem helpItem = menu.findItem(R.id.action_help);
         helpItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
@@ -160,9 +150,6 @@ public class ControllerActivity extends AppCompatActivity {
             }
 
             return true;
-        } else if (R.id.action_settings == item.getItemId()) {
-            goToSettingsActivity();
-            return true;
         } else if (R.id.action_help == item.getItemId()) {
             HelpFrag helpDialogueFragment = new HelpFrag();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
@@ -176,7 +163,6 @@ public class ControllerActivity extends AppCompatActivity {
         toolbarController = findViewById(R.id.toolbarController);
         setSupportActionBar(toolbarController);
         getSupportActionBar().setTitle("Controller Activity");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Bluetooth Elements
         buttonEstablishBluetoothConnection = findViewById(R.id.buttonEstablishBluetoothConnection);
@@ -264,12 +250,6 @@ public class ControllerActivity extends AppCompatActivity {
         // Real-Time Session Sensor Data
         textViewSensorData = findViewById(R.id.textViewSensorData);
         textViewSensorData.setVisibility(View.INVISIBLE);
-    }
-
-    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
-    private void goToSettingsActivity() {
-        Intent settingsIntent = new Intent(this, SettingsActivity.class);
-        startActivity(settingsIntent);
     }
 
     private void setupBluetooth() {
