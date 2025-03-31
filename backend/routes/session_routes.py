@@ -196,7 +196,7 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     fig, ax = plt.subplots()
     ax.plot(displacements, force_N, 'o-', label="Displacement vs Force")
     ax.text(0.95, 0.05, f"Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
-    ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+    ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("Displacement (cm)")
     ax.set_ylabel("Force (N)")
     ax.legend()
@@ -229,10 +229,13 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     ax.plot(range, offset_line, '--k', label="Offset Line")
 
     ax.scatter(engr_strain[lend-1],engr_stress[lend-1], color='red',s=200)#youngs modulus
-    ax.text(0.05, 0.90, f"Young's Modulus: {engr_strain[lend-1]:.5f}, {engr_stress[lend-1]:.5f}", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+    ax.text(0.05, 0.90, f"Young's Modulus: {engr_strain[lend-1]:.5f}, {engr_stress[lend-1]:.5f}", transform=ax.transAxes, fontsize=12, color='purple', ha='left', va='top')
 
-    ax.text(0.95, 0.05, f"Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
-    ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+    if slope<0:
+    ax.text(0.05, 0.85, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+
+    ax.text(0.95, 0.05, f"Avg Temp: {avg_temperature:.2f}�C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
+    ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("Strain")
     ax.set_ylabel("Stress (Pa)")
     ax.legend()
@@ -248,6 +251,7 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     # --- Load vs Time Plot ---
     fig, ax = plt.subplots()
     ax.plot(time_seconds, force_N, 'o-', label="Load vs Time", color='g')
+    ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("Time (sec)")
     ax.set_ylabel("Force (N)")
     ax.legend()
@@ -263,6 +267,7 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     # --- Displacement vs Time Plot ---
     fig, ax = plt.subplots()
     ax.plot(time_seconds, displacements, 'o-', label="Displacement vs Time", color='b')
+    ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("Time (sec)")
     ax.set_ylabel("Displacement (cm)")
     ax.legend()
