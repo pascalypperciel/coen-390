@@ -4,12 +4,6 @@
     android:id="@+id/menu">
 
     <item
-        android:title="settings"
-        android:icon="@drawable/baseline_settings_24"
-        android:id="@+id/action_settings"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:title="help"
         android:icon="@drawable/baseline_help_outline_24"
         android:id="@+id/action_help"

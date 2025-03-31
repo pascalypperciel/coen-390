@@ -47,9 +47,6 @@ public class DataItemActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_appbar_resource, menu);
 
         // Define the Toolbar Items and change their colour
-        MenuItem settingsItem = menu.findItem(R.id.action_settings);
-        settingsItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
-
         MenuItem helpItem = menu.findItem(R.id.action_help);
         helpItem.getIcon().setColorFilter(getResources().getColor(R.color.white, null), PorterDuff.Mode.SRC_IN);
 
@@ -58,10 +55,7 @@ public class DataItemActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(R.id.action_settings == item.getItemId()) {
-            goToSettingsActivity();
-            return true;
-        } else if(R.id.action_help == item.getItemId()) {
+        if(R.id.action_help == item.getItemId()) {
             HelpFrag helpDialogueFragment = new HelpFrag();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
@@ -75,11 +69,5 @@ public class DataItemActivity extends AppCompatActivity {
         setSupportActionBar(toolbarDataItem);
         getSupportActionBar().setTitle("Data Item");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    // This method will allow the Settings Activity to be accessed from the Recorded Data Activity
-    private void goToSettingsActivity() {
-        Intent settingsIntent = new Intent(this, SettingsActivity.class);
-        startActivity(settingsIntent);
     }
 }

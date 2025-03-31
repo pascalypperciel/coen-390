@@ -26,30 +26,26 @@
             android:theme="@style/Theme.DataActivity" />
         <activity
             android:name=".MaterialsInformationPageActivity"
+            android:launchMode="singleTop"
             android:exported="false"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.MaterialsInformationPageActivity" />
         <activity
-            android:name=".BluetoothActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.BluetoothActivity" />
-        <activity
-            android:name=".SettingsActivity"
+            android:name=".SettingsFragment"
+            android:launchMode="singleTop"
             android:exported="false"
             android:theme="@style/Theme.SettingsActivity" />
         <activity
             android:name=".ControllerActivity"
+            android:launchMode="singleTop"
             android:exported="false"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.ControllerActivity" />
         <activity
             android:name=".RecordedDataActivity"
+            android:launchMode="singleTop"
             android:exported="false"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.DataActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".BottomNavigationBarActivity"
             android:exported="true"
             android:theme="@style/Theme.MainActivity" >
             <intent-filter>
