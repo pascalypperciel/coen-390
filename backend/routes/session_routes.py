@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from backend.app import app, get_db_connection
+from app import app, get_db_connection
 import numpy as np
 import matplotlib.pyplot as plt
 import io
