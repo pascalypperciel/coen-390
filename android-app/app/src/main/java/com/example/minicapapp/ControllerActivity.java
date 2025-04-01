@@ -151,7 +151,7 @@ public class ControllerActivity extends AppCompatActivity {
 
             return true;
         } else if (R.id.action_help == item.getItemId()) {
-            HelpFrag helpDialogueFragment = new HelpFrag();
+            HelpFragment helpDialogueFragment = new HelpFragment();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
         }

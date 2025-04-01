@@ -32,22 +32,22 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         // Load the persistent navbar into the local BottomNavigationView attribute by its ID
         bottomNavigationViewPersistentNavbar = findViewById(R.id.bottomNavigationViewPersistentNavbar);
 
-        // Ensure that the Controller activity is the first activity launched
-        goToControllerActivity();
+        // Set an invalid menu ID to clear the initial selection
+        replaceFragment(new ControllerFragment());
 
         // Handle all of the possible input when the different icons of the persistent navbar are pressed
         bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(item -> {
             if(item.getItemId() == R.id.action_load_controller) {
-                goToControllerActivity();
+                replaceFragment(new ControllerFragment());
                 return true;
             } else if (item.getItemId() == R.id.action_load_recorded_data) {
-                goToRecordedDataActivity();
+                replaceFragment(new RecordedDataFragment());
                 return true;
             } else if (item.getItemId() == R.id.action_load_settings) {
                 replaceFragment(new SettingsFragment());
                 return true;
             } else if (item.getItemId() == R.id.action_load_materials_information_page) {
-                goToMaterialsInformationPageActivity();
+                replaceFragment(new MaterialsInformationFragment());
                 return true;
             } else {
                 return false;
@@ -64,18 +64,4 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    private void goToControllerActivity() {
-        Intent controllerIntent = new Intent(this, ControllerActivity.class);
-        startActivity(controllerIntent);
-    }
-
-    private void goToRecordedDataActivity() {
-        Intent recordedDataIntent = new Intent(this, RecordedDataActivity.class);
-        startActivity(recordedDataIntent);
-    }
-
-    private void goToMaterialsInformationPageActivity() {
-        Intent materialsInformationPageIntent = new Intent(this, MaterialsInformationPageActivity.class);
-        startActivity(materialsInformationPageIntent);
-    }
 }

@@ -11,14 +11,14 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
-public class HelpFrag extends DialogFragment {
-
+public class HelpFragment extends DialogFragment {
+    // The UI elements present within the Help Fragment
     protected Button buttonCloseDialogueFragment;
     protected View coverUp;
     protected RelativeLayout rlTextContainer;
     protected ScrollView textbox;
 
-    public HelpFrag() {
+    public HelpFragment() {
         // Required empty public constructor
     }
 
