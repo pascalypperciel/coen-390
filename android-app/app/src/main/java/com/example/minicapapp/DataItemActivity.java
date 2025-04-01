@@ -1,6 +1,5 @@
 package com.example.minicapapp;
 
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.Menu;
@@ -56,7 +55,7 @@ public class DataItemActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(R.id.action_help == item.getItemId()) {
-            HelpFrag helpDialogueFragment = new HelpFrag();
+            HelpFragment helpDialogueFragment = new HelpFragment();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
         }

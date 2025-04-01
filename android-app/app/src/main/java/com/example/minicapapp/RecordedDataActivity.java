@@ -1,6 +1,5 @@
 package com.example.minicapapp;
 
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 
@@ -32,10 +31,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.util.Base64;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 
 public class RecordedDataActivity extends AppCompatActivity {
@@ -85,7 +80,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (R.id.action_help == item.getItemId()) {
-            HelpFrag helpDialogueFragment = new HelpFrag();
+            HelpFragment helpDialogueFragment = new HelpFragment();
             helpDialogueFragment.show(getSupportFragmentManager(), "Help");
             return true;
         }
