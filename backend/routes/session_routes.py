@@ -232,9 +232,9 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     ax.text(0.05, 0.90, f"Young's Modulus: {engr_strain[lend-1]:.5f}, {engr_stress[lend-1]:.5f}", transform=ax.transAxes, fontsize=12, color='purple', ha='left', va='top')
 
     if slope<0:
-    ax.text(0.05, 0.85, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+        ax.text(0.05, 0.85, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
-    ax.text(0.95, 0.05, f"Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
+    ax.text(0.95, 0.05, f"Avg Temp: {avg_temperature:.2f}Â°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
     ax.text(0.05, 0.95, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("Strain")
     ax.set_ylabel("Stress (Pa)")
