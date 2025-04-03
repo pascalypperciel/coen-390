@@ -180,7 +180,7 @@ public class RecordedDataActivity extends AppCompatActivity {
                     RecordedDataItem item = new RecordedDataItem(
                             record.getLong("sessionid"),
                             record.getString("sessionname"),
-                            new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss").parse(record.getString("sessionTimestamp")),
+                            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(record.getString("sessionTimestamp")),
                             (float) record.getDouble("initiallength"),
                             (float) record.getDouble("initialarea")
                     );
