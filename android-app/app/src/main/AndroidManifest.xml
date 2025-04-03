@@ -46,8 +46,7 @@
             android:theme="@style/Theme.DataActivity" />
         <activity
             android:name=".BottomNavigationBarActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MainActivity" >
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

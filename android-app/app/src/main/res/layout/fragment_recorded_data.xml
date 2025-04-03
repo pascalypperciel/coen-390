@@ -10,27 +10,61 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textViewRecordedDataTemp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Recorded Data Placeholder"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageButton
             android:id="@+id/imageButtonHelpRecordedData"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
             android:background="@drawable/circular_button_background"
-            android:src="@drawable/baseline_help_outline_24"
-            android:scaleType="fitCenter"
             android:padding="10dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_help_outline_24"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewRecordedData"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/recyclerview_border"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewRecordedDataSummary"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/textViewRecordedDataSummary"
+            android:layout_width="0dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:gravity="center_vertical"
+            android:text="Recorded Data Summary Placeholder"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerDataFilter" />
+
+        <Spinner
+            android:id="@+id/spinnerDataFilter"
+            android:layout_width="0dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageViewLogoRecordedData"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/cattesterlogo"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
