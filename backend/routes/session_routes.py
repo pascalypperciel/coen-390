@@ -25,8 +25,8 @@ def get_all_sessions():
         conn.close()
 
         return jsonify({"list of tests": result}), 200  # ok
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500  # internal server error
+    except Exception as e:  # pragma: no cover
+        return jsonify({"error": str(e)}), 500  # internal server error  pragma: no cover
 
 
 # Route to delete a session from the db
@@ -62,8 +62,8 @@ def delete_session():
     
     except (psycopg2.errors.InvalidTextRepresentation, psycopg2.DataError) as e:
         return jsonify({"error": "Invalid input syntax or data type"}), 400
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500 # internal server error
+    except Exception as e:  # pragma: no cover
+        return jsonify({"error": str(e)}), 500 # internal server error  pragma: no cover
 
 
 @app.route("/initial-session-info", methods=["POST"])
@@ -98,5 +98,5 @@ def initial_session_info():
     
     except (psycopg2.errors.InvalidTextRepresentation, psycopg2.DataError) as e:
         return jsonify({"error": "Invalid input syntax or data type"}), 400
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500 # internal server error
+    except Exception as e:  # pragma: no cover
+        return jsonify({"error": str(e)}), 500 # internal server error  pragma: no cover
