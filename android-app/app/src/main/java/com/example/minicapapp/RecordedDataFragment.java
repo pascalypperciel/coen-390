@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class RecordedDataFragment extends Fragment {
     protected Spinner spinnerDataFilter;
     protected TextView textViewRecordedDataSummary;
     protected RecyclerView recyclerViewRecordedData;
-    protected RecordedDataListRecyclerViewAdapter recordedDataListRecyclerViewAdapter;
+    protected RecordedDataRecyclerViewAdapter recordedDataRecyclerViewAdapter;
 
 
 
@@ -67,33 +68,6 @@ public class RecordedDataFragment extends Fragment {
             }
         });
 
-        // Spinner
-        // Define the spinner logic
-        spinnerDataFilter = view.findViewById(R.id.spinnerDataFilter);
-        spinnerDataFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getItemAtPosition(position).toString();
-                Toast.makeText(getActivity().getBaseContext(), "Filtering Method Selected: " + item, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        // Create the different filtering options available to the user
-        filteringOptions.add("[Default] Chronologically (Newest to Oldest)");
-        filteringOptions.add("Chronologically (Oldest to Newest)");
-        filteringOptions.add("Alphabetically (A to Z)");
-        filteringOptions.add("Alphabetically (Z to A)");
-
-        // Set up the drop-down view
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity().getBaseContext(), android.R.layout.simple_spinner_item, filteringOptions);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
-        spinnerDataFilter.setAdapter(spinnerAdapter);
-
         // Recycler View
         getData(sessions -> {
             allSessions = sessions;
@@ -101,12 +75,12 @@ public class RecordedDataFragment extends Fragment {
             // Setup RecyclerView
             // Bind and organize the sessions items.
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity().getBaseContext());
-            recordedDataListRecyclerViewAdapter = new RecordedDataListRecyclerViewAdapter(getActivity().getBaseContext(), sessions);
+            recordedDataRecyclerViewAdapter = new RecordedDataRecyclerViewAdapter(getActivity().getBaseContext(), sessions);
 
             // Define and initialize the RecyclerView.
             recyclerViewRecordedData = view.findViewById(R.id.recyclerViewRecordedData);
             recyclerViewRecordedData.setLayoutManager(linearLayoutManager);
-            recyclerViewRecordedData.setAdapter(recordedDataListRecyclerViewAdapter);
+            recyclerViewRecordedData.setAdapter(recordedDataRecyclerViewAdapter);
 
             // Adding a border around each item.
             DividerItemDecoration border = new DividerItemDecoration(recyclerViewRecordedData.getContext(), linearLayoutManager.getOrientation());
@@ -139,8 +113,43 @@ public class RecordedDataFragment extends Fragment {
 //            });
         });
 
+        // Spinner
+        // Define the spinner logic
+        spinnerDataFilter = view.findViewById(R.id.spinnerDataFilter);
+        spinnerDataFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
 
+                if(!item.equals("None")) {
+                    Toast.makeText(getActivity().getBaseContext(), "Filtering Method Selected: " + item, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity().getBaseContext(), "Please selected a filtering method.", Toast.LENGTH_SHORT).show();
 
+                    // Sort the Recycler View items based on the chosen sorting method.
+                    if(recordedDataRecyclerViewAdapter != null) {
+                        recordedDataRecyclerViewAdapter.sortData(item);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // This rarely triggers.
+            }
+        });
+
+        // Create the different filtering options available to the user
+        filteringOptions.add("None");
+        filteringOptions.add("1. Chronologically (Newest to Oldest)");
+        filteringOptions.add("2. Chronologically (Oldest to Newest)");
+        filteringOptions.add("3. Alphabetically (A to Z)");
+        filteringOptions.add("4. Alphabetically (Z to A)");
+
+        // Set up the drop-down view
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity().getBaseContext(), android.R.layout.simple_spinner_item, filteringOptions);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+        spinnerDataFilter.setAdapter(spinnerAdapter);
 
         return view;
     }
@@ -170,6 +179,7 @@ public class RecordedDataFragment extends Fragment {
                     RecordedDataItem item = new RecordedDataItem(
                             record.getLong("sessionid"),
                             record.getString("sessionname"),
+                            new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss").parse(record.getString("sessionTimestamp")),
                             (float) record.getDouble("initiallength"),
                             (float) record.getDouble("initialarea")
                     );

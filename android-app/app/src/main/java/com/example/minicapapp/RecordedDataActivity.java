@@ -29,7 +29,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -39,7 +41,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     protected Spinner spinnerFilter;
     protected TextView textViewSummary;
     protected RecyclerView recyclerViewRecordedDataList;
-    protected RecordedDataListRecyclerViewAdapter recordedDataListRecyclerViewAdapter;
+    protected RecordedDataRecyclerViewAdapter recordedDataRecyclerViewAdapter;
     private List<RecordedDataItem> allSessions = new ArrayList<>();
 
 
@@ -113,9 +115,9 @@ public class RecordedDataActivity extends AppCompatActivity {
 
             // Setup RecyclerView
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-            recordedDataListRecyclerViewAdapter = new RecordedDataListRecyclerViewAdapter(this, sessions);
+            recordedDataRecyclerViewAdapter = new RecordedDataRecyclerViewAdapter(this, sessions);
             recyclerViewRecordedDataList.setLayoutManager(linearLayoutManager);
-            recyclerViewRecordedDataList.setAdapter(recordedDataListRecyclerViewAdapter);
+            recyclerViewRecordedDataList.setAdapter(recordedDataRecyclerViewAdapter);
             recyclerViewRecordedDataList.addItemDecoration(new DividerItemDecoration(this, linearLayoutManager.getOrientation()));
 
             textViewSummary.setText(sessions.size() + " Sessions, filtered by...");
@@ -131,13 +133,13 @@ public class RecordedDataActivity extends AppCompatActivity {
                             filteredList.add(item);
                         }
                     }
-                    recordedDataListRecyclerViewAdapter.updateList(filteredList);
+                    //recordedDataRecyclerViewAdapter.updateList(filteredList);
                     textViewSummary.setText("1 Session: " + selectedSessionName);
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    recordedDataListRecyclerViewAdapter.updateList(allSessions);
+                    //recordedDataRecyclerViewAdapter.updateList(allSessions);
                     textViewSummary.setText(allSessions.size() + " Sessions");
                 }
             });
@@ -148,7 +150,7 @@ public class RecordedDataActivity extends AppCompatActivity {
     protected void updateUI() {
         getData(sessions -> {
             allSessions = sessions;
-            recordedDataListRecyclerViewAdapter.updateList(sessions);
+            //recordedDataRecyclerViewAdapter.updateList(sessions);
             textViewSummary.setText(sessions.size() + " Sessions, filtered by...");
         });
     }
@@ -178,6 +180,7 @@ public class RecordedDataActivity extends AppCompatActivity {
                     RecordedDataItem item = new RecordedDataItem(
                             record.getLong("sessionid"),
                             record.getString("sessionname"),
+                            new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss").parse(record.getString("sessionTimestamp")),
                             (float) record.getDouble("initiallength"),
                             (float) record.getDouble("initialarea")
                     );
