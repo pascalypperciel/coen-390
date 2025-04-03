@@ -132,7 +132,7 @@ public class RecordedDataFragment extends Fragment {
         return view;
     }
 
-    void getData(RecordedDataActivity.DataCallback callback) {
+    void getData(RecordedDataFragment.DataCallback callback) {
         List<RecordedDataItem> sessionList = new ArrayList<>();
 
         new Thread(() -> {
