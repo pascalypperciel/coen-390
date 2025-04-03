@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 import base64
-import math
+import psycopg2.errors
 
 ## Routes
 
@@ -35,6 +35,43 @@ def get_all_sessions():
         return jsonify({"error": str(e)}), 500  # internal server error
 
 
+# Route to delete a session from the db
+@app.route("/delete-session", methods=["POST"])
+def delete_session():
+    try:
+        data = request.json
+        session_id = data.get("SessionID")
+        
+        if not (session_id):
+            return jsonify({"error": "SessionID is required"}), 400  # Bad request
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        query = """
+            DELETE FROM Session
+            WHERE SessionID = %s;
+        """
+
+        cur.execute(query, (session_id,))
+        conn.commit()
+
+        deleted = cur.rowcount
+
+        cur.close()
+        conn.close()
+        
+        if deleted == 0:
+            return jsonify({"error": "Session not found"}), 404 # not found
+
+        return jsonify({"message": "Session deleted successfully"}), 200 # ok
+    
+    except (psycopg2.errors.InvalidTextRepresentation, psycopg2.DataError) as e:
+        return jsonify({"error": "Invalid input syntax or data type"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500 # internal server error
+
+
 @app.route("/initial-session-info", methods=["POST"])
 def initial_session_info():
     try:
@@ -63,7 +100,10 @@ def initial_session_info():
         cur.close()
         conn.close()
 
-        return jsonify({"message": "Test inserted successfully", "SessionID": inserted_id}), 201 # created
+        return jsonify({"message": "Session inserted successfully", "SessionID": inserted_id}), 201 # created
+    
+    except (psycopg2.errors.InvalidTextRepresentation, psycopg2.DataError) as e:
+        return jsonify({"error": "Invalid input syntax or data type"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500 # internal server error
 

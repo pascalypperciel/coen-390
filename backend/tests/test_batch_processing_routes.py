@@ -31,7 +31,7 @@ def test_post_batch_valid(client):
     assert data["message"] == "Records inserted successfully"
 
 def test_post_batch_empty_payload(client):
-    # Empty payload, it shouldn't made anything crash
+    # Empty payload, it shouldn't make anything crash
     payload = []
     response = client.post("/batch-process-records", json=payload)
     assert response.status_code == 201 # expect success
