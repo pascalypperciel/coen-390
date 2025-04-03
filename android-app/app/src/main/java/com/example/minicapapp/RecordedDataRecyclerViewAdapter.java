@@ -5,15 +5,19 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
-public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<RecordedDataListRecyclerViewAdapter.ViewHolder> {
+public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<RecordedDataRecyclerViewAdapter.ViewHolder> {
     // Variables for the storage of objects to be displayed in the RecyclerView.
     private Context context; // The context of the activity housing the RecyclerView.
     private List<RecordedDataItem> localRecordedDataList; // A list of the recorded data objects.
@@ -24,7 +28,7 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
         private TextView textViewRecordedDataLisItemTimestamp;
         private TextView textViewRecordedDataListItemTestType;
         private TextView textViewRecordedDataListItemMaterialType;
-        private Button  buttonMoreDetails;
+        private ImageButton  imageButtonMoreDetails;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -32,7 +36,7 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
             textViewRecordedDataLisItemTimestamp = itemView.findViewById(R.id.textViewListItemTimestamp);
             textViewRecordedDataListItemTestType = itemView.findViewById(R.id.textViewListItemTestType);
             textViewRecordedDataListItemMaterialType = itemView.findViewById(R.id.textViewMaterialType);
-            buttonMoreDetails = itemView.findViewById(R.id.buttonMoreDetails);
+            imageButtonMoreDetails = itemView.findViewById(R.id.imageButtonMoreDetails);
         }
 
         public TextView getTextViewRecordedDataListItemName() {
@@ -51,12 +55,12 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
             return textViewRecordedDataListItemMaterialType;
         }
 
-        public Button getButtonMoreDetails() {
-            return buttonMoreDetails;
+        public ImageButton getImageButtonMoreDetails() {
+            return imageButtonMoreDetails;
         }
     }
 
-    public RecordedDataListRecyclerViewAdapter(Context context, List<RecordedDataItem> localRecordedDataList) {
+    public RecordedDataRecyclerViewAdapter(Context context, List<RecordedDataItem> localRecordedDataList) {
         this.context = context;
         this.localRecordedDataList = localRecordedDataList;
     }
@@ -64,7 +68,7 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
     // This method will allow us to retrieve or "inflate" the Recorded Data List Item resource.
     @NonNull
     @Override
-    public RecordedDataListRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecordedDataRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
         return new ViewHolder(view);
     }
@@ -77,15 +81,15 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
 
         // Set the correct information for each Recorded Data Item.
         holder.getTextViewRecordedDataListItemName().setText(dataItem.getSessionName());
-        holder.getTextViewRecordedDataLisItemTimestamp().setText(dataItem.getSessionTimestamp());
+        holder.getTextViewRecordedDataLisItemTimestamp().setText(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(dataItem.getSessionTimestamp()));
         holder.getTextViewRecordedDataListItemTestType().setText("Compressive");
         holder.getTextViewRecordedDataListItemMaterialType().setText(" ");
-        holder.getButtonMoreDetails().setText("More Details >");
 
         // Go to the Data Item Activity if the "More Details" button is pressed.
-        holder.buttonMoreDetails.setOnClickListener(new View.OnClickListener() {
+        holder.getImageButtonMoreDetails().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // TODO: Change the mechanic of this button to pass a bundle to a new fragment.
                 Intent intent  = new Intent(context, DataItemActivity.class); // Explicit Intent.
                 intent.putExtra("data_item_session_id", dataItem.getSessionID());
                 context.startActivity(intent);
@@ -99,11 +103,37 @@ public class RecordedDataListRecyclerViewAdapter extends RecyclerView.Adapter<Re
         return localRecordedDataList.size();
     }
 
-    // This method will refresh the recycler view when a new profile is added.
-    public void updateList(List<RecordedDataItem> updatedProfiles) {
-        this.localRecordedDataList = updatedProfiles;
+    // This method will sort the list of Profiles alphabetically or numerically, depending on the display mode.
+    public void sortData(String filteringOption) {
+        if(filteringOption.equals("1. Chronologically (Newest to Oldest)")) { // Sort the data chronologically, by Timestamp, from Newest to Oldest.
+            Collections.sort(localRecordedDataList, new Comparator<RecordedDataItem>() {
+                @Override
+                public int compare(RecordedDataItem d1, RecordedDataItem d2) {
+                    return d2.getSessionTimestamp().compareTo(d1.getSessionTimestamp());
+                }
+            });
+        } else if (filteringOption.equals("2. Chronologically (Oldest to Newest)")) { // Sort the data chronologically, by Timestamp, from Oldest to Newest.
+            Collections.sort(localRecordedDataList, new Comparator<RecordedDataItem>() {
+                @Override
+                public int compare(RecordedDataItem d1, RecordedDataItem d2) {
+                    return d1.getSessionTimestamp().compareTo(d2.getSessionTimestamp());
+                }
+            });
+        } else if(filteringOption.equals("3. Alphabetically (A to Z)")) { // Sort the data alphabetically, by Name, from A to Z.
+            Collections.sort(localRecordedDataList, new Comparator<RecordedDataItem>() {
+                @Override
+                public int compare(RecordedDataItem d1, RecordedDataItem d2) {
+                    return d1.getSessionName().compareToIgnoreCase(d2.getSessionName());
+                }
+            });
+        } else if(filteringOption.equals("4. Alphabetically (Z to A)")) { // Sort the data alphabetically, by name, from Z to A.
+            Collections.sort(localRecordedDataList, new Comparator<RecordedDataItem>() {
+                @Override
+                public int compare(RecordedDataItem d1, RecordedDataItem d2) {
+                    return d2.getSessionName().compareToIgnoreCase(d1.getSessionName());
+                }
+            });
+        }
         notifyDataSetChanged();
     }
-
-    // TODO: Create methods for sorting.
 }

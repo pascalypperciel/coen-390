@@ -32,16 +32,16 @@
         android:text="TextView"
         android:textColor="#D3D3D3" />
 
-    <Button
-        android:id="@+id/buttonMoreDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginLeft="315dp"
-        android:layout_marginTop="25dp"
-        android:gravity="center|center_vertical"
-        android:text="Button"
-        android:textAlignment="center"
-        app:cornerRadius="10dp" />
+    <ImageButton
+        android:id="@+id/imageButtonMoreDetails"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="375dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/circular_button_background"
+        android:padding="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_keyboard_arrow_right_24" />
 
     <TextView
         android:id="@+id/textViewMaterialType"
