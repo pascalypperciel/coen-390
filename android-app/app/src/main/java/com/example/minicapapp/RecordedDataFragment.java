@@ -179,9 +179,11 @@ public class RecordedDataFragment extends Fragment {
                     RecordedDataItem item = new RecordedDataItem(
                             record.getLong("sessionid"),
                             record.getString("sessionname"),
-                            new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss").parse(record.getString("sessionTimestamp")),
+                            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").parse(record.getString("datecreated")),
                             (float) record.getDouble("initiallength"),
-                            (float) record.getDouble("initialarea")
+                            (float) record.getDouble("initialarea"),
+                            (float) record.optDouble("yieldstrain", Double.NaN),
+                            (float) record.optDouble("yieldstress", Double.NaN)
                     );
                     sessionList.add(item);
                 }
