@@ -123,13 +123,13 @@ public class RecordedDataFragment extends Fragment {
 
                 if(!item.equals("None")) {
                     Toast.makeText(getActivity().getBaseContext(), "Filtering Method Selected: " + item, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity().getBaseContext(), "Please selected a filtering method.", Toast.LENGTH_SHORT).show();
 
                     // Sort the Recycler View items based on the chosen sorting method.
                     if(recordedDataRecyclerViewAdapter != null) {
                         recordedDataRecyclerViewAdapter.sortData(item);
                     }
+                } else {
+                    Toast.makeText(getActivity().getBaseContext(), "Please select a filtering method.", Toast.LENGTH_SHORT).show();
                 }
             }
 
