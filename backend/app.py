@@ -26,6 +26,7 @@ def get_db_connection():
 
 from routes.session_routes import *
 from routes.batch_processing_routes import *
+from routes.graphs_routes import *
 
 if __name__ == '__main__':
     app.run(host="127.0.0.1", port=5000, debug=True)
