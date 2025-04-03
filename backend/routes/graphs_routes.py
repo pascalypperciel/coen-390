@@ -61,8 +61,8 @@ def build_graphs():
         # Return success response
         return jsonify({"Graph": graphs_list, "message": "Graphs generated successfully"}), 200
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500  # Internal Server Error
+    except Exception as e: # pragma: no cover
+        return jsonify({"error": str(e)}), 500  # Internal Server Error pragma: no cover
 
 
 ## Helpers

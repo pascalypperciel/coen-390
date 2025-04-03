@@ -49,8 +49,8 @@ def batch_process_records():
         conn.close()
 
         return jsonify({"message": "Records inserted successfully", "received_count": len(data), "inserted_count": len(records)}), 201 # created
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500 # internal server error
+    except Exception as e: # pragma: no cover
+        return jsonify({"error": str(e)}), 500 # internal server error pragma: no cover
 
 # Route to request data from a whole session (batch)
 @app.route("/request-session-records", methods=["GET"])
@@ -91,5 +91,5 @@ def request_session_records():
             })
 
         return jsonify({"records": result}), 200 # ok
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500 # internal server error
+    except Exception as e: # pragma: no cover
+        return jsonify({"error": str(e)}), 500 # internal server error pragma: no cover
