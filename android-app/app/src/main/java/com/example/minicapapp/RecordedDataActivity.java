@@ -186,7 +186,9 @@ public class RecordedDataActivity extends AppCompatActivity {
                             (float) record.optDouble("yieldstrain", Double.NaN),
                             (float) record.optDouble("yieldstress", Double.NaN)
                     );
-                    sessionList.add(item);
+                    if (item.getSessionID() > 0) { //remove test sessions that have negative sessionId
+                        sessionList.add(item);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
