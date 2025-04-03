@@ -14,7 +14,7 @@ We chose PostgreSQL because it’s a powerful, reliable, and scalable database. 
 * #### Azure Cloud 
 Our PostgreSQL database and Flask API will be hosted on Azure Cloud, mainly for two reasons. The first one is cost-effectivenese. We have free Azure credits through our school, so this is the most budget-friendly option. The second one is familiarity. Some team members have prior experience with Azure, making deployment and management easier.
 
-![Tech Stack Image](docs/images/techstack.jpg)
+![Tech Stack Image](docs/images/techstack.png)
 
 
 ## Team members and roles:
