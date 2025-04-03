@@ -116,7 +116,7 @@ def build_graphs():
         offset = 0.05
 
         if not session_id:
-            return jsonify({"error": "Session Name is required"}), 400  # Bad request   
+            return jsonify({"error": "SessionID is required"}), 400  # Bad request   
        
         conn = get_db_connection()
         cur = conn.cursor()
@@ -128,12 +128,9 @@ def build_graphs():
         """
         cur.execute(select_query, (session_id,))
         records = cur.fetchall()
-        # cur.close()
-        # conn.close()
-
-        # cur = conn.cursor()
-        # conn = get_db_connection()
-
+        
+        if not records:
+            return jsonify({"error": "No valid records found for this session"}), 404  # Not found
 
         select_query2 = """
             SELECT InitialLength, InitialArea FROM Session 
@@ -157,8 +154,6 @@ def build_graphs():
                 "Valid": row[6]
             })
 
-        if not records:
-            return jsonify({"error": "No valid records found for this session"}), 404  # Not found
         # Extract relevant data
         distances = [row[1] for row in records]  # row[1] corresponds to Distance
         pressures = [row[3] for row in records]  # row[3] corresponds to Pressure
@@ -198,6 +193,10 @@ def find_best_interval(x_data, y_data):
         y_mean = np.mean(y_subset)
         numerator = np.sum((x_subset - x_mean) * (y_subset - y_mean))
         denominator = np.sum((x_subset - x_mean) ** 2)
+
+        if denominator == 0: #prevents division by 0
+            continue
+
         m = numerator / denominator  # Slope
         b = y_mean - m * x_mean     # Intercept
 

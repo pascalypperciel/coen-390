@@ -93,3 +93,24 @@ def test_post_delete_unfound(client):
     assert response.status_code == 404 # expect failure
     data = response.get_json()
     assert data["error"] == "Session not found"
+
+def test_get_build_graph(client):
+    # Good, valid
+    response = client.get(f"/build-graphs?SessionID={session_id}")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["message"] == "Graphs generated successfully"
+
+def test_get_build_graph_invalid_sessionid(client):
+    # Bad, SessionID doesn't exist
+    response = client.get(f"/build-graphs?SessionID={wrong_session_id}")
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data["error"] == "No valid records found for this session"
+
+def test_get_build_graph_missing_param(client):
+    # Bad, SessionID wasn't added to the URL
+    response = client.get(f"/build-graphs")
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data["error"] == "SessionID is required"
