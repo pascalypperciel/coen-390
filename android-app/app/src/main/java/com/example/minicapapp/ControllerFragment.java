@@ -177,6 +177,11 @@ public class ControllerFragment extends Fragment {
                 buttonStartStop.setText(R.string.stop);
                 buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
 
+                // Re-enable the session input fields
+                editTextSessionName.setEnabled(true);
+                editTextInitialLength.setEnabled(true);
+                editTextInitialArea.setEnabled(true);
+
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if(!btManager.isConnected()) {
                     Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
@@ -351,7 +356,7 @@ public class ControllerFragment extends Fragment {
                 if (responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED) {
                     Log.d("BatchProcessing", "Batch processed successfully: " + responseCode);
                 } else {
-                    Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage()); // problem here
+                    Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
                                 Toast.makeText(requireContext(), "Batch processing failed: " + responseCode, Toast.LENGTH_SHORT).show()
@@ -549,7 +554,7 @@ public class ControllerFragment extends Fragment {
         }
     }
 
-    private void createSession(long sessionID, String sessionName, float initialLength, float initialArea) {
+    private void createSession(long sessionID, String sessionName, float initialLength, float initialArea, Runnable onSuccess) {
         new Thread(() -> {
             JSONObject initialData = new JSONObject();
             try {
@@ -589,9 +594,10 @@ public class ControllerFragment extends Fragment {
                 if (responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_OK) {
                     Log.d("CreateSession", "Session created successfully: " + responseCode);
                     if (isAdded()) {
-                        requireActivity().runOnUiThread(() ->
-                                Toast.makeText(requireContext(), "Session created successfully!", Toast.LENGTH_SHORT).show()
-                        );
+                        requireActivity().runOnUiThread(() -> {
+                            Toast.makeText(requireContext(), "Session created successfully!", Toast.LENGTH_SHORT).show();
+                            onSuccess.run();
+                        });
                     }
                 } else {
                     Log.e("CreateSession", "Session creation failed: " + responseCode + " - " + conn.getResponseMessage());
@@ -646,15 +652,16 @@ public class ControllerFragment extends Fragment {
                     session.sessionName = editTextSessionName.getText().toString();
 
                     // Create the session
-                    createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea);
+                    createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea, () -> {
+                        // Start Bluetooth listener for batch records data
+                        startBluetoothDataListener(sessionID);
+                    });
 
                     // Disable session inputs
                     editTextSessionName.setEnabled(false);
                     editTextInitialLength.setEnabled(false);
                     editTextInitialArea.setEnabled(false);
 
-                    // Start Bluetooth listener for batch records data
-                    startBluetoothDataListener(sessionID);
                 } else {
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
