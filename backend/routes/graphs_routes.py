@@ -71,6 +71,8 @@ def build_graphs():
 def find_best_interval(x_data, y_data):
     # Sliding window size
     window_size = 10
+    #margin for how much points can deviate from linearity
+    margin=5
 
     # Loop through the data with a sliding window and calculate the R^2 for each window
     best_r2 = -np.inf
@@ -82,7 +84,10 @@ def find_best_interval(x_data, y_data):
         end = start + window_size
         x_subset = x_data[start:end]
         y_subset = y_data[start:end]
-    
+        
+        if abs(y_subset[window_size-1]-y_subset[0])>margin:
+            continue        
+
         # Perform linear regression on the subset
         #m, b = linear_regression(x_subset, y_subset)
         n = len(x_subset)
@@ -151,7 +156,7 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     if engr_slope<0:
         ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
-    ax.text(0.42, 0.78, f" Yield: {engr_strain[Elend-1]:.5f}, {engr_stress[Elend-1]:.5f} \n Young's Modulus: {engr_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
+    ax.text(0.98, 0.05, f" Yield: {engr_strain[Elend-1]:.5f}, {engr_stress[Elend-1]:.5f} \n Young's Modulus: {engr_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
     ax.text(0.02, 0.98, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("Strain")
     ax.set_ylabel("Stress (Pa)")
@@ -185,13 +190,11 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
     ax.plot(true_range, true_offset_line, '--k', label="Offset Line")
 
     ax.scatter(true_strain[Tlend-1],true_stress[Tlend-1], color='red',s=200)#yield
-    #ax.text(0.05, 0.90, f"Yield: {true_strain[Tlend-1]:.5f}, {true_stress[Tlend-1]:.5f}", transform=ax.transAxes, fontsize=12, color='purple', ha='left', va='top')
-    #ax.text(0.05, 0.85, f"Young's Modulus: {true_slope:.5f}", transform=ax.transAxes, fontsize=12, color='purple', ha='left', va='top')
-
+    
     if true_slope<0:
         ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
-    ax.text(0.42, 0.78, f" Yield: {true_strain[Tlend-1]:.5f}, {true_stress[Tlend-1]:.5f} \n Young's Modulus: {true_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
+    ax.text(0.98, 0.05, f" Yield: {true_strain[Tlend-1]:.5f}, {true_stress[Tlend-1]:.5f} \n Young's Modulus: {true_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
     ax.text(0.02, 0.98, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
     ax.set_xlabel("True Strain")
     ax.set_ylabel("True Stress (Pa)")
