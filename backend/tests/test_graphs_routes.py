@@ -34,4 +34,4 @@ def test_get_build_graphs_zero_variance_stress(client):
     assert response.status_code == 200
     data = response.get_json()
     assert data["message"] == "Graphs generated successfully"
-    assert len(data["Graph"]) == 4
+    assert len(data["Graph"]) == 5
