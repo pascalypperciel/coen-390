@@ -59,4 +59,5 @@
     <string name="selected">"Selected: "</string>
     <string name="bluetooth_button">Bluetooth Toggle</string>
     <string name="help_button">Help Button</string>
+    <string name="start_new_session">Start New Session</string>
 </resources>

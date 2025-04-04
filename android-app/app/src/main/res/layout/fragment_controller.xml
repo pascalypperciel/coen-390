@@ -101,12 +101,6 @@
                     android:imeOptions="actionDone"
                     android:inputType="numberDecimal" />
 
-                <Button
-                    android:id="@+id/buttonStartSession"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Start Session"
-                    android:layout_marginTop="12dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -214,7 +208,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -257,11 +251,9 @@
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/buttonStop"
+                    android:id="@+id/buttonStartStop"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Stop"
-                    android:backgroundTint="#FF0000"
                     android:textColor="@color/black"
                     android:layout_marginTop="8dp" />
             </LinearLayout>

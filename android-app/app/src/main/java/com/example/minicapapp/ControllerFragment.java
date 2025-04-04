@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -50,7 +51,7 @@ public class ControllerFragment extends Fragment {
     // Internal Attributes
     protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
-    protected Button buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop, buttonBluetoothStatus;
+    protected Button buttonMotorForward, buttonMotorBackward, buttonStartStop, buttonBluetoothStatus;
     private boolean testFinished = false;
 
     //definitions from old controller activity
@@ -62,6 +63,7 @@ public class ControllerFragment extends Fragment {
     private static final double GRAVITY = 9.81;
     private float initialLength = 0.0f;
     private float initialArea = 0.0f;
+    private volatile boolean isListening = false;
 
     // The UI elements present in the Controller Fragment
 
@@ -124,21 +126,6 @@ public class ControllerFragment extends Fragment {
         editTextInitialArea.setTextColor(getResources().getColor(R.color.black, null));
         editTextInitialArea.setVisibility(View.INVISIBLE);
 
-        // The button that will allow the session to commence
-        buttonStartSession = view.findViewById(R.id.buttonStartSession);
-        buttonStartSession.setText(R.string.start_session);
-        buttonStartSession.setVisibility(View.INVISIBLE);
-        buttonStartSession.setOnClickListener(v -> {
-            BluetoothManager btManager = BluetoothManager.getInstance();
-            if(!btManager.isConnected()) {
-                Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
-            } else {
-                // Check the parameters input by the user.
-                checkSessionParameters(editTextSessionName.getText().toString(), editTextInitialLength.getText().toString(), editTextInitialArea.getText().toString());
-            }
-
-        });
-
         // Motor Control Elements
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
         textViewMotorControls.setText(R.string.motor_controls);
@@ -181,16 +168,44 @@ public class ControllerFragment extends Fragment {
             return true;
         });
 
-        buttonStop = view.findViewById(R.id.buttonStop);
-        buttonStop.setText(R.string.stop);
-        buttonStop.setVisibility(View.INVISIBLE);
-        buttonStop.setOnClickListener(v -> {
-            BluetoothManager btManager = BluetoothManager.getInstance();
-            if (btManager.isConnected()) {
-                btManager.sendCommand("Motor_OFF");
-            }
-            disableInputStream();
+        buttonStartStop = view.findViewById(R.id.buttonStartStop);
+        buttonStartStop.setVisibility(View.INVISIBLE);
 
+        buttonStartStop.setOnClickListener(v -> {
+            if (!isListening) { //Stop if Started
+                isListening = true;
+                buttonStartStop.setText(R.string.stop);
+                buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if(!btManager.isConnected()) {
+                    Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Check the parameters input by the user.
+                    checkSessionParameters(editTextSessionName.getText().toString(), editTextInitialLength.getText().toString(), editTextInitialArea.getText().toString());
+                }
+
+            } else { //Start if Stopped
+                isListening = false;
+                buttonStartStop.setText(R.string.start_new_session);
+                buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if (btManager.isConnected()) {
+                    btManager.sendCommand("Motor_OFF");
+                }
+
+                // If any records left, send them to db
+                if (!recordList.isEmpty()) {
+                    try {
+                        sendBatchData(recordList);
+                    } catch (JSONException e) {
+                        Log.e("StopButton", "Failed to send final batch", e);
+                    }
+                }
+
+                disableInputStream();
+            }
         });
 
         // Real-Time Session Sensor Data
@@ -209,7 +224,9 @@ public class ControllerFragment extends Fragment {
             editTextSessionName.setVisibility(View.VISIBLE);
             editTextInitialLength.setVisibility(View.VISIBLE);
             editTextInitialArea.setVisibility(View.VISIBLE);
-            buttonStartSession.setVisibility(View.VISIBLE);
+            buttonStartStop.setVisibility(View.VISIBLE);
+            buttonStartStop.setText(R.string.start_new_session);
+            buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
         }
     }
 
@@ -228,7 +245,7 @@ public class ControllerFragment extends Fragment {
                 int bytes;
                 StringBuilder dataBuffer = new StringBuilder();
 
-                while (btManager.isConnected()) {
+                while (btManager.isConnected() && isListening) {
                     bytes = inputStream.read(buffer);
                     String incomingData = new String(buffer, 0, bytes);
                     dataBuffer.append(incomingData);
@@ -334,7 +351,7 @@ public class ControllerFragment extends Fragment {
                 if (responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED) {
                     Log.d("BatchProcessing", "Batch processed successfully: " + responseCode);
                 } else {
-                    Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
+                    Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage()); // problem here
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
                                 Toast.makeText(requireContext(), "Batch processing failed: " + responseCode, Toast.LENGTH_SHORT).show()
@@ -357,11 +374,9 @@ public class ControllerFragment extends Fragment {
 
         if (isAdded()) {
             requireActivity().runOnUiThread(() -> {
-                buttonStartSession.setVisibility(View.VISIBLE);
                 editTextSessionName.setEnabled(false);
                 editTextInitialLength.setEnabled(false);
                 editTextInitialArea.setEnabled(false);
-                buttonStartSession.setEnabled(false);
             });
         }
     }
@@ -615,7 +630,7 @@ public class ControllerFragment extends Fragment {
                     textViewMotorControls.setVisibility(View.VISIBLE);
                     buttonMotorForward.setVisibility(View.VISIBLE);
                     buttonMotorBackward.setVisibility(View.VISIBLE);
-                    buttonStop.setVisibility(View.VISIBLE);
+                    buttonStartStop.setVisibility(View.VISIBLE);
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     String sessionID = sdf.format(new Date());
@@ -637,7 +652,6 @@ public class ControllerFragment extends Fragment {
                     editTextSessionName.setEnabled(false);
                     editTextInitialLength.setEnabled(false);
                     editTextInitialArea.setEnabled(false);
-                    buttonStartSession.setEnabled(false);
 
                     // Start Bluetooth listener for batch records data
                     startBluetoothDataListener(sessionID);
