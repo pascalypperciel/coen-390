@@ -18,11 +18,17 @@ import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+
 import java.util.ArrayList;
 
+@RequiresApi(api = Build.VERSION_CODES.S)
 public class BluetoothFragment extends Fragment {
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> deviceListAdapter;
@@ -46,6 +52,31 @@ public class BluetoothFragment extends Fragment {
             }
         }
     };
+
+
+    private final ActivityResultLauncher<String[]> permissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                Boolean scanGranted = result.getOrDefault(Manifest.permission.BLUETOOTH_SCAN, false);
+                Boolean connectGranted = result.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false);
+                Boolean locationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
+
+                if (Boolean.TRUE.equals(scanGranted) && Boolean.TRUE.equals(connectGranted) && Boolean.TRUE.equals(locationGranted)) {
+                    startDiscovery();
+                } else {
+                    Toast.makeText(requireContext(), "Permissions denied.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private void startDiscovery() {
+        deviceListAdapter.clear();
+        discoveredDevices.clear();
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            }
+        }
+        boolean started = bluetoothAdapter.startDiscovery();
+    }
 
 
     @Override
@@ -92,12 +123,14 @@ public class BluetoothFragment extends Fragment {
 
         buttonScan.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
                     ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                requestPermissions(new String[] {
+                permissionLauncher.launch(new String[] {
                         Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT,
                         Manifest.permission.ACCESS_FINE_LOCATION
-                }, 1);
+                });
                 return;
             }
 
