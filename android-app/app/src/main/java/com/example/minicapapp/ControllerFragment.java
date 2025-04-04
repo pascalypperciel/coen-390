@@ -177,11 +177,6 @@ public class ControllerFragment extends Fragment {
                 buttonStartStop.setText(R.string.stop);
                 buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
 
-                // Re-enable the session input fields
-                editTextSessionName.setEnabled(true);
-                editTextInitialLength.setEnabled(true);
-                editTextInitialArea.setEnabled(true);
-
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if(!btManager.isConnected()) {
                     Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
@@ -194,6 +189,16 @@ public class ControllerFragment extends Fragment {
                 isListening = false;
                 buttonStartStop.setText(R.string.start_new_session);
                 buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+
+                // Re-disable the session input fields
+                editTextSessionName.setEnabled(true);
+                editTextInitialLength.setEnabled(true);
+                editTextInitialArea.setEnabled(true);
+
+                // Reset the text fields
+                editTextSessionName.setText("");
+                editTextInitialLength.setText("");
+                editTextInitialArea.setText("");
 
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if (btManager.isConnected()) {
@@ -376,14 +381,6 @@ public class ControllerFragment extends Fragment {
     private void disableInputStream() {
         // Update the UI on the main thread
         testFinished = false;
-
-        if (isAdded()) {
-            requireActivity().runOnUiThread(() -> {
-                editTextSessionName.setEnabled(false);
-                editTextInitialLength.setEnabled(false);
-                editTextInitialArea.setEnabled(false);
-            });
-        }
     }
 
     private void displayRecord(Record newMessage) {
@@ -653,14 +650,16 @@ public class ControllerFragment extends Fragment {
 
                     // Create the session
                     createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea, () -> {
+                        // Disable session inputs after successful session creation
+                        requireActivity().runOnUiThread(() -> {
+                            editTextSessionName.setEnabled(false);
+                            editTextInitialLength.setEnabled(false);
+                            editTextInitialArea.setEnabled(false);
+
+                        });
                         // Start Bluetooth listener for batch records data
                         startBluetoothDataListener(sessionID);
                     });
-
-                    // Disable session inputs
-                    editTextSessionName.setEnabled(false);
-                    editTextInitialLength.setEnabled(false);
-                    editTextInitialArea.setEnabled(false);
 
                 } else {
                     if (isAdded()) {
