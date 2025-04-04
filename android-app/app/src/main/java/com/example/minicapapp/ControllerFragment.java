@@ -20,6 +20,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class ControllerFragment extends Fragment {
 
@@ -48,8 +49,8 @@ public class ControllerFragment extends Fragment {
     // Internal Attributes
     protected TextView textViewMotorControls, textViewSensorData;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
-
     protected Button buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop;
+    private boolean testFinished = false;
 
     //definitions from old controller activity
     private static final int BATCH_SIZE = 10;
@@ -65,7 +66,6 @@ public class ControllerFragment extends Fragment {
 
     //////////////////////////////////////////////////////
     protected ImageButton imageButtonHelpController;
-    protected TextView textViewTemp;
 
     public ControllerFragment() {
         // Required empty public constructor
@@ -173,13 +173,10 @@ public class ControllerFragment extends Fragment {
         textViewSensorData = view.findViewById(R.id.textViewSensorData);
         textViewSensorData.setVisibility(View.INVISIBLE);
 
-        textViewTemp = view.findViewById(R.id.textViewControllerTemp);
-
         showSessionInputsIfConnected();
 
         return view;
     }
-
 
     private void showSessionInputsIfConnected() {
         BluetoothManager btManager = BluetoothManager.getInstance();
@@ -191,6 +188,45 @@ public class ControllerFragment extends Fragment {
         }
     }
 
+    private void startBluetoothDataListener(String sessionID) {
+        BluetoothManager btManager = BluetoothManager.getInstance();
+        InputStream inputStream = btManager.getInputStream();
+
+        if (inputStream == null) {
+            Log.e("BluetoothData", "InputStream is null. Cannot start data listener.");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                byte[] buffer = new byte[1024];
+                int bytes;
+                StringBuilder dataBuffer = new StringBuilder();
+
+                while (btManager.isConnected()) {
+                    bytes = inputStream.read(buffer);
+                    String incomingData = new String(buffer, 0, bytes);
+                    dataBuffer.append(incomingData);
+
+                    int endOfLineIndex;
+                    while ((endOfLineIndex = dataBuffer.indexOf("\n")) >= 0) {
+                        String fullMessage = dataBuffer.substring(0, endOfLineIndex).trim();
+                        dataBuffer.delete(0, endOfLineIndex + 1);
+
+                        try {
+                            processBluetoothData(fullMessage, sessionID);
+                        } catch (JSONException e) {
+                            Log.e("BluetoothData", "Error parsing Bluetooth data", e);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                Log.e("BluetoothData", "Error reading from input stream", e);
+            }
+        }).start();
+    }
+
+
 
     private void processBluetoothData(String incoming, String sessionID) throws JSONException {
         String[] values = incoming.split(";");
@@ -201,7 +237,7 @@ public class ControllerFragment extends Fragment {
         if (values.length == 3) {
             String valid = "True";
             for (String value : values) {
-                if (Objects.equals(value, "NaN")) {
+                if (value.equalsIgnoreCase("nan")) {
                     valid = "False";
                     break;
                 }
@@ -292,10 +328,15 @@ public class ControllerFragment extends Fragment {
     }
     private void disableInputStream() {
         // Update the UI on the main thread
+        testFinished = false;
+
         if (isAdded()) {
             requireActivity().runOnUiThread(() -> {
-                //textViewBluetoothStatus.setText(R.string.bluetooth_connected);
                 buttonStartSession.setVisibility(View.VISIBLE);
+                editTextSessionName.setEnabled(false);
+                editTextInitialLength.setEnabled(false);
+                editTextInitialArea.setEnabled(false);
+                buttonStartSession.setEnabled(false);
             });
         }
     }
@@ -311,16 +352,20 @@ public class ControllerFragment extends Fragment {
         // Stop if the sensor detects "too close" or "too far"
         try {
             float distance = Float.parseFloat(newMessage.distance.trim());
-            if (distance < 2.0 || distance > 10.55) {
+            if ((distance < 2.0) && !testFinished) {
+                testFinished = true;
+
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
                             Toast.makeText(requireContext(), "Test Finished", Toast.LENGTH_LONG).show()
                     );
                 }
+
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if (btManager.isConnected()) {
                     btManager.sendCommand("Motor_OFF");
                 }
+
                 disableInputStream();
             }
         } catch (NumberFormatException e) {
@@ -334,7 +379,14 @@ public class ControllerFragment extends Fragment {
         }
 
         // Extract the last 10 records
-        List<ControllerFragment.Record> lastTenRecords = recordList.subList(recordList.size() - 10, recordList.size());
+        List<Record> lastTenRecords = recordList.subList(recordList.size() - 10, recordList.size());
+
+        for (Record r : lastTenRecords) {
+            if (r.valid.equals("False")) {
+                Log.w("ANALYZE", "Skipping variation analysis due to invalid data");
+                return; // One or more of the values were NaN
+            }
+        }
 
         double sumDistanceFirstFive = 0.0, sumDistanceLastFive = 0.0;
         double sumPressureFirstFive = 0.0, sumPressureLastFive = 0.0;
@@ -381,6 +433,15 @@ public class ControllerFragment extends Fragment {
     private void monitorYoungModulus() {
         if (recordList.size() < 10) {
             return; // Not enough data to calculate Young's modulus
+        }
+
+        List<Record> recentRecords = recordList.subList(recordList.size() - 10, recordList.size());
+
+        for (Record r : recentRecords) {
+            if (r.valid.equals("False")) {
+                Log.w("YOUNG_MODULUS", "Skipping Young Modulus calc due to invalid data");
+                return; // One or more of the values were NaN
+            }
         }
 
         // Calculate the initial Young's modulus if not already calculated
@@ -545,6 +606,15 @@ public class ControllerFragment extends Fragment {
 
                     // Create the session
                     createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea);
+
+                    // Disable session inputs
+                    editTextSessionName.setEnabled(false);
+                    editTextInitialLength.setEnabled(false);
+                    editTextInitialArea.setEnabled(false);
+                    buttonStartSession.setEnabled(false);
+
+                    // Start Bluetooth listener for batch records data
+                    startBluetoothDataListener(sessionID);
                 } else {
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
