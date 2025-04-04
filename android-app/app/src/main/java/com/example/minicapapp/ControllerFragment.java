@@ -102,6 +102,8 @@ public class ControllerFragment extends Fragment {
                         .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
                         .addToBackStack(null)
                         .commit();
+
+                ((BottomNavigationBarActivity) requireActivity()).setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
             }
         });
 

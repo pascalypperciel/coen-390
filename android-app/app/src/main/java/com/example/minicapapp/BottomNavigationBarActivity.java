@@ -48,6 +48,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
             }
         });
 
+        setupBottomNavListener();
     }
 
     // Internal method that will allow the persistent navbar to switch between fragment easily
@@ -56,6 +57,32 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayoutActivityContent, fragment);
         fragmentTransaction.commit();
+    }
+
+    private void setupBottomNavListener() {
+        bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.action_load_controller) {
+                replaceFragment(new ControllerFragment());
+                return true;
+            } else if (item.getItemId() == R.id.action_load_recorded_data) {
+                replaceFragment(new RecordedDataFragment());
+                return true;
+            } else if (item.getItemId() == R.id.action_load_settings) {
+                replaceFragment(new SettingsFragment());
+                return true;
+            } else if (item.getItemId() == R.id.action_load_materials_information_page) {
+                replaceFragment(new MaterialsInformationFragment());
+                return true;
+            } else {
+                return false;
+            }
+        });
+    }
+
+    public void setBottomNavSelectedItemWithoutTriggering(int itemId) {
+        bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(null);
+        bottomNavigationViewPersistentNavbar.setSelectedItemId(itemId);
+        setupBottomNavListener();
     }
 
 }
