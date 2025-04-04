@@ -45,10 +45,20 @@ public class BluetoothFragment extends Fragment {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device != null && !discoveredDevices.contains(device)) {
                     if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                        String name = device.getName() != null ? device.getName() : null;
-                        if (Objects.equals(name, "CAT_Tester")) {
+                        String deviceName = device.getName();
+                        String deviceAddress = device.getAddress();
+                        String connectedAddress = null;
+
+                        // Check if we are connected. If we are, don't display connected device in the scanned list.
+                        BluetoothManager btManager = BluetoothManager.getInstance();
+                        if (btManager.isConnected()) {
+                            BluetoothDevice connectedDevice = btManager.getSelectedDevice();
+                            connectedAddress = connectedDevice.getAddress();
+                        }
+
+                        if (Objects.equals(deviceName, "CAT_Tester") && !deviceAddress.equals(connectedAddress)) {
                             discoveredDevices.add(device);
-                            deviceListAdapter.add(name + "\n" + device.getAddress());
+                            deviceListAdapter.add(deviceName + "\n" + device.getAddress());
                         }
                     }
                 }
