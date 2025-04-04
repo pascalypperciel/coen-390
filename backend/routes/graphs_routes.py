@@ -84,9 +84,7 @@ def find_best_interval(x_data, y_data):
         end = start + window_size
         x_subset = x_data[start:end]
         y_subset = y_data[start:end]
-        
-        if abs(y_subset[window_size-1]-y_subset[0])>margin:
-            continue        
+               
 
         # Perform linear regression on the subset
         #m, b = linear_regression(x_subset, y_subset)
@@ -113,10 +111,13 @@ def find_best_interval(x_data, y_data):
             r2 = 1 - (ss_residual / ss_total)  # R-squared
     
         if r2 >= best_r2:
-            best_r2 = r2
-            best_interval = (start, end)
-            best_m=m
-            best_b=b
+            if start>=window_size and abs(y_data[start-2]-y_data[start+2])>margin:
+                continue
+            else:
+                best_r2 = r2
+                best_interval = (start, end)
+                best_m=m
+                best_b=b
 
     return best_interval, best_m, best_b
     
