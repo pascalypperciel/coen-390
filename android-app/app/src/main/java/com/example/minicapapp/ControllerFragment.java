@@ -48,7 +48,7 @@ public class ControllerFragment extends Fragment {
         public float initialArea;
     }
     // Internal Attributes
-    protected TextView textViewMotorControls, textViewSensorData;
+    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
     protected Button buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop, buttonBluetoothStatus;
     private boolean testFinished = false;
@@ -194,8 +194,9 @@ public class ControllerFragment extends Fragment {
         });
 
         // Real-Time Session Sensor Data
-        textViewSensorData = view.findViewById(R.id.textViewSensorData);
-        textViewSensorData.setVisibility(View.INVISIBLE);
+        textViewDistance = view.findViewById(R.id.textDistanceValue);
+        textViewPressure = view.findViewById(R.id.textPressureValue);
+        textViewTemperature = view.findViewById(R.id.textTemperatureValue);
 
         showSessionInputsIfConnected();
 
@@ -366,11 +367,13 @@ public class ControllerFragment extends Fragment {
     }
 
     private void displayRecord(Record newMessage) {
-        String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
-
         // Update the UI on the main thread
         if (isAdded()) {
-            requireActivity().runOnUiThread(() -> textViewSensorData.setText(displayText));
+            requireActivity().runOnUiThread(() -> {
+                textViewDistance.setText(newMessage.distance + " cm");
+                textViewPressure.setText(newMessage.pressure + " kg");
+                textViewTemperature.setText(newMessage.temperature + "°C");
+            });
         }
 
         // Stop if the sensor detects "too close" or "too far"
@@ -613,7 +616,6 @@ public class ControllerFragment extends Fragment {
                     buttonMotorForward.setVisibility(View.VISIBLE);
                     buttonMotorBackward.setVisibility(View.VISIBLE);
                     buttonStop.setVisibility(View.VISIBLE);
-                    textViewSensorData.setVisibility(View.VISIBLE);
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     String sessionID = sdf.format(new Date());
