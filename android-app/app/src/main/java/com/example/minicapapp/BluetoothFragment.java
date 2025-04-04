@@ -53,10 +53,7 @@ public class BluetoothFragment extends Fragment {
                     }
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                ProgressBar progressBar = requireView().findViewById(R.id.progressBarScan);
                 Button buttonScan = requireView().findViewById(R.id.buttonScan);
-
-                progressBar.setVisibility(View.GONE);
                 buttonScan.setText("Scan Devices");
                 buttonScan.setEnabled(true);
             }
@@ -128,7 +125,6 @@ public class BluetoothFragment extends Fragment {
         textViewConnectionStatus = view.findViewById(R.id.textViewConnectionStatus);
         Button buttonScan = view.findViewById(R.id.buttonScan);
         Button buttonConnect = view.findViewById(R.id.buttonConnect);
-        ProgressBar progressBarScan = view.findViewById(R.id.progressBarScan);
 
         BluetoothManager btManager = BluetoothManager.getInstance();
 
@@ -177,8 +173,7 @@ public class BluetoothFragment extends Fragment {
 
             // Button is loading while scanning/discovery
             buttonScan.setEnabled(false);
-            buttonScan.setText("");
-            progressBarScan.setVisibility(View.VISIBLE);
+            buttonScan.setText("Scanning Devices...");
 
             deviceListAdapter.clear();
             discoveredDevices.clear();
@@ -204,7 +199,6 @@ public class BluetoothFragment extends Fragment {
                     bluetoothAdapter.cancelDiscovery();
                 }
 
-                progressBarScan.setVisibility(View.GONE);
                 buttonScan.setText("Scan Devices");
                 buttonScan.setEnabled(true);
 
