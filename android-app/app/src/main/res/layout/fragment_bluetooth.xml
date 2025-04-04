@@ -18,12 +18,27 @@
             android:textStyle="bold"
             android:textColor="@android:color/black"
             android:layout_marginBottom="10dp" />
-        
-        <Button
-            android:id="@+id/buttonScan"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Scan Devices" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ProgressBar
+                android:id="@+id/progressBarScan"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/buttonScan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Scan Devices" />
+        </LinearLayout>
 
         <ListView
             android:id="@+id/listViewDevices"

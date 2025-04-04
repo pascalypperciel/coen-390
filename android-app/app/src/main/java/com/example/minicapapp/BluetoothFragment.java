@@ -27,6 +27,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class BluetoothFragment extends Fragment {
@@ -43,12 +44,21 @@ public class BluetoothFragment extends Fragment {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device != null && !discoveredDevices.contains(device)) {
-                    discoveredDevices.add(device);
                     if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                        String name = device.getName() != null ? device.getName() : "Unnamed Device";
-                        deviceListAdapter.add(name + "\n" + device.getAddress());
+                        String name = device.getName() != null ? device.getName() : null;
+                        if (Objects.equals(name, "CAT_Tester")) {
+                            discoveredDevices.add(device);
+                            deviceListAdapter.add(name + "\n" + device.getAddress());
+                        }
                     }
                 }
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                ProgressBar progressBar = requireView().findViewById(R.id.progressBarScan);
+                Button buttonScan = requireView().findViewById(R.id.buttonScan);
+
+                progressBar.setVisibility(View.GONE);
+                buttonScan.setText("Scan Devices");
+                buttonScan.setEnabled(true);
             }
         }
     };
@@ -82,11 +92,27 @@ public class BluetoothFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        requireActivity().unregisterReceiver(receiver);
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             bluetoothAdapter.cancelDiscovery();
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        try {
+            requireActivity().unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            // Already unregistered or not registered — safe to ignore
+        }
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            }
+        }
+    }
+
 
 
     @SuppressLint("SetTextI18n")
@@ -102,8 +128,23 @@ public class BluetoothFragment extends Fragment {
         textViewConnectionStatus = view.findViewById(R.id.textViewConnectionStatus);
         Button buttonScan = view.findViewById(R.id.buttonScan);
         Button buttonConnect = view.findViewById(R.id.buttonConnect);
+        ProgressBar progressBarScan = view.findViewById(R.id.progressBarScan);
 
         BluetoothManager btManager = BluetoothManager.getInstance();
+
+        if (btManager.isConnected()) {
+            buttonConnect.setText("Disconnect");
+            textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+            BluetoothDevice currentDevice = btManager.getSelectedDevice();
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                String name = currentDevice != null ? currentDevice.getName() : "Device";
+                textViewConnectionStatus.setText(getString(R.string.connected_to) + name);
+            }
+        } else {
+            buttonConnect.setText("Connect");
+            textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+            textViewConnectionStatus.setText(getString(R.string.not_connected));
+        }
 
         if (btManager.isConnected() && btManager.getInputStream() != null) {
             textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
@@ -134,6 +175,11 @@ public class BluetoothFragment extends Fragment {
                 return;
             }
 
+            // Button is loading while scanning/discovery
+            buttonScan.setEnabled(false);
+            buttonScan.setText("");
+            progressBarScan.setVisibility(View.VISIBLE);
+
             deviceListAdapter.clear();
             discoveredDevices.clear();
             if (bluetoothAdapter.isDiscovering()) {
@@ -153,17 +199,30 @@ public class BluetoothFragment extends Fragment {
         buttonConnect.setOnClickListener(v -> {
             if (!btManager.isConnected()) {
                 btManager.connect(requireContext());
+
+                if (bluetoothAdapter.isDiscovering()) {
+                    bluetoothAdapter.cancelDiscovery();
+                }
+
+                progressBarScan.setVisibility(View.GONE);
+                buttonScan.setText("Scan Devices");
+                buttonScan.setEnabled(true);
+
                 textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
                 BluetoothDevice currentDevice = btManager.getSelectedDevice();
                 String deviceName = (currentDevice != null) ? currentDevice.getName() : "Unknown";
                 textViewConnectionStatus.setText("Connected to: " + deviceName);
 
+                buttonConnect.setText("Disconnect");
+
             } else {
                 btManager.disconnect(requireContext());
                 textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
                 textViewConnectionStatus.setText("Disconnected");
+                buttonConnect.setText("Connect");
             }
         });
+
 
         // Register BroadcastReceiver for Bluetooth discovery
         IntentFilter filter = new IntentFilter();
