@@ -175,8 +175,22 @@ public class ControllerFragment extends Fragment {
 
         textViewTemp = view.findViewById(R.id.textViewControllerTemp);
 
+        showSessionInputsIfConnected();
+
         return view;
     }
+
+
+    private void showSessionInputsIfConnected() {
+        BluetoothManager btManager = BluetoothManager.getInstance();
+        if (btManager.isConnected()) {
+            editTextSessionName.setVisibility(View.VISIBLE);
+            editTextInitialLength.setVisibility(View.VISIBLE);
+            editTextInitialArea.setVisibility(View.VISIBLE);
+            buttonStartSession.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     private void processBluetoothData(String incoming, String sessionID) throws JSONException {
         String[] values = incoming.split(";");

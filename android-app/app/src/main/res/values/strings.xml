@@ -57,4 +57,6 @@
     <string name="connected_to">"Connected to: "</string>
     <string name="not_connected">Not Connected</string>
     <string name="selected">"Selected: "</string>
+    <string name="bluetooth_button">Bluetooth Toggle</string>
+    <string name="help_button">Help Button</string>
 </resources>
