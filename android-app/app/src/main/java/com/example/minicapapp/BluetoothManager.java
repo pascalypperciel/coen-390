@@ -53,7 +53,7 @@ public class BluetoothManager {
         }
 
         try {
-            bluetoothSocket = selectedDevice.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+            bluetoothSocket = selectedDevice.createRfcommSocketToServiceRecord(SPP_UUID);
             bluetoothSocket.connect();
 
             outStream = bluetoothSocket.getOutputStream();
