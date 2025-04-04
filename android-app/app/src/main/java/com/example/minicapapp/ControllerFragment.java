@@ -1,6 +1,7 @@
 package com.example.minicapapp;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -49,7 +50,7 @@ public class ControllerFragment extends Fragment {
     // Internal Attributes
     protected TextView textViewMotorControls, textViewSensorData;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
-    protected Button buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop;
+    protected Button buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop, buttonBluetoothStatus;
     private boolean testFinished = false;
 
     //definitions from old controller activity
@@ -72,12 +73,35 @@ public class ControllerFragment extends Fragment {
     }
 
 
+    private void updateBluetoothStatusButton() {
+        BluetoothManager btManager = BluetoothManager.getInstance();
+        if (btManager.isConnected()) {
+            buttonBluetoothStatus.setText("Connected");
+        } else {
+            buttonBluetoothStatus.setText("Disconnected");
+        }
+        buttonBluetoothStatus.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_bluetooth_24, 0, 0, 0);
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
+
+        // Define the Bluetooth Status button
+        buttonBluetoothStatus = view.findViewById(R.id.buttonBluetoothStatus);
+        updateBluetoothStatusButton();
+
+        buttonBluetoothStatus.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
 
         // Define and set the behaviour of the UI elements in ths fragment
         imageButtonHelpController = view.findViewById(R.id.imageButtonHelpController);
@@ -306,7 +330,7 @@ public class ControllerFragment extends Fragment {
                 os.close();
 
                 int responseCode = conn.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_OK) {
+                if (responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED) {
                     Log.d("BatchProcessing", "Batch processed successfully: " + responseCode);
                 } else {
                     Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());

@@ -18,25 +18,24 @@
             android:src="@drawable/baseline_help_outline_24"
             android:scaleType="fitCenter"
             android:padding="10dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="25dp"
             android:layout_marginEnd="30dp"
-            android:contentDescription="@string/help_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/imageButtonBluetooth"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/circular_button_background"
-            android:src="@drawable/bluetooth_off"
-            android:scaleType="fitCenter"
+        <Button
+            android:id="@+id/buttonBluetoothStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/baseline_bluetooth_24"
             android:padding="10dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="30dp"
-            android:contentDescription="@string/bluetooth_button"
+            android:text="Disconnected"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toStartOf="@+id/imageButtonHelpController"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <Button
             android:id="@+id/buttonStartSession"
@@ -49,7 +48,8 @@
             app:layout_constraintBottom_toTopOf="@+id/textViewMotorControls"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonBluetoothStatus" />
 
         <Button
             android:id="@+id/buttonStop"
@@ -119,16 +119,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:layout_marginBottom="15dp"
             android:ems="10"
             android:hint="Enter Session Name"
             android:inputType="text"
             app:layout_constraintBottom_toTopOf="@+id/editTextInitialLength"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageButtonBluetooth"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <EditText
             android:id="@+id/editTextInitialLength"
@@ -136,7 +132,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:layout_marginBottom="8dp"
             android:ems="10"
             android:hint="Enter Initial Length"
             android:inputType="text"
@@ -151,7 +146,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:layout_marginBottom="64dp"
             android:ems="10"
             android:hint="Enter Initial Cross-Sectional Area"
             android:inputType="text"
