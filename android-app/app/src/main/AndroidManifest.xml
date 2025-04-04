@@ -20,30 +20,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".DataItemActivity"
-            android:exported="false"
-            android:parentActivityName=".RecordedDataActivity"
-            android:theme="@style/Theme.DataActivity" />
-        <activity
-            android:name=".MaterialsInformationPageActivity"
-            android:launchMode="singleTop"
-            android:exported="false"
-            android:theme="@style/Theme.MaterialsInformationPageActivity" />
-        <activity
-            android:name=".SettingsFragment"
-            android:launchMode="singleTop"
-            android:exported="false"
-            android:theme="@style/Theme.SettingsActivity" />
-        <activity
             android:name=".ControllerActivity"
             android:launchMode="singleTop"
             android:exported="false"
             android:theme="@style/Theme.ControllerActivity" />
-        <activity
-            android:name=".RecordedDataActivity"
-            android:launchMode="singleTop"
-            android:exported="false"
-            android:theme="@style/Theme.DataActivity" />
         <activity
             android:name=".BottomNavigationBarActivity"
             android:exported="true" >

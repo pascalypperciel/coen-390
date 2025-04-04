@@ -90,9 +90,9 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
             @Override
             public void onClick(View v) {
                 // TODO: Change the mechanic of this button to pass a bundle to a new fragment.
-                Intent intent  = new Intent(context, DataItemActivity.class); // Explicit Intent.
-                intent.putExtra("data_item_session_id", dataItem.getSessionID());
-                context.startActivity(intent);
+                //Intent intent  = new Intent(context, DataItemActivity.class); // Explicit Intent.
+                //intent.putExtra("data_item_session_id", dataItem.getSessionID());
+                //context.startActivity(intent);
             }
         });
     }

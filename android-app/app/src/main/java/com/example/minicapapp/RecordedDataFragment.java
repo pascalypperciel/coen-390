@@ -89,28 +89,6 @@ public class RecordedDataFragment extends Fragment {
             // Recorded Data Summary
             textViewRecordedDataSummary = view.findViewById(R.id.textViewRecordedDataSummary);
             textViewRecordedDataSummary.setText(sessions.size() + " Recorded Sessions");
-
-//            // Spinner filtering logic
-//            spinnerDataFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//                @Override
-//                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                    String selectedSessionName = sessionNames.get(position);
-//                    List<RecordedDataItem> filteredList = new ArrayList<>();
-//                    for (RecordedDataItem item : allSessions) {
-//                        if (item.getSessionName().equals(selectedSessionName)) {
-//                            filteredList.add(item);
-//                        }
-//                    }
-//                    recordedDataListRecyclerViewAdapter.updateList(filteredList);
-//                    textViewSummary.setText("1 Session: " + selectedSessionName);
-//                }
-//
-//                @Override
-//                public void onNothingSelected(AdapterView<?> parent) {
-//                    recordedDataListRecyclerViewAdapter.updateList(allSessions);
-//                    textViewSummary.setText(allSessions.size() + " Sessions");
-//                }
-//            });
         });
 
         // Spinner
@@ -154,7 +132,7 @@ public class RecordedDataFragment extends Fragment {
         return view;
     }
 
-    void getData(RecordedDataActivity.DataCallback callback) {
+    void getData(RecordedDataFragment.DataCallback callback) {
         List<RecordedDataItem> sessionList = new ArrayList<>();
 
         new Thread(() -> {
