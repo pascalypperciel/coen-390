@@ -121,14 +121,13 @@ public class BluetoothFragment extends Fragment {
             if (!btManager.isConnected()) {
                 btManager.connect(requireContext());
                 textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
-                textViewConnectionStatus.setText(
-                        getString(R.string.connected_to) + (btManager.isConnected() ?
-                        btManager.getInstance().getInputStream() != null ?
-                        btManager.getInstance().getInputStream().toString() :
-                        "Device" : "None"
-                ));
+                BluetoothDevice currentDevice = btManager.getSelectedDevice();
+                String deviceName = (currentDevice != null) ? currentDevice.getName() : "Unknown";
+                textViewConnectionStatus.setText("Connected to: " + deviceName);
+
             } else {
                 btManager.disconnect(requireContext());
+                textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
                 textViewConnectionStatus.setText("Disconnected");
             }
         });
