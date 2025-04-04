@@ -1,14 +1,8 @@
 package com.example.minicapapp;
 
-import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -26,7 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -36,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class ControllerFragment extends Fragment {
 
@@ -54,38 +46,25 @@ public class ControllerFragment extends Fragment {
         public float initialArea;
     }
     // Internal Attributes
-    public boolean isConnected = false; // A global variable that is kept to track if the Bluetooth connection is persistent.
-
-    protected TextView textViewBluetoothStatus, textViewMotorControls, textViewSensorData;
+    protected TextView textViewMotorControls, textViewSensorData;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
 
     protected Button buttonStartSession, buttonMotorForward, buttonMotorBackward, buttonStop;
+
     //definitions from old controller activity
-    private static final String ESP32_MAC_ADDRESS = "20:43:A8:64:E6:9E"; //Change this if we change board btw.
-    private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private BluetoothAdapter bluetoothAdapter = null;
-    private BluetoothSocket bluetoothSocket = null;
-    private OutputStream outStream = null;
-    private InputStream inStream = null;
-    private Thread inThread;
-    private volatile boolean stopInThread = true;
-    private static final int REQUEST_BT_PERMISSIONS = 100;
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<ControllerFragment.Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
-    private boolean showMotorControls = false; // If this value is true, the motor controls will appear below the preliminary session parameters.
     private double youngModulus = -1;
     private static final double GRAVITY = 9.81;
     private float initialLength = 0.0f;
     private float initialArea = 0.0f;
-    private boolean bluetoothConnected = false;
+
     // The UI elements present in the Controller Fragment
 
     //////////////////////////////////////////////////////
     protected ImageButton imageButtonHelpController;
-
-    private ImageButton imageButtonBluetooth;
     protected TextView textViewTemp;
 
     public ControllerFragment() {
@@ -94,6 +73,7 @@ public class ControllerFragment extends Fragment {
 
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -101,21 +81,9 @@ public class ControllerFragment extends Fragment {
 
         // Define and set the behaviour of the UI elements in ths fragment
         imageButtonHelpController = view.findViewById(R.id.imageButtonHelpController);
-        imageButtonHelpController.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HelpFragment helpFragment = HelpFragment.newInstance("Controller");
-                helpFragment.show(getActivity().getSupportFragmentManager(), "HelpDialogue");
-            }
-        });
-        imageButtonBluetooth = view.findViewById(R.id.imageButtonBluetooth);
-        imageButtonBluetooth.setImageResource(R.drawable.bluetooth_off);
-        imageButtonBluetooth.setOnClickListener(v -> {
-            if (!bluetoothConnected) {
-                setupBluetooth(); // Attempt to connect
-            } else {
-                disconnectBluetooth(); // Disconnect if already connected
-            }
+        imageButtonHelpController.setOnClickListener(v -> {
+            HelpFragment helpFragment = HelpFragment.newInstance("Controller");
+            helpFragment.show(requireActivity().getSupportFragmentManager(), "HelpDialogue");
         });
 
         // Session Parameters
@@ -134,60 +102,71 @@ public class ControllerFragment extends Fragment {
 
         // The button that will allow the session to commence
         buttonStartSession = view.findViewById(R.id.buttonStartSession);
-        buttonStartSession.setText("Start Session");
+        buttonStartSession.setText(R.string.start_session);
         buttonStartSession.setVisibility(View.INVISIBLE);
-        buttonStartSession.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!bluetoothAdapter.isEnabled()) {
-                    Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Check the parameters input by the user.
-                    checkSessionParameters(editTextSessionName.getText().toString(), editTextInitialLength.getText().toString(), editTextInitialArea.getText().toString());
-                }
-
+        buttonStartSession.setOnClickListener(v -> {
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if(!btManager.isConnected()) {
+                Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
+            } else {
+                // Check the parameters input by the user.
+                checkSessionParameters(editTextSessionName.getText().toString(), editTextInitialLength.getText().toString(), editTextInitialArea.getText().toString());
             }
+
         });
 
         // Motor Control Elements
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
-        textViewMotorControls.setText("Motor Controls");
+        textViewMotorControls.setText(R.string.motor_controls);
         textViewMotorControls.setVisibility(View.INVISIBLE);
 
         buttonMotorForward = view.findViewById(R.id.buttonMotorForward);
-        buttonMotorForward.setText("Move Forward");
+        buttonMotorForward.setText(R.string.move_forward);
         buttonMotorForward.setVisibility(View.INVISIBLE);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("Motor_FWD");
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if (btManager.isConnected()) {
+                    btManager.sendCommand("Motor_FWD");
+                }
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("Motor_OFF");
+
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if (btManager.isConnected()) {
+                    btManager.sendCommand("Motor_OFF");
+                }
             }
             return true;
         });
 
         buttonMotorBackward = view.findViewById(R.id.buttonMotorBackward);
-        buttonMotorBackward.setText("Move Backward");
+        buttonMotorBackward.setText(R.string.move_backward);
         buttonMotorBackward.setVisibility(View.INVISIBLE);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                sendBluetoothCommand("Motor_BWD");
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if (btManager.isConnected()) {
+                    btManager.sendCommand("Motor_BWD");
+                }
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                sendBluetoothCommand("Motor_OFF");
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if (btManager.isConnected()) {
+                    btManager.sendCommand("Motor_OFF");
+                }
             }
             return true;
         });
 
         buttonStop = view.findViewById(R.id.buttonStop);
-        buttonStop.setText("STOP");
+        buttonStop.setText(R.string.stop);
         buttonStop.setVisibility(View.INVISIBLE);
-        buttonStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBluetoothCommand("Motor_OFF");
-                disableInputStream();
-
+        buttonStop.setOnClickListener(v -> {
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if (btManager.isConnected()) {
+                btManager.sendCommand("Motor_OFF");
             }
+            disableInputStream();
+
         });
 
         // Real-Time Session Sensor Data
@@ -197,137 +176,6 @@ public class ControllerFragment extends Fragment {
         textViewTemp = view.findViewById(R.id.textViewControllerTemp);
 
         return view;
-    }
-    private void setupBluetooth() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            textViewBluetoothStatus.setText(R.string.bluetooth_not_work);
-            return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            int scanPerm = ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN);
-            int connectPerm = ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT);
-
-            if (scanPerm != PackageManager.PERMISSION_GRANTED || connectPerm != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BT_PERMISSIONS);
-            } else {
-                startBluetoothOutThread();
-            }
-        } else {
-            startBluetoothOutThread();
-        }
-    }
-
-    private void startBluetoothOutThread() {
-        if (!bluetoothAdapter.isEnabled()) {
-            textViewBluetoothStatus.setText(R.string.bluetooth_not_enabled);
-            return;
-        }
-
-         //Update the visibility of session parameters
-        editTextSessionName.setVisibility(View.VISIBLE);
-        editTextInitialLength.setVisibility(View.VISIBLE);
-        editTextInitialArea.setVisibility(View.VISIBLE);
-        buttonStartSession.setVisibility(View.VISIBLE);
-
-        connectOutputStream();
-    }
-
-    private void connectOutputStream() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(requireContext(), "Bluetooth permissions are required to connect", Toast.LENGTH_SHORT).show();
-                    return; // Exit if permissions are not granted
-                }
-            }
-            // Cancel discovery before connecting
-            bluetoothAdapter.cancelDiscovery();
-            // Get the remote device
-            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(ESP32_MAC_ADDRESS);
-            // Create the Bluetooth socket
-            bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
-            // Attempt to connect
-            bluetoothSocket.connect();
-
-            outStream = bluetoothSocket.getOutputStream();
-            inStream = bluetoothSocket.getInputStream();
-
-            // Update UI on successful connection
-            requireActivity().runOnUiThread(() -> {
-                bluetoothConnected = true;
-                imageButtonBluetooth.setImageResource(R.drawable.bluetooth_on); // Change to green image
-                //textViewBluetoothStatus.setText(R.string.bluetooth_connected);
-                Toast.makeText(requireContext(), "Bluetooth Connected", Toast.LENGTH_SHORT).show();
-            });
-        } catch (Exception e) {
-            Log.e("Bluetooth", "Connection failed", e);
-            requireActivity().runOnUiThread(() -> {
-                //textViewBluetoothStatus.setText("Error: " + e.getMessage());
-                Toast.makeText(requireContext(), "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
-            });
-        }
-    }
-    private void disconnectBluetooth() {
-        try {
-            if (bluetoothSocket != null) {
-                bluetoothSocket.close();
-            }
-            bluetoothConnected = false;
-            imageButtonBluetooth.setImageResource(R.drawable.bluetooth_off); // Change to red image
-            //textViewBluetoothStatus.setText("Bluetooth Disconnected");
-            Toast.makeText(requireContext(), "Bluetooth Disconnected", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Log.e("Bluetooth", "Disconnection failed", e);
-            Toast.makeText(requireContext(), "Failed to disconnect Bluetooth", Toast.LENGTH_SHORT).show();
-        }
-    }
-    private void connectInputStream(String sessionID) {
-        synchronized (this) {
-            if (!stopInThread) {
-                return;
-            }
-            stopInThread = false;
-        }
-
-        inThread = new Thread(() -> {
-            byte[] buffer = new byte[128];
-            int bytesRead;
-            clearInputStream();
-            while (!stopInThread) {
-                try {
-                    bytesRead = inStream.read(buffer);
-                    if (bytesRead > 0) {
-                        final String incoming = new String(buffer, 0, bytesRead).trim();
-                        processBluetoothData(incoming, sessionID);
-
-                        // Update the UI on the main thread
-                        requireActivity().runOnUiThread(() -> textViewBluetoothStatus.setText("Connected and Fetching Data"));
-                    }
-                } catch (SecurityException se) {
-                    se.printStackTrace();
-                    requireActivity().runOnUiThread(() -> textViewBluetoothStatus.setText("SecurityException: " + se.getMessage()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    requireActivity().runOnUiThread(() -> textViewBluetoothStatus.setText("Error: " + e.getMessage()));
-                }
-            }
-
-            // Update the UI when the thread stops
-            requireActivity().runOnUiThread(() -> {
-                textViewBluetoothStatus.setText(R.string.bluetooth_connected);
-                buttonStartSession.setVisibility(View.VISIBLE);
-            });
-        });
-
-        inThread.start();
-
-        // Update the UI to indicate the thread has started
-        requireActivity().runOnUiThread(() -> {
-            textViewBluetoothStatus.setText(R.string.bluetooth_connected);
-            buttonStartSession.setVisibility(View.INVISIBLE);
-        });
     }
 
     private void processBluetoothData(String incoming, String sessionID) throws JSONException {
@@ -429,14 +277,6 @@ public class ControllerFragment extends Fragment {
         }).start();
     }
     private void disableInputStream() {
-        if (stopInThread) {
-            return;
-        }
-        stopInThread = true;
-        if (inThread != null && inThread.isAlive()) {
-            inThread.interrupt();
-        }
-
         // Update the UI on the main thread
         if (isAdded()) {
             requireActivity().runOnUiThread(() -> {
@@ -445,16 +285,7 @@ public class ControllerFragment extends Fragment {
             });
         }
     }
-    private void sendBluetoothCommand(String command) {
-        if (bluetoothSocket != null && outStream != null) {
-            try {
-                outStream.write((command + "\n").getBytes());
-                outStream.flush();
-            } catch (Exception e) {
-                Log.e("BT", "Error sending command: " + e.getMessage());
-            }
-        }
-    }
+
     private void displayRecord(Record newMessage) {
         String displayText = "Distance: " + newMessage.distance + "\nPressure: " + newMessage.pressure + "\nTemperature: " + newMessage.temperature;
 
@@ -472,7 +303,10 @@ public class ControllerFragment extends Fragment {
                             Toast.makeText(requireContext(), "Test Finished", Toast.LENGTH_LONG).show()
                     );
                 }
-                sendBluetoothCommand("Motor_OFF");
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                if (btManager.isConnected()) {
+                    btManager.sendCommand("Motor_OFF");
+                }
                 disableInputStream();
             }
         } catch (NumberFormatException e) {
@@ -480,21 +314,6 @@ public class ControllerFragment extends Fragment {
         }
     }
 
-    private void clearInputStream() {
-        byte[] buffer = new byte[1024];
-        try {
-            while (inStream != null && inStream.available() > 0) {
-                inStream.read(buffer);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (isAdded()) {
-                requireActivity().runOnUiThread(() ->
-                        textViewBluetoothStatus.setText("Error clearing inStream: " + e.getMessage())
-                );
-            }
-        }
-    }
     private void analyzeStopData() {
         if (recordList.size() < 10) {
             return; // Not enough data to analyze
@@ -537,7 +356,11 @@ public class ControllerFragment extends Fragment {
         // Check if differences exceed thresholds
         if (distanceDifference > distanceThreshold || pressureDifference > pressureThreshold) {
             Toast.makeText(requireContext(), "Test stopped due to large data variation", Toast.LENGTH_LONG).show();
-            sendBluetoothCommand("Motor_OFF");
+
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if (btManager.isConnected()) {
+                btManager.sendCommand("Motor_OFF");
+            }
             disableInputStream();
         }
     }
@@ -566,7 +389,11 @@ public class ControllerFragment extends Fragment {
         double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
         if (percDiff > 5) {
             Toast.makeText(requireContext(), "Test stopped due to large Young Modulus variation", Toast.LENGTH_LONG).show();
-            sendBluetoothCommand("Motor_OFF");
+
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if (btManager.isConnected()) {
+                btManager.sendCommand("Motor_OFF");
+            }
             disableInputStream();
         }
     }
@@ -576,7 +403,6 @@ public class ControllerFragment extends Fragment {
             double totalStrain = 0.0;
 
             // Calculate total stress and strain
-            double originalLength = Double.parseDouble(records.get(0).distance); // Calculate once
             for (ControllerFragment.Record record : records) {
                 double pressure = Double.parseDouble(record.pressure);
                 double distance = Double.parseDouble(record.distance);
@@ -679,8 +505,7 @@ public class ControllerFragment extends Fragment {
 
                 // Verify that the conditions for the length and area variables are met.
                 if ((length > 0.0f) && (area > 0.0f)) {
-                    showMotorControls = true;
-
+                    // If this value is true, the motor controls will appear below the preliminary session parameters.
                     initialLength = length;
                     initialArea = area;
 
@@ -694,16 +519,18 @@ public class ControllerFragment extends Fragment {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     String sessionID = sdf.format(new Date());
 
-                    sendBluetoothCommand("Motor_BWD");
+                    BluetoothManager btManager = BluetoothManager.getInstance();
+                    if (btManager.isConnected()) {
+                        btManager.sendCommand("Motor_BWD");
+                    }
 
                     Session session = new Session();
                     session.initialArea = Float.parseFloat(editTextInitialArea.getText().toString());
                     session.initialLength = Float.parseFloat(editTextInitialLength.getText().toString());
                     session.sessionName = editTextSessionName.getText().toString();
 
-                    // Create the session and connect the input stream
+                    // Create the session
                     createSession(Long.parseLong(sessionID), session.sessionName, session.initialLength, session.initialArea);
-                    connectInputStream(sessionID);
                 } else {
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
@@ -726,6 +553,4 @@ public class ControllerFragment extends Fragment {
             }
         }
     }
-
-
 }

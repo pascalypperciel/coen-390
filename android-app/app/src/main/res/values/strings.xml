@@ -48,4 +48,13 @@
     <string name="bluetooth_not_enabled">Must enable Bluetooth</string>
     <string name="bluetooth_permissions_not_allowed">Bluetooth permissions aren\'t allowed</string>
     <string name="bluetooth_connected">Connected to CAT tester</string>
+    <string name="start_session">Start Session</string>
+    <string name="motor_controls">Motor Controls</string>
+    <string name="move_forward">Move Forward</string>
+    <string name="move_backward">Move Backward</string>
+    <string name="stop">STOP</string>
+    <string name="connected_and_fetching_data">Connected and Fetching Data</string>
+    <string name="connected_to">"Connected to: "</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="selected">"Selected: "</string>
 </resources>
