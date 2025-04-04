@@ -200,6 +200,11 @@ public class ControllerFragment extends Fragment {
                 editTextInitialLength.setText("");
                 editTextInitialArea.setText("");
 
+                // Reset the Live Data Displays
+                textViewDistance.setText("-");
+                textViewPressure.setText("-");
+                textViewTemperature.setText("-");
+
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if (btManager.isConnected()) {
                     btManager.sendCommand("Motor_OFF");
@@ -655,8 +660,8 @@ public class ControllerFragment extends Fragment {
                             editTextSessionName.setEnabled(false);
                             editTextInitialLength.setEnabled(false);
                             editTextInitialArea.setEnabled(false);
-
                         });
+
                         // Start Bluetooth listener for batch records data
                         startBluetoothDataListener(sessionID);
                     });
@@ -664,21 +669,21 @@ public class ControllerFragment extends Fragment {
                 } else {
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
-                                Toast.makeText(requireContext(), "Length and Area cannot be 0", Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireContext(), "Length and Area cannot be 0", Toast.LENGTH_LONG).show()
                         );
                     }
                 }
             } catch (NumberFormatException e) {
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Invalid Input", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "Invalid Input", Toast.LENGTH_LONG).show()
                     );
                 }
             }
         } else {
             if (isAdded()) {
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "All fields must be filled", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "All fields must be filled", Toast.LENGTH_LONG).show()
                 );
             }
         }
