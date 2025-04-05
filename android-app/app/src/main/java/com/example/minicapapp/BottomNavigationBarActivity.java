@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,6 +23,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bottom_navigation_bar);
+
+        // Set the orientation of the application to Portrait, exclusively
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Load the persistent navbar into the local BottomNavigationView attribute by its ID
         bottomNavigationViewPersistentNavbar = findViewById(R.id.bottomNavigationViewPersistentNavbar);
