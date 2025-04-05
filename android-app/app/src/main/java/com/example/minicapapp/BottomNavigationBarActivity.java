@@ -27,21 +27,21 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         bottomNavigationViewPersistentNavbar = findViewById(R.id.bottomNavigationViewPersistentNavbar);
 
         // Set an invalid menu ID to clear the initial selection
-        replaceFragment(new ControllerFragment());
+        replaceFragment(new ControllerFragment(), false);
 
         // Handle all of the possible input when the different icons of the persistent navbar are pressed
         bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(item -> {
             if(item.getItemId() == R.id.action_load_controller) {
-                replaceFragment(new ControllerFragment());
+                replaceFragment(new ControllerFragment(), true);
                 return true;
             } else if (item.getItemId() == R.id.action_load_recorded_data) {
-                replaceFragment(new RecordedDataFragment());
+                replaceFragment(new RecordedDataFragment(), true);
                 return true;
             } else if (item.getItemId() == R.id.action_load_settings) {
-                replaceFragment(new SettingsFragment());
+                replaceFragment(new SettingsFragment(), true);
                 return true;
             } else if (item.getItemId() == R.id.action_load_materials_information_page) {
-                replaceFragment(new MaterialsInformationFragment());
+                replaceFragment(new MaterialsInformationFragment(), true);
                 return true;
             } else {
                 return false;
@@ -67,26 +67,28 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
     }
 
     // Internal method that will allow the persistent navbar to switch between fragment easily
-    private void replaceFragment(Fragment fragment) {
+    private void replaceFragment(Fragment fragment, boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayoutActivityContent, fragment);
+        if (addToBackStack)
+            fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     private void setupBottomNavListener() {
         bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(item -> {
             if(item.getItemId() == R.id.action_load_controller) {
-                replaceFragment(new ControllerFragment());
+                replaceFragment(new ControllerFragment(), true);
                 return true;
             } else if (item.getItemId() == R.id.action_load_recorded_data) {
-                replaceFragment(new RecordedDataFragment());
+                replaceFragment(new RecordedDataFragment(), true);
                 return true;
             } else if (item.getItemId() == R.id.action_load_settings) {
-                replaceFragment(new SettingsFragment());
+                replaceFragment(new SettingsFragment(), true);
                 return true;
             } else if (item.getItemId() == R.id.action_load_materials_information_page) {
-                replaceFragment(new MaterialsInformationFragment());
+                replaceFragment(new MaterialsInformationFragment(), true);
                 return true;
             } else {
                 return false;
@@ -99,5 +101,4 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         bottomNavigationViewPersistentNavbar.setSelectedItemId(itemId);
         setupBottomNavListener();
     }
-
 }
