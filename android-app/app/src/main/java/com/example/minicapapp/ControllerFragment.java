@@ -695,4 +695,34 @@ public class ControllerFragment extends Fragment {
             }
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopSessionIfActive();
+    }
+
+    private void stopSessionIfActive() {
+        if (isListening) {
+            isListening = false;
+
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if (btManager.isConnected()) {
+                btManager.sendCommand("Motor_OFF");
+            }
+
+            // Send any remaining records
+            if (!recordList.isEmpty()) {
+                try {
+                    sendBatchData(recordList);
+                    recordList.clear();
+                } catch (JSONException e) {
+                    Log.e("ControllerFragment", "Error sending batch data on pause", e);
+                }
+            }
+
+            disableInputStream();
+        }
+    }
+
 }
