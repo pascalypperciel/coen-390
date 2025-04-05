@@ -175,10 +175,6 @@ public class ControllerFragment extends Fragment {
 
         buttonStartStop.setOnClickListener(v -> {
             if (!isListening) { //Stop if Started
-                isListening = true;
-                buttonStartStop.setText(R.string.stop);
-                buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
-
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if(!btManager.isConnected()) {
                     Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
@@ -630,6 +626,10 @@ public class ControllerFragment extends Fragment {
 
     private void checkSessionParameters(String nameString, String lengthString, String areaString) {
         if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {
+            isListening = true;
+            buttonStartStop.setText(R.string.stop);
+            buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+
             try {
                 // Convert the length and area parameters to float variables.
                 float length = Float.parseFloat(lengthString);
@@ -695,4 +695,34 @@ public class ControllerFragment extends Fragment {
             }
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopSessionIfActive();
+    }
+
+    private void stopSessionIfActive() {
+        if (isListening) {
+            isListening = false;
+
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if (btManager.isConnected()) {
+                btManager.sendCommand("Motor_OFF");
+            }
+
+            // Send any remaining records
+            if (!recordList.isEmpty()) {
+                try {
+                    sendBatchData(recordList);
+                    recordList.clear();
+                } catch (JSONException e) {
+                    Log.e("ControllerFragment", "Error sending batch data on pause", e);
+                }
+            }
+
+            disableInputStream();
+        }
+    }
+
 }

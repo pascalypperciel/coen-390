@@ -208,29 +208,35 @@ public class BluetoothFragment extends Fragment {
 
         buttonConnect.setOnClickListener(v -> {
             if (!btManager.isConnected()) {
-                btManager.connect(requireContext());
+                buttonConnect.setText("Connecting");
+                buttonConnect.setEnabled(false);
+                buttonConnect.post(() -> {
+                    btManager.connect(requireContext());
 
-                if (bluetoothAdapter.isDiscovering()) {
-                    bluetoothAdapter.cancelDiscovery();
-                }
+                    if (bluetoothAdapter.isDiscovering()) {
+                        bluetoothAdapter.cancelDiscovery();
+                    }
 
-                buttonScan.setText("Scan Devices");
-                buttonScan.setEnabled(true);
+                    buttonScan.setText("Scan Devices");
+                    buttonScan.setEnabled(true);
 
-                textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
-                BluetoothDevice currentDevice = btManager.getSelectedDevice();
-                String deviceName = (currentDevice != null) ? currentDevice.getName() : "Unknown";
-                textViewConnectionStatus.setText("Connected to: " + deviceName);
+                    textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                    BluetoothDevice currentDevice = btManager.getSelectedDevice();
+                    String deviceName = (currentDevice != null) ? currentDevice.getName() : "Unknown";
+                    textViewConnectionStatus.setText("Connected to: " + deviceName);
 
-                buttonConnect.setText("Disconnect");
+                    buttonConnect.setText("Disconnect");
+                    buttonConnect.setEnabled(true);
 
-                imageViewBluetoothStatus.setImageResource(R.drawable.ic_bluetooth);
-                imageViewBluetoothStatus.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                    imageViewBluetoothStatus.setImageResource(R.drawable.ic_bluetooth);
+                    imageViewBluetoothStatus.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                });
             } else {
                 btManager.disconnect(requireContext());
                 textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
                 textViewConnectionStatus.setText("Disconnected");
                 buttonConnect.setText("Connect");
+                buttonConnect.setEnabled(true);
                 imageViewBluetoothStatus.setImageResource(R.drawable.ic_bluetooth_disabled);
                 imageViewBluetoothStatus.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
             }
