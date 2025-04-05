@@ -30,7 +30,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class SessionDetailsFragment extends Fragment {
 
@@ -78,8 +80,8 @@ public class SessionDetailsFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         new Thread(() -> {
             try {
-                String apiUrl = "https://cat-tester-api.azurewebsites.net/build-graphs?SessionID=" + sessionId;
-                HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
+                String graphsURL = "https://cat-tester-api.azurewebsites.net/build-graphs?SessionID=" + sessionId;
+                HttpURLConnection connection = (HttpURLConnection) new URL(graphsURL).openConnection();
                 connection.setRequestMethod("GET");
 
                 int responseCode = connection.getResponseCode();
@@ -145,6 +147,46 @@ public class SessionDetailsFragment extends Fragment {
 
                     progressBar.setVisibility(View.GONE);
                     toggleTableButton.setVisibility(View.VISIBLE);
+                });
+
+                String dataUrl = "https://cat-tester-api.azurewebsites.net/request-session-records?SessionID=" + sessionId;
+                HttpURLConnection dataConnection = (HttpURLConnection) new URL(dataUrl).openConnection();
+                dataConnection.setRequestMethod("GET");
+
+                int dataResponseCode = dataConnection.getResponseCode();
+                if (dataResponseCode >= 400) {
+                    Log.e("SessionDetails", "Failed to fetch raw records");
+                    return;
+                }
+
+                InputStream dataInputStream = dataConnection.getInputStream();
+                StringBuilder dataResponse = new StringBuilder();
+                while ((ch = dataInputStream.read()) != -1) {
+                    dataResponse.append((char) ch);
+                }
+
+                JSONObject dataJson = new JSONObject(dataResponse.toString());
+                JSONArray records = dataJson.getJSONArray("records");
+
+                requireActivity().runOnUiThread(() -> {
+                    addTableHeader();
+                    for (int i = 0; i < records.length(); i++) {
+                        try {
+                            JSONObject record = records.getJSONObject(i);
+                            String id = String.valueOf(record.getInt("RecordID"));
+                            String dist = String.valueOf(record.getDouble("Distance"));
+                            String temp = String.valueOf(record.getDouble("Temperature"));
+                            String press = String.valueOf(record.getDouble("Pressure"));
+                            String isoTimestamp = record.getString("Timestamp");
+                            SimpleDateFormat inputFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                            SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                            Date parsedDate = inputFormat.parse(isoTimestamp);
+                            String formattedTime = outputFormat.format(parsedDate);
+                            addRawRow(id, dist, press, temp, formattedTime);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 });
 
             } catch (Exception e) {
