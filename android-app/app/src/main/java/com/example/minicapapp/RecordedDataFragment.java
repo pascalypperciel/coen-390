@@ -75,7 +75,7 @@ public class RecordedDataFragment extends Fragment {
             // Setup RecyclerView
             // Bind and organize the sessions items.
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity().getBaseContext());
-            recordedDataRecyclerViewAdapter = new RecordedDataRecyclerViewAdapter(getActivity().getBaseContext(), sessions);
+            recordedDataRecyclerViewAdapter = new RecordedDataRecyclerViewAdapter(requireActivity(), sessions);
 
             // Define and initialize the RecyclerView.
             recyclerViewRecordedData = view.findViewById(R.id.recyclerViewRecordedData);

@@ -32,4 +32,12 @@ public class RecordedDataItem {
     public Date getSessionTimestamp() {
         return sessionTimestamp;
     }
+
+    public float getInitialLength() { return initialLength; }
+
+    public float getInitialArea() { return initialArea; }
+
+    public float getYieldStrain() { return yieldStrain; }
+
+    public float getYieldStress() { return yieldStress; }
 }
