@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +50,8 @@ public class ControllerFragment extends Fragment {
         public float initialArea;
     }
     // Internal Attributes
-    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature;
+    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature, textViewConnectBluetoothMessage;
+    private LinearLayout mainContent;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
     protected Button buttonMotorForward, buttonMotorBackward, buttonStartStop, buttonBluetoothStatus;
     private boolean testFinished = false;
@@ -92,6 +94,9 @@ public class ControllerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
 
+        mainContent = view.findViewById(R.id.mainContent);
+        textViewConnectBluetoothMessage = view.findViewById(R.id.textViewConnectBluetoothMessage);
+
         // Define the Bluetooth Status button
         buttonBluetoothStatus = view.findViewById(R.id.buttonBluetoothStatus);
         updateBluetoothStatusButton();
@@ -118,15 +123,12 @@ public class ControllerFragment extends Fragment {
         // Session Name
         editTextSessionName = view.findViewById(R.id.editTextSessionName);
         editTextSessionName.setTextColor(getResources().getColor(R.color.black, null));
-        editTextSessionName.setEnabled(false);
         // Initial Length of the Material Object
         editTextInitialLength = view.findViewById(R.id.editTextInitialLength);
         editTextInitialLength.setTextColor(getResources().getColor(R.color.black, null));
-        editTextInitialLength.setEnabled(false);
         // Initial Cross-Sectional Area of the Material Object
         editTextInitialArea = view.findViewById(R.id.editTextInitialArea);
         editTextInitialArea.setTextColor(getResources().getColor(R.color.black, null));
-        editTextInitialArea.setEnabled(false);
 
         // Motor Control Elements
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
@@ -170,7 +172,6 @@ public class ControllerFragment extends Fragment {
         });
 
         buttonStartStop = view.findViewById(R.id.buttonStartStop);
-        buttonStartStop.setEnabled(false);
 
         buttonStartStop.setOnClickListener(v -> {
             if (!isListening) { //Stop if Started
@@ -236,15 +237,20 @@ public class ControllerFragment extends Fragment {
 
     private void showSessionInputsIfConnected() {
         BluetoothManager btManager = BluetoothManager.getInstance();
-        if (btManager.isConnected()) {
-            editTextSessionName.setVisibility(View.VISIBLE);
-            editTextInitialLength.setVisibility(View.VISIBLE);
-            editTextInitialArea.setVisibility(View.VISIBLE);
-            buttonStartStop.setEnabled(true);
-            buttonStartStop.setText(R.string.start_new_session);
-            buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+        boolean isConnected = btManager.isConnected();
+
+        if (isConnected) {
+            mainContent.setAlpha(0f);
+            mainContent.setVisibility(View.VISIBLE);
+            mainContent.animate().alpha(1f).setDuration(300).start();
+
+            textViewConnectBluetoothMessage.setVisibility(View.GONE);
+        } else {
+            mainContent.setVisibility(View.GONE);
+            textViewConnectBluetoothMessage.setVisibility(View.VISIBLE);
         }
     }
+
 
     private void startBluetoothDataListener(String sessionID) {
         BluetoothManager btManager = BluetoothManager.getInstance();
