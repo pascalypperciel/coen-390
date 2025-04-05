@@ -60,4 +60,6 @@
     <string name="bluetooth_button">Bluetooth Toggle</string>
     <string name="help_button">Help Button</string>
     <string name="start_new_session">Start New Session</string>
+    <string name="bluetooth_instruction_message">Please connect to a CAT Tester via <b>Bluetooth</b> to enable these features.</string>
+
 </resources>
