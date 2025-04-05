@@ -175,10 +175,6 @@ public class ControllerFragment extends Fragment {
 
         buttonStartStop.setOnClickListener(v -> {
             if (!isListening) { //Stop if Started
-                isListening = true;
-                buttonStartStop.setText(R.string.stop);
-                buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
-
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if(!btManager.isConnected()) {
                     Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
@@ -630,6 +626,10 @@ public class ControllerFragment extends Fragment {
 
     private void checkSessionParameters(String nameString, String lengthString, String areaString) {
         if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {
+            isListening = true;
+            buttonStartStop.setText(R.string.stop);
+            buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+
             try {
                 // Convert the length and area parameters to float variables.
                 float length = Float.parseFloat(lengthString);
