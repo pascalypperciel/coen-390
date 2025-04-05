@@ -21,13 +21,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_bottom_navigation_bar);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         // Load the persistent navbar into the local BottomNavigationView attribute by its ID
         bottomNavigationViewPersistentNavbar = findViewById(R.id.bottomNavigationViewPersistentNavbar);
@@ -54,6 +48,22 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
             }
         });
 
+        setupBottomNavListener();
+        
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frameLayoutActivityContent);
+            if (currentFragment instanceof ControllerFragment) {
+                setBottomNavSelectedItemWithoutTriggering(R.id.action_load_controller);
+            } else if (currentFragment instanceof RecordedDataFragment) {
+                setBottomNavSelectedItemWithoutTriggering(R.id.action_load_recorded_data);
+            } else if (currentFragment instanceof SettingsFragment) {
+                setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
+            } else if (currentFragment instanceof MaterialsInformationFragment) {
+                setBottomNavSelectedItemWithoutTriggering(R.id.action_load_materials_information_page);
+            } else if (currentFragment instanceof BluetoothFragment) {
+                setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
+            }
+        });
     }
 
     // Internal method that will allow the persistent navbar to switch between fragment easily
@@ -62,6 +72,32 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayoutActivityContent, fragment);
         fragmentTransaction.commit();
+    }
+
+    private void setupBottomNavListener() {
+        bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.action_load_controller) {
+                replaceFragment(new ControllerFragment());
+                return true;
+            } else if (item.getItemId() == R.id.action_load_recorded_data) {
+                replaceFragment(new RecordedDataFragment());
+                return true;
+            } else if (item.getItemId() == R.id.action_load_settings) {
+                replaceFragment(new SettingsFragment());
+                return true;
+            } else if (item.getItemId() == R.id.action_load_materials_information_page) {
+                replaceFragment(new MaterialsInformationFragment());
+                return true;
+            } else {
+                return false;
+            }
+        });
+    }
+
+    public void setBottomNavSelectedItemWithoutTriggering(int itemId) {
+        bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(null);
+        bottomNavigationViewPersistentNavbar.setSelectedItemId(itemId);
+        setupBottomNavListener();
     }
 
 }

@@ -171,7 +171,9 @@ public class RecordedDataFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            requireActivity().runOnUiThread(() -> callback.onDataFetched(sessionList));
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> callback.onDataFetched(sessionList));
+            }
         }).start();
     }
 
