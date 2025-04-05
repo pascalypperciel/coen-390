@@ -118,24 +118,23 @@ public class ControllerFragment extends Fragment {
         // Session Name
         editTextSessionName = view.findViewById(R.id.editTextSessionName);
         editTextSessionName.setTextColor(getResources().getColor(R.color.black, null));
-        editTextSessionName.setVisibility(View.INVISIBLE);
+        editTextSessionName.setEnabled(false);
         // Initial Length of the Material Object
         editTextInitialLength = view.findViewById(R.id.editTextInitialLength);
         editTextInitialLength.setTextColor(getResources().getColor(R.color.black, null));
-        editTextInitialLength.setVisibility(View.INVISIBLE);
+        editTextInitialLength.setEnabled(false);
         // Initial Cross-Sectional Area of the Material Object
         editTextInitialArea = view.findViewById(R.id.editTextInitialArea);
         editTextInitialArea.setTextColor(getResources().getColor(R.color.black, null));
-        editTextInitialArea.setVisibility(View.INVISIBLE);
+        editTextInitialArea.setEnabled(false);
 
         // Motor Control Elements
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
         textViewMotorControls.setText(R.string.motor_controls);
-        textViewMotorControls.setVisibility(View.INVISIBLE);
 
         buttonMotorForward = view.findViewById(R.id.buttonMotorForward);
         buttonMotorForward.setText(R.string.move_forward);
-        buttonMotorForward.setVisibility(View.INVISIBLE);
+        buttonMotorForward.setEnabled(false);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 BluetoothManager btManager = BluetoothManager.getInstance();
@@ -154,7 +153,7 @@ public class ControllerFragment extends Fragment {
 
         buttonMotorBackward = view.findViewById(R.id.buttonMotorBackward);
         buttonMotorBackward.setText(R.string.move_backward);
-        buttonMotorBackward.setVisibility(View.INVISIBLE);
+        buttonMotorBackward.setEnabled(false);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 BluetoothManager btManager = BluetoothManager.getInstance();
@@ -171,7 +170,7 @@ public class ControllerFragment extends Fragment {
         });
 
         buttonStartStop = view.findViewById(R.id.buttonStartStop);
-        buttonStartStop.setVisibility(View.INVISIBLE);
+        buttonStartStop.setEnabled(false);
 
         buttonStartStop.setOnClickListener(v -> {
             if (!isListening) { //Stop if Started
@@ -241,7 +240,7 @@ public class ControllerFragment extends Fragment {
             editTextSessionName.setVisibility(View.VISIBLE);
             editTextInitialLength.setVisibility(View.VISIBLE);
             editTextInitialArea.setVisibility(View.VISIBLE);
-            buttonStartStop.setVisibility(View.VISIBLE);
+            buttonStartStop.setEnabled(true);
             buttonStartStop.setText(R.string.start_new_session);
             buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
         }
@@ -637,10 +636,10 @@ public class ControllerFragment extends Fragment {
                     initialArea = area;
 
                     // Make the motor controls section visible.
-                    textViewMotorControls.setVisibility(View.VISIBLE);
-                    buttonMotorForward.setVisibility(View.VISIBLE);
-                    buttonMotorBackward.setVisibility(View.VISIBLE);
-                    buttonStartStop.setVisibility(View.VISIBLE);
+                    textViewMotorControls.setEnabled(true);
+                    buttonMotorForward.setEnabled(true);
+                    buttonMotorBackward.setEnabled(true);
+                    buttonStartStop.setEnabled(true);
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     String sessionID = sdf.format(new Date());
