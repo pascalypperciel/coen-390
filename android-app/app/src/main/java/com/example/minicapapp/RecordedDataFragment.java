@@ -56,7 +56,7 @@ public class RecordedDataFragment extends Fragment {
 
         // Define and set the behaviour of the UI elements in ths fragment
         // Logo
-        imageViewLogo = view.findViewById(R.id.imageViewLogoRecordedData);
+        imageViewLogo = view.findViewById(R.id.imageViewLogo);
 
         // Help Button
         imageButtonHelpRecordedData = view.findViewById(R.id.imageButtonHelpRecordedData);
@@ -106,8 +106,6 @@ public class RecordedDataFragment extends Fragment {
                     if(recordedDataRecyclerViewAdapter != null) {
                         recordedDataRecyclerViewAdapter.sortData(item);
                     }
-                } else {
-                    Toast.makeText(getActivity().getBaseContext(), "Please select a filtering method.", Toast.LENGTH_SHORT).show();
                 }
             }
 
