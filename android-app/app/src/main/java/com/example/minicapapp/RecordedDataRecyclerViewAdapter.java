@@ -92,7 +92,6 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
 
         holder.itemView.setOnClickListener(v -> {
             Log.d("RecyclerView", "Item clicked: " + dataItem.getSessionName());
-            Toast.makeText(activity, "Clicked: " + dataItem.getSessionName(), Toast.LENGTH_SHORT).show();
 
             SessionDetailsFragment sessionDetailsFragment = new SessionDetailsFragment();
             Bundle args = new Bundle();
