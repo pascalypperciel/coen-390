@@ -149,6 +149,7 @@ public class BluetoothFragment extends Fragment {
             }
         } else {
             buttonConnect.setText("Connect");
+            buttonConnect.setEnabled(false);
             textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
             textViewConnectionStatus.setText(getString(R.string.not_connected));
         }
@@ -202,6 +203,7 @@ public class BluetoothFragment extends Fragment {
             btManager.setSelectedDevice(selectedDevice);
             textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
             textViewConnectionStatus.setText(getString(R.string.selected) + selectedDevice.getName());
+            buttonConnect.setEnabled(true);
         });
 
         buttonConnect.setOnClickListener(v -> {
