@@ -22,11 +22,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ControllerActivity"
-            android:launchMode="singleTop"
-            android:exported="false"
-            android:theme="@style/Theme.ControllerActivity" />
-        <activity
             android:name=".BottomNavigationBarActivity"
             android:exported="true" >
             <intent-filter>

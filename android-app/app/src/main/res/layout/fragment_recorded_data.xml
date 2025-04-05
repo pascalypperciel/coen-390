@@ -60,7 +60,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageViewLogoRecordedData"
+            android:id="@+id/imageViewLogo"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/cattesterlogo"
