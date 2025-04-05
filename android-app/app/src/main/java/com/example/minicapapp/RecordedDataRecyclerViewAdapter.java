@@ -31,16 +31,12 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
         // UI elements present within the List Item Resource
         private TextView textViewRecordedDataListItemName;
         private TextView textViewRecordedDataLisItemTimestamp;
-        private TextView textViewRecordedDataListItemTestType;
-        private TextView textViewRecordedDataListItemMaterialType;
         private ImageButton  imageButtonMoreDetails;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewRecordedDataListItemName = itemView.findViewById(R.id.textViewListItemName);
             textViewRecordedDataLisItemTimestamp = itemView.findViewById(R.id.textViewListItemTimestamp);
-            textViewRecordedDataListItemTestType = itemView.findViewById(R.id.textViewListItemTestType);
-            textViewRecordedDataListItemMaterialType = itemView.findViewById(R.id.textViewMaterialType);
             imageButtonMoreDetails = itemView.findViewById(R.id.imageButtonMoreDetails);
         }
 
@@ -50,14 +46,6 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
 
         public TextView getTextViewRecordedDataLisItemTimestamp() {
             return textViewRecordedDataLisItemTimestamp;
-        }
-
-        public TextView getTextViewRecordedDataListItemTestType() {
-            return textViewRecordedDataListItemTestType;
-        }
-
-        public TextView getTextViewRecordedDataListItemMaterialType() {
-            return textViewRecordedDataListItemMaterialType;
         }
 
         public ImageButton getImageButtonMoreDetails() {
@@ -87,8 +75,6 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
         // Set the correct information for each Recorded Data Item.
         holder.getTextViewRecordedDataListItemName().setText(dataItem.getSessionName());
         holder.getTextViewRecordedDataLisItemTimestamp().setText(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(dataItem.getSessionTimestamp()));
-        holder.getTextViewRecordedDataListItemTestType().setText("Compressive");
-        holder.getTextViewRecordedDataListItemMaterialType().setText(" ");
 
         holder.itemView.setOnClickListener(v -> {
             Log.d("RecyclerView", "Item clicked: " + dataItem.getSessionName());

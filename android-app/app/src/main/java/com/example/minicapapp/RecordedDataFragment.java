@@ -88,7 +88,7 @@ public class RecordedDataFragment extends Fragment {
 
             // Recorded Data Summary
             textViewRecordedDataSummary = view.findViewById(R.id.textViewRecordedDataSummary);
-            textViewRecordedDataSummary.setText(sessions.size() + " Recorded Sessions");
+            textViewRecordedDataSummary.setText(sessions.size() + " Recorded Sessions Found.");
         });
 
         // Spinner
