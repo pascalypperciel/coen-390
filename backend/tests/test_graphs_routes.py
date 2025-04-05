@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 
 session_id = -1 # This is the sessionid I added in the db dedicated to this
 session_id_variance = -999999999999999901 # Used for a specific test
+session_id_neg_slope = -999999999999999902 # Used for a specific test
 session_id_temp = 12345678912345 # Dummy test session for testing purposes, will be removed after use
 wrong_session_id = -999999999999999999 # This is sessionid isn't in db. (never add it)
-
 
 def test_get_build_graph(client):
     # Good, valid
@@ -34,4 +34,11 @@ def test_get_build_graphs_zero_variance_stress(client):
     assert response.status_code == 200
     data = response.get_json()
     assert data["message"] == "Graphs generated successfully"
-    assert len(data["Graph"]) == 4
+    assert len(data["Graph"]) == 5
+
+def test_build_graphs_negative_slope(client):
+    response = client.get(f"/build-graphs?SessionID={session_id_neg_slope}")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "Graphs generated successfully" in data["message"]
+    assert len(data["Graph"]) == 5
