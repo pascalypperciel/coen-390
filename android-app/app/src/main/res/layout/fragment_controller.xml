@@ -110,7 +110,7 @@
                         android:id="@+id/editTextInitialLength"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Initial Length (m)"
+                        android:hint="Initial Length (cm)"
                         android:layout_marginTop="8dp"
                         android:imeOptions="actionNext"
                         android:inputType="numberDecimal" />
@@ -119,7 +119,7 @@
                         android:id="@+id/editTextInitialArea"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Initial Cross-Sectional Area (m²)"
+                        android:hint="Initial Cross-Sectional Area (cm²)"
                         android:layout_marginTop="8dp"
                         android:imeOptions="actionDone"
                         android:inputType="numberDecimal" />
