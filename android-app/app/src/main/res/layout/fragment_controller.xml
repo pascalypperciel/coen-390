@@ -79,7 +79,7 @@
                     android:id="@+id/editTextSessionName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Session Name"
+                    android:hint="Session Name"
                     android:imeOptions="actionNext"
                     android:inputType="text" />
 
@@ -87,7 +87,7 @@
                     android:id="@+id/editTextInitialLength"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Initial Length"
+                    android:hint="Initial Length (m)"
                     android:layout_marginTop="8dp"
                     android:imeOptions="actionNext"
                     android:inputType="numberDecimal" />
@@ -96,7 +96,7 @@
                     android:id="@+id/editTextInitialArea"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Initial Cross-Sectional Area"
+                    android:hint="Initial Cross-Sectional Area (m²)"
                     android:layout_marginTop="8dp"
                     android:imeOptions="actionDone"
                     android:inputType="numberDecimal" />
