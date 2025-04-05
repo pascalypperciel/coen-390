@@ -8,7 +8,7 @@
 
     <!-- Colour Palette -->
     <color name="text_colour">#2B313B</color>
-    <color name="button_colour">#FDA821</color>
+    <color name="button_colour">#F39B53</color>
     <color name="navbar_colour">#157A5D</color>
     <color name="background_colour">#DCF9F1</color>
 </resources>
