@@ -110,11 +110,6 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
                     .replace(R.id.frameLayoutActivityContent, sessionDetailsFragment)
                     .addToBackStack(null)
                     .commit();
-
-            if (activity instanceof BottomNavigationBarActivity) {
-                ((BottomNavigationBarActivity) activity)
-                        .setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
-            }
         });
 
         // Go to the Data Item Activity if the "More Details" button is pressed.
