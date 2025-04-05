@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>CAT Tester Info Page</title>
+<style type="text/css">
+body {
+	background-color:  #FFFFFF;
+}
+
+.title {
+	text-align:center;
+	color: #ffff00;
+}
+
+.pic1 {
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /*border-radius:50px;*/
+    border: 1px solid black;
+    box-shadow: 10px 10px 5px #00ffff;
+}
+
+
+
+
+</style>
+</head>
+<body>
+
+<h1 class="title">Info Page</h1>
+
+<h4>Calculating Stress/Strain Curves</h4>
+<p>We defined stress as the measure of an external force acting over the cross-sectional area of an object. Stress has units of force per area: N/<sub>m<sup>2</sup></sub>(SI) in Pascals.
+</p>
+<h4>Deriving Stress</h4>
+<p>Normal stress is stress experienced perpendicular to an object. As an arbitrary object has an arbitrary cross-sectional area, we measure stress as a unit of pressure, not force. Thus, it a has mathematical representation:</p>
+<center>
+<img class="pic1" src="math-pic1.png" width="264" height="92" title="Boston University, Mechanics of Materials: Stress">
+</center>
+<br>
+<center>
+<img class="pic1" src="math-pic2.png" width="545" height="146" title="Boston University, Mechanics of Materials: Stress">
+</center>
+<p>Which is our average normal stress over the cross-sectional area.
+</p>
+<h4>Deriving Strain</h4>
+<p>We defined strain as the ratio of deformed length to the original length of a material. Strain is unitless.</p>
+<center>
+<img class="pic1" src="math-pic3.png" width="547" height="225" title="Boston University, Mechanics of Materials: Stress">
+</center>
+<p>As a material is stressed, it exhibits strain. Since we want to measure the strength of a material, we </p>
+<h4>Deriving Engineering VS True Stress & Strain</h4>
+<p>For engineering stress, we assume the length and diameter of the sample remain constant throughout the whole experiment. True stress is the applied load divided by the actual cross-sectional area (the changing area with time) of the material. Engineering stress is the applied load divided by the original cross-sectional area of the material. Also known as nominal stress.
+</p>
+<center>
+<img class="pic1" src="math-pic4.png" width="525" height="504" title="Prof. Yasin Çapar, Engineering vs. True Stress and Strain">
+</center>
+<p>In a tensile test, true stress is larger than engineering stress and true strain is less than engineering strain. The difference between the true and engineering stresses and strains will increase with plastic deformation. At low strains (in the elastic region), the differences between the two are negligible.</p>
+
+<h4>Stress-Strain Curves</h4>
+<p>So, how does a material behave under load? This is a typical engineering elastic stress-strain curve of an ideal material. It's the most basic, iconic reference of strength testing in material science, so it's our baseline for any theory in this document. We begin with the elastic stress-strain curve arbitrarily; we will discuss the compressive stress-strain curve in context later on.</p>
+
+<center>
+<img class="pic1" src="stress-strain-curve.png" width="544" height="356" title="Wikipedia, Stress-strain curve">
+</center>
+
+<p>There are two main regions in this curve: The elastic region, which is between zero stress and the material's yield strength, and the plastic region, where we see strain hardening and necking on the graph above. Not all materials exhibit necking and strain hardening, which we will discuss further elsewhere. Let's first discuss the elastic region, which is most relevant to our project.
+<br><br>
+Inside the elastic region, the material undergoes elastic deformation. This means that it will undergo deformation, but if you unload it the material will return to its original state (length and cross-sectional area). In the elastic region, the material absorbs the energy of the load and acts like a spring. This is why it's linear in this range - the deformation is governed by Hooke's law for springs F = -kx. In this region, engineering stress/strain looks the same as true stress/strain but this will change after yield.
+<br><br>
+Our alternative to elastic deformation is plastic deformation, whereby the material's shape change is permanent. This is what will occur after the material begins to yield. As stress increases, eventually it yields and undergoes plastic deformation. Something to note about plastic deformation is that if you unload the material, it will still return somewhat to its original state from the elastic part of its deformation, and if you try to apply load again it will again undergo some elastic deformation before further plastic deformation occurs. As the material deforms, it sometimes undergoes a phenomenon called strain hardening. 
+<br><br>
+The curve is difficult to model using engineering stress and strain, but easy with true stress and strain. This will demonstrate the difference between the curves:
+</p>
+
+<center>
+<img class="pic1" src="stress-strain-curve2.png" width="543" height="415" title="Prof. Yasin Çapar, Engineering vs. True Stress and Strain">
+</center>
+
+<p>We would use true stress and strain for our math in real applications. We can model the plastic region of the curve using the Ramberg-Osgood relationship, which is 
+</p>
+
+<center>
+<img class="pic1" src="math-pic5.png" width="173" height="63" title="Prof. Yasin Çapar, Engineering vs. True Stress and Strain">
+</center>
+
+<p>In this relationship, epsilon is strain, sigma is stress, E is the elastic modulus of the material, and K and n are hardening constants. Not all materials undergo strain hardening, but this is helpful nonetheless.
+<br><br>
+Ultimate strength is the point when a material begins necking, which is when the cross-sectional area at a weak point (in an isotropic shape like a cylinder, this is the center) starts to get smaller as the strain increases and the material starts almost pulling apart. Picture stretching a piece of Play-Doh. Although the force is distributed evenly throughout the putty, the center starts to collapse first. This phenomenon is known as necking.
+</p>
+
+<center>
+<img class="pic1" src="necking.png" width="668" height="229" title="Springer, Basic Material Properties">
+</center>
+
+<p>The plastic region of the stress-strain curve is split into the strain-hardening region and the necking region. The point of separation is called the ultimate strength of the material. 
+<br><br>
+Finally, the material will eventually fracture. Fracture behaviour depends on several parameters, with the most significant being the ductility of the material. We can separate materials into two main categories here: A material can be either ductile, or it can be brittle.
+</p>
+
+<center>
+<img class="pic1" src="stress-strain-curve3.png" width="553" height="409" title="Prof. Yasin Çapar, Engineering vs. True Stress and Strain">
+</center>
+<br>
+<center>
+<img class="pic1" src="rods.png" width="675" height="204" title="Prof. Yasin Çapar, Engineering vs. True Stress and Strain">
+</center>
+<p>A is a ductile material whereas B is a brittle material. Note the necking in A before the fracture.</p>
+<h4>Compressive versus Tensile Stress-Strain Curve</h4>
+<p>The behaviour of materials in compression testing is similar but not identical to the stress-strain curve we discuss above. In a compressive curve, the same critical points exist, but the curve looks different. Dr. David Roylance says "As long as the loads are sufficiently small (stresses less than the proportional limit), in many materials, the relations outlined above apply equally well if loads are placed to put the specimen in compression rather than tension. The expression for deformation and a given load &#x3B4; = P L/AE applies just as in tension, with negative values for &#x3B4; and P indicating compression. Further, the modulus E is the same in tension and compression to a good approximation". Although there are some differences elsewhere on the curve (they are rarely perfectly symmetrical), for our purposes the most important is the elastic region of the curve.</p>
+
+<center>
+<img class="pic1" src="tc-curve.png" width="288" height="220" title="David Roylance, Stress-strain Curves and Anshuman Shrivastava, Intro to Plastics Engineering
+">
+</center>
+
+<br><br>
+
+<hr>
+<p>Copyright &copy; Team 1<br></p>
+
+</body>
+
+</html>
