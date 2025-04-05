@@ -12,7 +12,7 @@ def test_post_batch_valid(client):
             "Pressure": 101.3,
             "SessionID": session_id,
             "Timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "Valid": True
+            "Valid": "True"
         },
         {
             "Distance": 20.1,
@@ -20,7 +20,7 @@ def test_post_batch_valid(client):
             "Pressure": 102.2,
             "SessionID": session_id,
             "Timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "Valid": False
+            "Valid": "False"
         }
     ]
     response = client.post("/batch-process-records", json=payload)
@@ -48,7 +48,7 @@ def test_post_batch_missing_field(client):
             "Pressure": 101.3,
             "SessionID": session_id,
             "Timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "Valid": True
+            "Valid": "True"
         }
     ]
     response = client.post("/batch-process-records", json=payload)
@@ -65,7 +65,7 @@ def test_post_batch_data_type(client):
             "Pressure": 101.3,
             "SessionID": session_id,
             "Timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "Valid": True
+            "Valid": "True"
         }
     ]
     response = client.post("/batch-process-records", json=payload)
@@ -82,7 +82,7 @@ def test_post_batch_invalid_timestamp(client):
             "Pressure": 101.3,
             "SessionID": session_id,
             "Timestamp": "Not a valid date format",
-            "Valid": True
+            "Valid": "True"
         }
     ]
     response = client.post("/batch-process-records", json=payload)
@@ -99,7 +99,7 @@ def test_post_batch_dictionary(client):
         "Pressure": 101.3,
         "SessionID": session_id,
         "Timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "Valid": True
+        "Valid": "True"
     }
     response = client.post("/batch-process-records", json=payload)
     assert response.status_code == 201 # expect success
