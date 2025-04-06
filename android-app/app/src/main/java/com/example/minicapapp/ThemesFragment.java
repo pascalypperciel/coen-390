@@ -34,15 +34,15 @@ public class ThemesFragment extends Fragment {
 
         Button btnDefault = view.findViewById(R.id.themeDefaultButton);
         Button btnDark = view.findViewById(R.id.themeDarkButton);
-        Button btnSunset = view.findViewById(R.id.themeSunsetButton);
+        Button btnModern = view.findViewById(R.id.themeModernButton);
 
         styleButton(btnDefault, buttonColor, textColor);
         styleButton(btnDark, buttonColor, textColor);
-        styleButton(btnSunset, buttonColor, textColor);
+        styleButton(btnModern, buttonColor, textColor);
 
         btnDefault.setOnClickListener(v -> applyTheme(ThemeManager.Theme.DEFAULT));
         btnDark.setOnClickListener(v -> applyTheme(ThemeManager.Theme.DARK));
-        btnSunset.setOnClickListener(v -> applyTheme(ThemeManager.Theme.SUNSET));
+        btnModern.setOnClickListener(v -> applyTheme(ThemeManager.Theme.MODERN));
 
         return view;
     }
