@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -469,7 +468,7 @@ public class ControllerFragment extends Fragment {
         // Stop if the sensor detects "too close" or "too far"
         try {
             float distance = Float.parseFloat(newMessage.distance.trim());
-            if ((distance < youngModulusThreshold) && !testFinished) {
+            if ((distance < minDistanceRange) && !testFinished) {
                 testFinished = true;
 
                 if(isAdded()) {
