@@ -13,6 +13,8 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
 
@@ -31,6 +33,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class BluetoothFragment extends Fragment {
@@ -136,6 +139,7 @@ public class BluetoothFragment extends Fragment {
 
         ImageView imageViewBluetoothStatus = view.findViewById(R.id.imageViewBluetoothStatus);
         ListView listViewDevices = view.findViewById(R.id.listViewDevices);
+        MaterialCardView cardViewBluetooth = view.findViewById(R.id.cardViewBluetooth);
         textViewConnectionStatus = view.findViewById(R.id.textViewConnectionStatus);
         Button buttonScan = view.findViewById(R.id.buttonScan);
         Button buttonConnect = view.findViewById(R.id.buttonConnect);
@@ -213,10 +217,23 @@ public class BluetoothFragment extends Fragment {
             bluetoothAdapter.startDiscovery();
         });
 
-        if (Build.VERSION.SDK_INT >= 31) {
-        } else {
+        LinearLayout macAddressLayout = view.findViewById(R.id.macAddressLayout);
+        EditText editTextMacAddress = view.findViewById(R.id.editTextMacAddress);
+        Button buttonConnectMac = view.findViewById(R.id.buttonConnectMac);
+        editTextMacAddress.setTextColor(ThemeManager.getTextColor(requireContext()));
+        buttonConnectMac.setBackgroundTintList(ColorStateList.valueOf(ThemeManager.getButtonColor(requireContext())));
+        buttonConnectMac.setTextColor(ThemeManager.getTextColor(requireContext()));
+
+        if (Build.VERSION.SDK_INT < 36) {
             buttonScan.setVisibility(View.GONE);
-            listViewDevices.setVisibility(View.GONE);
+            cardViewBluetooth.setVisibility(View.GONE);
+            macAddressLayout.setVisibility(View.VISIBLE);
+            buttonConnect.setVisibility(View.GONE);
+        } else {
+            buttonScan.setVisibility(View.VISIBLE);
+            cardViewBluetooth.setVisibility(View.VISIBLE);
+            macAddressLayout.setVisibility(View.GONE);
+            buttonConnect.setVisibility(View.VISIBLE);
         }
 
         listViewDevices.setOnItemClickListener((parent, view1, position, id) -> {
@@ -264,6 +281,61 @@ public class BluetoothFragment extends Fragment {
             }
         });
 
+        final Pattern macPattern = Pattern.compile("^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$");
+
+        buttonConnectMac.setOnClickListener(v -> {
+            String macAddress = editTextMacAddress.getText().toString().trim().toUpperCase();
+
+            if (!macPattern.matcher(macAddress).matches()) {
+                Toast.makeText(requireContext(), "Invalid MAC address format. Please use format: XX:XX:XX:XX:XX:XX", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(macAddress);
+                BluetoothManager.getInstance().setSelectedDevice(device);
+                boolean success = BluetoothManager.getInstance().connect(requireContext());
+
+                if (success) {
+                    textViewConnectionStatus.setTextColor(ThemeManager.getTextColor(requireContext()));
+                    textViewConnectionStatus.setText("Connected to: " + macAddress);
+                    imageViewBluetoothStatus.setImageResource(R.drawable.ic_bluetooth);
+                    imageViewBluetoothStatus.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                } else {
+                    textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+                    textViewConnectionStatus.setText("Connection failed");
+                    imageViewBluetoothStatus.setImageResource(R.drawable.ic_bluetooth_disabled);
+                    imageViewBluetoothStatus.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+                }
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(requireContext(), "Invalid MAC address", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Connection failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        editTextMacAddress.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String upper = s.toString().toUpperCase();
+                if (!upper.equals(s.toString())) {
+                    editTextMacAddress.removeTextChangedListener(this);
+                    editTextMacAddress.setText(upper);
+                    editTextMacAddress.setSelection(upper.length());
+                    editTextMacAddress.addTextChangedListener(this);
+                    return;
+                }
+
+                boolean isValid = macPattern.matcher(upper).matches();
+                buttonConnectMac.setEnabled(isValid);
+            }
+        });
 
         // Register BroadcastReceiver for Bluetooth discovery
         IntentFilter filter = new IntentFilter();

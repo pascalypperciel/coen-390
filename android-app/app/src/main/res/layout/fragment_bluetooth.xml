@@ -59,6 +59,29 @@
             android:backgroundTint="@color/button_colour"
             android:layout_marginBottom="12dp" />
 
+        <LinearLayout
+            android:id="@+id/macAddressLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/editTextMacAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Enter MAC address"
+                android:inputType="text"/>
+
+            <Button
+                android:id="@+id/buttonConnectMac"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connect"/>
+        </LinearLayout>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardViewBluetooth"
             android:layout_width="match_parent"

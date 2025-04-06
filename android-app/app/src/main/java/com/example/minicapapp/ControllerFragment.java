@@ -414,7 +414,7 @@ public class ControllerFragment extends Fragment {
                     Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
-                                Toast.makeText(requireContext(), "Batch processing failed: " + responseCode, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Batch processing failed: " + responseCode, Toast.LENGTH_SHORT).show()
                         );
                     }
                 }
@@ -422,7 +422,7 @@ public class ControllerFragment extends Fragment {
                 Log.e("BatchProcessing", "Error during batch processing", e);
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Error during batch processing: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Error during batch processing: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
                 }
             }
@@ -557,13 +557,12 @@ public class ControllerFragment extends Fragment {
         // Calculate the percentage difference
         double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
         if (percDiff > 5) {
-            Toast.makeText(requireContext(), "Test stopped due to large Young Modulus variation", Toast.LENGTH_LONG).show();
-
             BluetoothManager btManager = BluetoothManager.getInstance();
             if (btManager.isConnected()) {
                 btManager.sendCommand("Motor_OFF");
             }
             disableInputStream();
+            stopSessionIfActive();
         }
     }
     private double calculateYoungModulus(List<ControllerFragment.Record> records) {
