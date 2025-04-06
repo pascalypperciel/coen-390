@@ -42,6 +42,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         // Load the persistent navbar into the local BottomNavigationView attribute by its ID
         bottomNavigationViewPersistentNavbar = findViewById(R.id.bottomNavigationViewPersistentNavbar);
 
+        // Theme
+        setAppTheme();
+        
         // Set an invalid menu ID to clear the initial selection
         replaceFragment(new ControllerFragment(), false);
 
@@ -81,6 +84,25 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void setAppTheme() {
+        int backgroundColor = ThemeManager.getBackgroundColor(this);
+        int navbarColor = ThemeManager.getNavbarColor(this);
+
+        getWindow().getDecorView().setBackgroundColor(backgroundColor);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(navbarColor);
+            getWindow().setStatusBarColor(backgroundColor);
+        }
+
+        if (bottomNavigationViewPersistentNavbar != null) {
+            bottomNavigationViewPersistentNavbar.setBackgroundColor(navbarColor);
+            bottomNavigationViewPersistentNavbar.setItemIconTintList(ColorStateList.valueOf(ThemeManager.getTextColor(this)));
+            bottomNavigationViewPersistentNavbar.setItemTextColor(ColorStateList.valueOf(ThemeManager.getTextColor(this)));
+        }
+    }
+
 
     // Internal method that will allow the persistent navbar to switch between fragment easily
     private void replaceFragment(Fragment fragment, boolean addToBackStack) {
