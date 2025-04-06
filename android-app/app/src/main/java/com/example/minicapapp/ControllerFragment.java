@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -50,7 +51,7 @@ public class ControllerFragment extends Fragment {
         public float initialArea;
     }
     // Internal Attributes
-    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature, textViewConnectBluetoothMessage;
+    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature, textViewConnectBluetoothMessage, textViewSession, textViewDistanceTitle, textViewPressureTitle, textViewTemperatureTitle;
     private LinearLayout mainContent;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
     protected Button buttonMotorForward, buttonMotorBackward, buttonStartStop, buttonBluetoothStatus;
@@ -94,11 +95,20 @@ public class ControllerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
 
+        int textColor = ThemeManager.getTextColor(requireContext());
+        int buttonColor = ThemeManager.getButtonColor(requireContext());
+        int backgroundColor = ThemeManager.getBackgroundColor(requireContext());
+
+        view.setBackgroundColor(backgroundColor);
+
         mainContent = view.findViewById(R.id.mainContent);
         textViewConnectBluetoothMessage = view.findViewById(R.id.textViewConnectBluetoothMessage);
+        textViewConnectBluetoothMessage.setTextColor(textColor);
 
         // Define the Bluetooth Status button
         buttonBluetoothStatus = view.findViewById(R.id.buttonBluetoothStatus);
+        buttonBluetoothStatus.setBackgroundColor(buttonColor);
+        buttonBluetoothStatus.setTextColor(textColor);
         updateBluetoothStatusButton();
 
         buttonBluetoothStatus.setOnClickListener(v -> {
@@ -114,28 +124,46 @@ public class ControllerFragment extends Fragment {
 
         // Define and set the behaviour of the UI elements in ths fragment
         imageButtonHelpController = view.findViewById(R.id.imageButtonHelpController);
+        imageButtonHelpController.setBackgroundResource(R.drawable.circular_button_background);
+        imageButtonHelpController.setColorFilter(buttonColor);
+        imageButtonHelpController.getBackground().setTint(buttonColor);
         imageButtonHelpController.setOnClickListener(v -> {
             HelpFragment helpFragment = HelpFragment.newInstance("Controller");
             helpFragment.show(requireActivity().getSupportFragmentManager(), "HelpDialogue");
         });
 
         // Session Parameters
+        // Session Container
+        CardView cardViewSession = view.findViewById(R.id.sessionCard);
+        cardViewSession.setCardBackgroundColor(backgroundColor);
+        // Session Title
+        textViewSession = view.findViewById(R.id.textViewSession);
+        textViewSession.setTextColor(textColor);
+        textViewSession.setHintTextColor(textColor);
         // Session Name
         editTextSessionName = view.findViewById(R.id.editTextSessionName);
-        editTextSessionName.setTextColor(getResources().getColor(R.color.black, null));
+        editTextSessionName.setTextColor(textColor);
+        editTextSessionName.setHintTextColor(textColor);
         // Initial Length of the Material Object
         editTextInitialLength = view.findViewById(R.id.editTextInitialLength);
-        editTextInitialLength.setTextColor(getResources().getColor(R.color.black, null));
+        editTextInitialLength.setTextColor(textColor);
+        editTextInitialLength.setHintTextColor(textColor);
         // Initial Cross-Sectional Area of the Material Object
         editTextInitialArea = view.findViewById(R.id.editTextInitialArea);
-        editTextInitialArea.setTextColor(getResources().getColor(R.color.black, null));
+        editTextInitialArea.setTextColor(textColor);
+        editTextInitialArea.setHintTextColor(textColor);
 
         // Motor Control Elements
+        CardView cardViewController = view.findViewById(R.id.controllerCard);
+        cardViewController.setCardBackgroundColor(backgroundColor);
+
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
         textViewMotorControls.setText(R.string.motor_controls);
+        textViewMotorControls.setTextColor(textColor);
 
         buttonMotorForward = view.findViewById(R.id.buttonMotorForward);
         buttonMotorForward.setText(R.string.move_forward);
+        buttonMotorForward.setBackgroundColor(buttonColor);
         buttonMotorForward.setEnabled(false);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -155,6 +183,7 @@ public class ControllerFragment extends Fragment {
 
         buttonMotorBackward = view.findViewById(R.id.buttonMotorBackward);
         buttonMotorBackward.setText(R.string.move_backward);
+        buttonMotorBackward.setBackgroundColor(buttonColor);
         buttonMotorBackward.setEnabled(false);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -172,6 +201,7 @@ public class ControllerFragment extends Fragment {
         });
 
         buttonStartStop = view.findViewById(R.id.buttonStartStop);
+        buttonStartStop.setBackgroundColor(buttonColor);
 
         buttonStartStop.setOnClickListener(v -> {
             if (!isListening) { //Stop if Started
@@ -186,7 +216,6 @@ public class ControllerFragment extends Fragment {
             } else { //Start if Stopped
                 isListening = false;
                 buttonStartStop.setText(R.string.start_new_session);
-                buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
 
                 // Re-disable the session input fields
                 editTextSessionName.setEnabled(true);
@@ -225,6 +254,19 @@ public class ControllerFragment extends Fragment {
         textViewDistance = view.findViewById(R.id.textDistanceValue);
         textViewPressure = view.findViewById(R.id.textPressureValue);
         textViewTemperature = view.findViewById(R.id.textTemperatureValue);
+
+        textViewDistance.setTextColor(textColor);
+        textViewPressure.setTextColor(textColor);
+        textViewTemperature.setTextColor(textColor);
+
+
+        textViewDistanceTitle = view.findViewById(R.id.textViewDistanceTitle);
+        textViewPressureTitle = view.findViewById(R.id.textViewPressureTitle);
+        textViewTemperatureTitle = view.findViewById(R.id.textViewTemperatureTitle);
+
+        textViewDistanceTitle.setTextColor(textColor);
+        textViewPressureTitle.setTextColor(textColor);
+        textViewTemperatureTitle.setTextColor(textColor);
 
         showSessionInputsIfConnected();
 
@@ -372,7 +414,7 @@ public class ControllerFragment extends Fragment {
                     Log.e("BatchProcessing", "Batch processing failed: " + responseCode + " - " + conn.getResponseMessage());
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
-                                Toast.makeText(requireContext(), "Batch processing failed: " + responseCode, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Batch processing failed: " + responseCode, Toast.LENGTH_SHORT).show()
                         );
                     }
                 }
@@ -380,7 +422,7 @@ public class ControllerFragment extends Fragment {
                 Log.e("BatchProcessing", "Error during batch processing", e);
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Error during batch processing: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Error during batch processing: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
                 }
             }
@@ -515,13 +557,12 @@ public class ControllerFragment extends Fragment {
         // Calculate the percentage difference
         double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
         if (percDiff > 5) {
-            Toast.makeText(requireContext(), "Test stopped due to large Young Modulus variation", Toast.LENGTH_LONG).show();
-
             BluetoothManager btManager = BluetoothManager.getInstance();
             if (btManager.isConnected()) {
                 btManager.sendCommand("Motor_OFF");
             }
             disableInputStream();
+            stopSessionIfActive();
         }
     }
     private double calculateYoungModulus(List<ControllerFragment.Record> records) {
@@ -628,7 +669,6 @@ public class ControllerFragment extends Fragment {
         if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {
             isListening = true;
             buttonStartStop.setText(R.string.stop);
-            buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
 
             try {
                 // Convert the length and area parameters to float variables.

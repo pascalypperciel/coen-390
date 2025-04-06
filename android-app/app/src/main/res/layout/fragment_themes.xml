@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/background_colour">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/themeTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose a Theme"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"
+            android:textColor="@color/text_colour" />
+
+        <Button
+            android:id="@+id/themeDefaultButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Default Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeDarkButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dark Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeModernButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modern Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeModernCoastalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modern Coastal Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeSunriseBlushButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sunrise Blush Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeForestTechButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Forest Tech Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -1,54 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:layout_gravity="center_vertical">
+    android:layout_height="80dp"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
     <TextView
         android:id="@+id/textViewListItemName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
         android:text="TextView"
-        android:textColor="#000000"
-        android:textSize="16sp" />
+        android:textColor="@color/text_colour"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textViewListItemTimestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_below="@id/textViewListItemName"
+        android:layout_marginTop="4dp"
         android:text="TextView"
-        android:textColor="#D3D3D3" />
-
-    <TextView
-        android:id="@+id/textViewListItemTestType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="50dp"
-        android:text="TextView"
-        android:textColor="#D3D3D3" />
+        android:textColor="#A9A9A9"
+        android:textSize="15sp" />
 
     <ImageButton
         android:id="@+id/imageButtonMoreDetails"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginLeft="375dp"
-        android:layout_marginTop="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         android:background="@drawable/circular_button_background"
-        android:padding="5dp"
+        android:src="@drawable/baseline_keyboard_arrow_right_24"
         android:scaleType="fitCenter"
-        android:src="@drawable/baseline_keyboard_arrow_right_24" />
-
-    <TextView
-        android:id="@+id/textViewMaterialType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:text="TextView"
-        android:textColor="#000000" />
-</FrameLayout>
+        android:padding="5dp"
+        android:theme="@style/Theme.FragmentButton" />
+</RelativeLayout>

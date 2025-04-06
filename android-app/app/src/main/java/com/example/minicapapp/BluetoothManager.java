@@ -39,17 +39,17 @@ public class BluetoothManager {
     }
 
 
-    public void connect(Context context) {
+    public boolean connect(Context context) {
         if (isConnected || selectedDevice == null) {
             Toast.makeText(context, "No device selected", Toast.LENGTH_SHORT).show();
             Log.e("BluetoothManager", "Connection attempt failed: no selected device or already connected.");
-            return;
+            return false;
         }
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "Bluetooth permission not granted", Toast.LENGTH_SHORT).show();
             Log.e("BluetoothManager", "Missing BLUETOOTH_CONNECT permission");
-            return;
+            return false;
         }
 
         try {
@@ -62,6 +62,8 @@ public class BluetoothManager {
 
             Toast.makeText(context, "Connected to " + selectedDevice.getName(), Toast.LENGTH_SHORT).show();
             Log.i("BluetoothManager", "Connected to " + selectedDevice.getName() + " (" + selectedDevice.getAddress() + ")");
+            return true;
+
         } catch (IOException e) {
             Log.e("BluetoothManager", "Connection failed: IOException - " + e.getMessage(), e);
             Toast.makeText(context, "Connection failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -69,6 +71,9 @@ public class BluetoothManager {
             Log.e("BluetoothManager", "Connection failed: Unexpected error", e);
             Toast.makeText(context, "Unexpected connection error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+
+        isConnected = false;
+        return false;
     }
 
 

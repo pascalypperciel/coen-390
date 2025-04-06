@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_colour"
     tools:context=".MaterialsInformationFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,13 +22,15 @@
 
             <!-- Logo -->
             <ImageView
-                android:id="@+id/imageViewLogo"
+                android:id="@+id/imageViewLogoBluetooth"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@drawable/cattesterlogo"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"
+                android:contentDescription="CAT Tester Logo" />
 
             <!-- Help Button -->
             <ImageButton
@@ -45,24 +48,45 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/webViewCard"
+            android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/button_colour"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@android:color/white">
 
-            <!-- Materials Information Page Content -->
-            <WebView
-                android:id="@+id/webViewMaterialsInformationPage"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="match_parent"
+                android:padding="2dp"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="12dp"
+                    android:orientation="vertical"
+                    android:clipToPadding="false"
+                    android:background="@android:color/white">
+
+                    <WebView
+                        android:id="@+id/webViewMaterialsInformationPage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/white"
+                        android:overScrollMode="never" />
+                </LinearLayout>
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

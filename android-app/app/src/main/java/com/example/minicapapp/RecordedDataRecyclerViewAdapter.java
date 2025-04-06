@@ -2,13 +2,18 @@ package com.example.minicapapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -19,23 +24,22 @@ import java.util.Locale;
 
 public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<RecordedDataRecyclerViewAdapter.ViewHolder> {
     // Variables for the storage of objects to be displayed in the RecyclerView.
-    private Context context; // The context of the activity housing the RecyclerView.
+    private FragmentActivity activity;
     private List<RecordedDataItem> localRecordedDataList; // A list of the recorded data objects.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // UI elements present within the List Item Resource
         private TextView textViewRecordedDataListItemName;
         private TextView textViewRecordedDataLisItemTimestamp;
-        private TextView textViewRecordedDataListItemTestType;
-        private TextView textViewRecordedDataListItemMaterialType;
         private ImageButton  imageButtonMoreDetails;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
             textViewRecordedDataListItemName = itemView.findViewById(R.id.textViewListItemName);
+            int textColor = ThemeManager.getTextColor(context);
+            textViewRecordedDataListItemName.setTextColor(textColor);
             textViewRecordedDataLisItemTimestamp = itemView.findViewById(R.id.textViewListItemTimestamp);
-            textViewRecordedDataListItemTestType = itemView.findViewById(R.id.textViewListItemTestType);
-            textViewRecordedDataListItemMaterialType = itemView.findViewById(R.id.textViewMaterialType);
+            textViewRecordedDataLisItemTimestamp.setTextColor(textColor);
             imageButtonMoreDetails = itemView.findViewById(R.id.imageButtonMoreDetails);
         }
 
@@ -47,21 +51,13 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
             return textViewRecordedDataLisItemTimestamp;
         }
 
-        public TextView getTextViewRecordedDataListItemTestType() {
-            return textViewRecordedDataListItemTestType;
-        }
-
-        public TextView getTextViewRecordedDataListItemMaterialType() {
-            return textViewRecordedDataListItemMaterialType;
-        }
-
         public ImageButton getImageButtonMoreDetails() {
             return imageButtonMoreDetails;
         }
     }
 
-    public RecordedDataRecyclerViewAdapter(Context context, List<RecordedDataItem> localRecordedDataList) {
-        this.context = context;
+    public RecordedDataRecyclerViewAdapter(FragmentActivity activity, List<RecordedDataItem> localRecordedDataList) {
+        this.activity = activity;
         this.localRecordedDataList = localRecordedDataList;
     }
 
@@ -70,7 +66,7 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
     @Override
     public RecordedDataRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, parent.getContext());
     }
 
     // This method will bind the Recorded Data List item to its holder.
@@ -82,8 +78,27 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
         // Set the correct information for each Recorded Data Item.
         holder.getTextViewRecordedDataListItemName().setText(dataItem.getSessionName());
         holder.getTextViewRecordedDataLisItemTimestamp().setText(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(dataItem.getSessionTimestamp()));
-        holder.getTextViewRecordedDataListItemTestType().setText("Compressive");
-        holder.getTextViewRecordedDataListItemMaterialType().setText(" ");
+
+        holder.itemView.setOnClickListener(v -> {
+            Log.d("RecyclerView", "Item clicked: " + dataItem.getSessionName());
+
+            SessionDetailsFragment sessionDetailsFragment = new SessionDetailsFragment();
+            Bundle args = new Bundle();
+            args.putLong("session_id", dataItem.getSessionID());
+            args.putString("session_name", dataItem.getSessionName());
+            args.putSerializable("session_timestamp", dataItem.getSessionTimestamp());
+            args.putFloat("initial_length", dataItem.getInitialLength());
+            args.putFloat("initial_area", dataItem.getInitialArea());
+            args.putFloat("yield_strain", dataItem.getYieldStrain());
+            args.putFloat("yield_stress", dataItem.getYieldStress());
+            sessionDetailsFragment.setArguments(args);
+
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frameLayoutActivityContent, sessionDetailsFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         // Go to the Data Item Activity if the "More Details" button is pressed.
         holder.getImageButtonMoreDetails().setOnClickListener(new View.OnClickListener() {

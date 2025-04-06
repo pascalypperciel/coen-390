@@ -1,32 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Multi-purpose colours -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
     <color name="green">#00FF00</color>
     <color name="red">#FF0000</color>
 
-    <!-- Main Activity Colours -->
-    <color name="main_primary">#A566FF</color>
-    <color name="main_accent">#5E3993</color>
-
-    <!-- Settings Activity Colours -->
-    <color name="settings_primary">#708090</color>
-    <color name="settings_accent">#4C8095</color>
-
-    <!-- Controller Activity Colours -->
-    <color name="controller_primary">#FF9800</color>
-    <color name="controller_accent">#F57C00</color>
-
-    <!-- Bluetooth Activity Colours -->
-    <color name="bluetooth_primary">#0082FC</color>
-    <color name="bluetooth_accent">#0000CD</color>
-
-    <!-- Recorded Data and Data Item Activity Colours -->
-    <color name="data_primary">#E91E63</color>
-    <color name="data_accent">#C2185B</color>
-
-    <!-- Materials Information Page Activity Colours -->
-    <color name="materials_information_page_primary">#03DAC5</color>
-    <color name="materials_information_page_accent">#018786</color>
-
+    <!-- Colour Palette -->
+    <color name="text_colour">#2B313B</color>
+    <color name="button_colour">#F39B53</color>
+    <color name="navbar_colour">#157A5D</color>
+    <color name="background_colour">#DCF9F1</color>
 </resources>

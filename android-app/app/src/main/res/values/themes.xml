@@ -7,58 +7,30 @@
 
     <style name="Theme.MinicapApp" parent="Base.Theme.MinicapApp" />
 
-    <!-- Main Activity Theme -->
-    <style name="Theme.MainActivity" parent="Base.Theme.MinicapApp">
-        <item name="colorPrimary">@color/main_primary</item>
-        <item name="colorAccent">@color/main_accent</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
+    <!-- CAT Tester Theme (Light Mode) -->
+    <!-- Bottom Navigation Bar Theme -->
+    <style name="Theme.Navbar" parent="Base.Theme.MinicapApp">
+        <item name="android:background">@color/navbar_colour</item>
     </style>
 
-    <!-- Settings Activity Theme -->
-    <style name="Theme.SettingsActivity" parent="Base.Theme.MinicapApp">
-        <item name="colorPrimary">@color/settings_primary</item>
-        <item name="colorAccent">@color/settings_accent</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
+    <!-- Fragment Background -->
+    <style name="Theme.FragmentBackground" parent="Base.Theme.MinicapApp">
+        <item name="android:background">@color/background_colour</item>
     </style>
 
-    <!-- Controller Activity Theme -->
-    <style name="Theme.ControllerActivity" parent="Base.Theme.MinicapApp">
-        <item name="colorPrimary">@color/controller_primary</item>
-        <item name="colorAccent">@color/controller_accent</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
+    <!-- Fragment Buttons -->
+    <style name="Theme.FragmentButton" parent="Base.Theme.MinicapApp">
+        <item name="colorPrimary">@color/button_colour</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="elevation">4dp</item>
     </style>
 
-    <!-- Bluetooth Activity Theme -->
-    <style name="Theme.BluetoothActivity" parent="Base.Theme.MinicapApp">
-        <item name="colorPrimary">@color/bluetooth_primary</item>
-        <item name="colorAccent">@color/bluetooth_accent</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-    </style>
-
-    <!-- Recorded Data and Data Item Activity Theme -->
-    <style name="Theme.DataActivity" parent="Base.Theme.MinicapApp">
-        <item name="colorPrimary">@color/data_primary</item>
-        <item name="colorAccent">@color/data_accent</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-    </style>
-
-    <!-- Materials Information Page Activity Theme -->
-    <style name="Theme.MaterialsInformationPageActivity" parent="Base.Theme.MinicapApp">
-        <item name="colorPrimary">@color/materials_information_page_primary</item>
-        <item name="colorAccent">@color/materials_information_page_accent</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
+    <!-- Fragment Card Style -->
+    <style name="Theme.FragmentCard" parent="Base.Theme.MinicapApp">
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="android:textColor">@color/text_colour</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
     </style>
 
 </resources>

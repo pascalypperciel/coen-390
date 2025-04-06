@@ -25,6 +25,7 @@
         android:id="@+id/bottomNavigationViewPersistentNavbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:itemActiveIndicatorStyle="@style/CustomActiveIndicator"
         app:itemIconSize="24dp"
         app:labelVisibilityMode="selected"
         app:layout_constraintBottom_toBottomOf="parent"
