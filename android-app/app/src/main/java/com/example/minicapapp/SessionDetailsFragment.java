@@ -69,7 +69,7 @@ public class SessionDetailsFragment extends Fragment {
         buttonColor = ThemeManager.getButtonColor(requireContext());
         backgroundColor = ThemeManager.getBackgroundColor(requireContext());
         textColor = ThemeManager.getTextColor(requireContext());
-        
+
         view.setBackgroundColor(backgroundColor);
 
         graphContainer = view.findViewById(R.id.graphContainer);
