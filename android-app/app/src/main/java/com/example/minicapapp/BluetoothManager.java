@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -46,7 +47,7 @@ public class BluetoothManager {
             return false;
         }
 
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "Bluetooth permission not granted", Toast.LENGTH_SHORT).show();
             Log.e("BluetoothManager", "Missing BLUETOOTH_CONNECT permission");
             return false;
