@@ -26,6 +26,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:theme="@style/Theme.Navbar"
+        app:itemActiveIndicatorStyle="@style/CustomActiveIndicator"
         app:itemIconTint="@color/background_colour"
         app:itemTextColor="@color/background_colour"
         app:itemIconSize="24dp"
