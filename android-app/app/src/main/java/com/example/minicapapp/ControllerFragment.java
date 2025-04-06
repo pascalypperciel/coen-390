@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -36,6 +35,9 @@ import java.util.Date;
 import java.util.List;
 
 public class ControllerFragment extends Fragment {
+    //Values to tweak
+    float maxPressureRange, maxDistanceRange, minDistanceRange;
+    double youngModulusThreshold;
 
     public static class Record {
         public String distance;
@@ -94,6 +96,11 @@ public class ControllerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
+
+        maxPressureRange = ThresholdsManager.getMaxPressure(requireContext());
+        maxDistanceRange = ThresholdsManager.getMaxDistance(requireContext());
+        minDistanceRange = ThresholdsManager.getMinDistance(requireContext());
+        youngModulusThreshold = ThresholdsManager.getYoungModulus(requireContext());
 
         int textColor = ThemeManager.getTextColor(requireContext());
         int buttonColor = ThemeManager.getButtonColor(requireContext());
@@ -207,46 +214,18 @@ public class ControllerFragment extends Fragment {
             if (!isListening) { //Stop if Started
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if(!btManager.isConnected()) {
-                    Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() ->
+                            Toast.makeText(requireContext(), "Bluetooth has not been enabled", Toast.LENGTH_SHORT).show()
+                        );
+                    }
                 } else {
                     // Check the parameters input by the user.
                     checkSessionParameters(editTextSessionName.getText().toString(), editTextInitialLength.getText().toString(), editTextInitialArea.getText().toString());
                 }
 
             } else { //Start if Stopped
-                isListening = false;
-                buttonStartStop.setText(R.string.start_new_session);
-
-                // Re-disable the session input fields
-                editTextSessionName.setEnabled(true);
-                editTextInitialLength.setEnabled(true);
-                editTextInitialArea.setEnabled(true);
-
-                // Reset the text fields
-                editTextSessionName.setText("");
-                editTextInitialLength.setText("");
-                editTextInitialArea.setText("");
-
-                // Reset the Live Data Displays
-                textViewDistance.setText("-");
-                textViewPressure.setText("-");
-                textViewTemperature.setText("-");
-
-                BluetoothManager btManager = BluetoothManager.getInstance();
-                if (btManager.isConnected()) {
-                    btManager.sendCommand("Motor_OFF");
-                }
-
-                // If any records left, send them to db
-                if (!recordList.isEmpty()) {
-                    try {
-                        sendBatchData(recordList);
-                    } catch (JSONException e) {
-                        Log.e("StopButton", "Failed to send final batch", e);
-                    }
-                }
-
-                disableInputStream();
+                stopSessionRecording("Stop button pushed");
             }
         });
 
@@ -272,6 +251,51 @@ public class ControllerFragment extends Fragment {
 
         return view;
     }
+
+    private void stopSessionRecording(String reason) {
+        if (isListening) {
+            isListening = false;
+
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(requireContext(), "Test stopped: " + reason, Toast.LENGTH_LONG).show();
+
+                    buttonStartStop.setText(R.string.start_new_session);
+
+                    // Re-enable the session input fields
+                    editTextSessionName.setEnabled(true);
+                    editTextInitialLength.setEnabled(true);
+                    editTextInitialArea.setEnabled(true);
+
+                    // Reset the text fields
+                    editTextSessionName.setText("");
+                    editTextInitialLength.setText("");
+                    editTextInitialArea.setText("");
+
+                    // Reset the Live Data Displays
+                    textViewDistance.setText("-");
+                    textViewPressure.setText("-");
+                    textViewTemperature.setText("-");
+                });
+            }
+
+            BluetoothManager btManager = BluetoothManager.getInstance();
+            if (btManager.isConnected()) {
+                btManager.sendCommand("Motor_OFF");
+            }
+
+            if (!recordList.isEmpty()) {
+                try {
+                    sendBatchData(recordList);
+                } catch (JSONException e) {
+                    Log.e("StopButton", "Failed to send final batch", e);
+                }
+            }
+
+            disableInputStream();
+        }
+    }
+
 
     private void showSessionInputsIfConnected() {
         BluetoothManager btManager = BluetoothManager.getInstance();
@@ -434,33 +458,22 @@ public class ControllerFragment extends Fragment {
     }
 
     private void displayRecord(Record newMessage) {
+        if (!isListening || !isAdded()) return;
+
         // Update the UI on the main thread
-        if (isAdded()) {
-            requireActivity().runOnUiThread(() -> {
-                textViewDistance.setText(newMessage.distance + " cm");
-                textViewPressure.setText(newMessage.pressure + " kg");
-                textViewTemperature.setText(newMessage.temperature + "°C");
-            });
-        }
+        requireActivity().runOnUiThread(() -> {
+            textViewDistance.setText(newMessage.distance + " cm");
+            textViewPressure.setText(newMessage.pressure + " kg");
+            textViewTemperature.setText(newMessage.temperature + "°C");
+        });
 
         // Stop if the sensor detects "too close" or "too far"
         try {
             float distance = Float.parseFloat(newMessage.distance.trim());
-            if ((distance < 2.0) && !testFinished) {
+            if ((distance < minDistanceRange) && !testFinished) {
                 testFinished = true;
 
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Test Finished", Toast.LENGTH_LONG).show()
-                    );
-                }
-
-                BluetoothManager btManager = BluetoothManager.getInstance();
-                if (btManager.isConnected()) {
-                    btManager.sendCommand("Motor_OFF");
-                }
-
-                disableInputStream();
+                stopSessionRecording("Minimum distance reached");
             }
         } catch (NumberFormatException e) {
             Log.e("BT", "Error parsing distance: " + e.getMessage());
@@ -509,19 +522,9 @@ public class ControllerFragment extends Fragment {
         double distanceDifference = Math.abs(avgDistanceLastFive - avgDistanceFirstFive);
         double pressureDifference = Math.abs(avgPressureLastFive - avgPressureFirstFive);
 
-        // Define thresholds for stopping the test
-        double distanceThreshold = 5.0;
-        double pressureThreshold = 100.0;
-
         // Check if differences exceed thresholds
-        if (distanceDifference > distanceThreshold || pressureDifference > pressureThreshold) {
-            Toast.makeText(requireContext(), "Test stopped due to large data variation", Toast.LENGTH_LONG).show();
-
-            BluetoothManager btManager = BluetoothManager.getInstance();
-            if (btManager.isConnected()) {
-                btManager.sendCommand("Motor_OFF");
-            }
-            disableInputStream();
+        if (distanceDifference > maxDistanceRange || pressureDifference > maxPressureRange) {
+            stopSessionRecording("Data variation too large");
         }
     }
     private void monitorYoungModulus() {
@@ -556,13 +559,8 @@ public class ControllerFragment extends Fragment {
 
         // Calculate the percentage difference
         double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
-        if (percDiff > 5) {
-            BluetoothManager btManager = BluetoothManager.getInstance();
-            if (btManager.isConnected()) {
-                btManager.sendCommand("Motor_OFF");
-            }
-            disableInputStream();
-            stopSessionIfActive();
+        if (percDiff > youngModulusThreshold) {
+            stopSessionRecording("Young Modulus threshold reached");
         }
     }
     private double calculateYoungModulus(List<ControllerFragment.Record> records) {
@@ -613,7 +611,7 @@ public class ControllerFragment extends Fragment {
                 Log.e("CreateSession", "Error creating JSON payload", e);
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Error creating session data: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Error creating session data: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
                 }
                 return;
@@ -657,7 +655,7 @@ public class ControllerFragment extends Fragment {
                 Log.e("CreateSession", "Error during session creation", e);
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Error during session creation: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Error during session creation: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
                 }
             }
@@ -738,31 +736,7 @@ public class ControllerFragment extends Fragment {
 
     @Override
     public void onPause() {
+        stopSessionRecording("Fragment was left");
         super.onPause();
-        stopSessionIfActive();
     }
-
-    private void stopSessionIfActive() {
-        if (isListening) {
-            isListening = false;
-
-            BluetoothManager btManager = BluetoothManager.getInstance();
-            if (btManager.isConnected()) {
-                btManager.sendCommand("Motor_OFF");
-            }
-
-            // Send any remaining records
-            if (!recordList.isEmpty()) {
-                try {
-                    sendBatchData(recordList);
-                    recordList.clear();
-                } catch (JSONException e) {
-                    Log.e("ControllerFragment", "Error sending batch data on pause", e);
-                }
-            }
-
-            disableInputStream();
-        }
-    }
-
 }
