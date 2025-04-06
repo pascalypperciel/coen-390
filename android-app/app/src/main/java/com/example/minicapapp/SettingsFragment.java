@@ -23,6 +23,13 @@ public class SettingsFragment extends Fragment {
                 .addToBackStack(null)
                 .commit());
 
+        LinearLayout themesSettingsRow = view.findViewById(R.id.themesSettingsRow);
+        themesSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayoutActivityContent, new ThemesFragment())
+                .addToBackStack(null)
+                .commit());
+
         return view;
     }
 }
