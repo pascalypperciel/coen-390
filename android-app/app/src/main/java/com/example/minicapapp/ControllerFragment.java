@@ -136,6 +136,7 @@ public class ControllerFragment extends Fragment {
 
         buttonMotorForward = view.findViewById(R.id.buttonMotorForward);
         buttonMotorForward.setText(R.string.move_forward);
+        buttonMotorForward.setBackgroundColor(getResources().getColor(R.color.button_colour));
         buttonMotorForward.setEnabled(false);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -155,6 +156,7 @@ public class ControllerFragment extends Fragment {
 
         buttonMotorBackward = view.findViewById(R.id.buttonMotorBackward);
         buttonMotorBackward.setText(R.string.move_backward);
+        buttonMotorBackward.setBackgroundColor(getResources().getColor(R.color.button_colour));
         buttonMotorBackward.setEnabled(false);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -186,7 +188,6 @@ public class ControllerFragment extends Fragment {
             } else { //Start if Stopped
                 isListening = false;
                 buttonStartStop.setText(R.string.start_new_session);
-                buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
 
                 // Re-disable the session input fields
                 editTextSessionName.setEnabled(true);
@@ -628,7 +629,6 @@ public class ControllerFragment extends Fragment {
         if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {
             isListening = true;
             buttonStartStop.setText(R.string.stop);
-            buttonStartStop.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
 
             try {
                 // Convert the length and area parameters to float variables.
