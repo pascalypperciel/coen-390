@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.*;
@@ -141,7 +142,7 @@ public class BluetoothFragment extends Fragment {
 
         if (btManager.isConnected()) {
             buttonConnect.setText("Disconnect");
-            textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+            textViewConnectionStatus.setTextColor(ThemeManager.getTextColor(requireContext()));
             BluetoothDevice currentDevice = btManager.getSelectedDevice();
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
                 String name = currentDevice != null ? currentDevice.getName() : "Device";
@@ -226,7 +227,7 @@ public class BluetoothFragment extends Fragment {
                     buttonScan.setText("Scan Devices");
                     buttonScan.setEnabled(true);
 
-                    textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                    textViewConnectionStatus.setTextColor(ThemeManager.getTextColor(requireContext()));
                     BluetoothDevice currentDevice = btManager.getSelectedDevice();
                     String deviceName = (currentDevice != null) ? currentDevice.getName() : "Unknown";
                     textViewConnectionStatus.setText("Connected to: " + deviceName);
@@ -255,6 +256,19 @@ public class BluetoothFragment extends Fragment {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         requireActivity().registerReceiver(receiver, filter);
+
+        view.setBackgroundColor(ThemeManager.getBackgroundColor(requireContext()));
+
+        buttonScan.setBackgroundTintList(ColorStateList.valueOf(ThemeManager.getButtonColor(requireContext())));
+        buttonScan.setTextColor(ThemeManager.getTextColor(requireContext()));
+
+        buttonConnect.setBackgroundTintList(ColorStateList.valueOf(ThemeManager.getButtonColor(requireContext())));
+        buttonConnect.setTextColor(ThemeManager.getTextColor(requireContext()));
+
+        textViewConnectionStatus.setTextColor(ThemeManager.getTextColor(requireContext()));
+
+        listViewDevices.setBackgroundColor(ThemeManager.getBackgroundColor(requireContext()));
+
 
         return view;
     }
