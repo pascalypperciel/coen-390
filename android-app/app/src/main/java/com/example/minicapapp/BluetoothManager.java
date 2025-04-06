@@ -46,10 +46,18 @@ public class BluetoothManager {
             return false;
         }
 
+        if (Build.VERSION.SDK_INT >= 31){
+
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "Bluetooth permission not granted", Toast.LENGTH_SHORT).show();
             Log.e("BluetoothManager", "Missing BLUETOOTH_CONNECT permission");
-            return false;
+            return;
+        }}
+        else
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(context, "Bluetooth permission not granted but for mac address version", Toast.LENGTH_SHORT).show();
+            Log.e("BluetoothManager", "Missing BLUETOOTH_CONNECT permission");
+            return;
         }
 
         try {
