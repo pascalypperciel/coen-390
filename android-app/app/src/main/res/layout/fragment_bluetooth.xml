@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_colour">
+
+    <ImageView
+        android:id="@+id/imageViewLogoBluetooth"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/cattesterlogo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:contentDescription="CAT Tester Logo" />
 
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">+
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/imageViewLogoBluetooth"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:id="@+id/connectionStatusContainer"
@@ -37,33 +52,40 @@
                 android:textColor="@android:color/black"/>
         </LinearLayout>
 
-        <LinearLayout
+        <Button
+            android:id="@+id/buttonScan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:text="Scan Devices"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="12dp" />
 
-            <Button
-                android:id="@+id/buttonScan"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Scan Devices" />
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/listViewDevices"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginVertical="10dp" />
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            android:background="@drawable/cardview_border_button_colored">
+
+            <ListView
+                android:id="@+id/listViewDevices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="1dp"
+                android:background="@android:color/white"
+                android:padding="8dp" />
+        </androidx.cardview.widget.CardView>
 
         <Button
             android:id="@+id/buttonConnect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Connect/Disconnect" />
+            android:text="Connect/Disconnect"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="12dp" />
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
