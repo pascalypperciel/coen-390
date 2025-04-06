@@ -39,7 +39,6 @@ public class RecordedDataFragment extends Fragment {
     protected ImageView imageViewLogo;
     protected ImageButton imageButtonHelpRecordedData;
     protected Spinner spinnerDataFilter;
-    protected TextView textViewRecordedDataSummary;
     protected RecyclerView recyclerViewRecordedData;
     protected RecordedDataRecyclerViewAdapter recordedDataRecyclerViewAdapter;
 
@@ -85,10 +84,6 @@ public class RecordedDataFragment extends Fragment {
             // Adding a border around each item.
             DividerItemDecoration border = new DividerItemDecoration(recyclerViewRecordedData.getContext(), linearLayoutManager.getOrientation());
             recyclerViewRecordedData.addItemDecoration(border);
-
-            // Recorded Data Summary
-            textViewRecordedDataSummary = view.findViewById(R.id.textViewRecordedDataSummary);
-            textViewRecordedDataSummary.setText(sessions.size() + " Recorded Sessions Found.");
         });
 
         // Spinner

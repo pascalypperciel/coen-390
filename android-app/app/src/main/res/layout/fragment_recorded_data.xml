@@ -43,23 +43,32 @@
 
     <!-- Summary & Filter -->
     <TextView
-        android:id="@+id/textViewRecordedDataSummary"
-        android:layout_width="0dp"
+        android:id="@+id/textViewSortLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Recorded Data Summary Placeholder"
-        android:textSize="16sp"
-        android:gravity="center_vertical"
+        android:text="Select a sorting option:"
+        android:textColor="@color/text_colour"
+        android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/constraintLayout2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_marginStart="16dp" />
 
     <Spinner
         android:id="@+id/spinnerDataFilter"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
         android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewRecordedDataSummary"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="@drawable/spinner_background"
+        android:popupBackground="@android:color/white"
+        android:spinnerMode="dropdown"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/textViewSortLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
