@@ -35,14 +35,23 @@ public class ThemesFragment extends Fragment {
         Button btnDefault = view.findViewById(R.id.themeDefaultButton);
         Button btnDark = view.findViewById(R.id.themeDarkButton);
         Button btnModern = view.findViewById(R.id.themeModernButton);
+        Button btnModernCoastal = view.findViewById(R.id.themeModernCoastalButton);
+        Button btnSunriseBlush = view.findViewById(R.id.themeSunriseBlushButton);
+        Button btnForestTech = view.findViewById(R.id.themeForestTechButton);
 
         styleButton(btnDefault, buttonColor, textColor);
         styleButton(btnDark, buttonColor, textColor);
         styleButton(btnModern, buttonColor, textColor);
+        styleButton(btnModernCoastal, buttonColor, textColor);
+        styleButton(btnSunriseBlush, buttonColor, textColor);
+        styleButton(btnForestTech, buttonColor, textColor);
 
         btnDefault.setOnClickListener(v -> applyTheme(ThemeManager.Theme.DEFAULT));
         btnDark.setOnClickListener(v -> applyTheme(ThemeManager.Theme.DARK));
         btnModern.setOnClickListener(v -> applyTheme(ThemeManager.Theme.MODERN));
+        btnModernCoastal.setOnClickListener(v -> applyTheme(ThemeManager.Theme.MODERN_COASTAL));
+        btnSunriseBlush.setOnClickListener(v -> applyTheme(ThemeManager.Theme.SUNRISE_BLUSH));
+        btnForestTech.setOnClickListener(v -> applyTheme(ThemeManager.Theme.FOREST_TECH));
 
         return view;
     }

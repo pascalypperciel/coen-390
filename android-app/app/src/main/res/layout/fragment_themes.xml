@@ -47,5 +47,32 @@
             android:textColor="@color/white"
             android:layout_marginBottom="12dp" />
 
+        <Button
+            android:id="@+id/themeModernCoastalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modern Coastal Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeSunriseBlushButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sunrise Blush Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/themeForestTechButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Forest Tech Theme"
+            android:backgroundTint="@color/button_colour"
+            android:textColor="@color/white"
+            android:layout_marginBottom="12dp" />
+
     </LinearLayout>
 </ScrollView>
