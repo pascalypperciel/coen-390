@@ -106,7 +106,9 @@ public class BluetoothFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-            bluetoothAdapter.cancelDiscovery();
+            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            }
         }
     }
 

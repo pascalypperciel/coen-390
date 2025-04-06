@@ -74,13 +74,19 @@
                     android:textColor="@android:color/white" />
 
                 <!-- Raw Data Table -->
-                <TableLayout
-                    android:id="@+id/rawDataTable"
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:stretchColumns="*"
-                    android:visibility="gone"
-                    android:layout_marginTop="12dp" />
+                    android:scrollbars="none"
+                    android:layout_marginTop="12dp">
+
+                    <TableLayout
+                        android:id="@+id/rawDataTable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*"
+                        android:visibility="gone" />
+                </HorizontalScrollView>
             </LinearLayout>
         </ScrollView>
     </com.google.android.material.card.MaterialCardView>
