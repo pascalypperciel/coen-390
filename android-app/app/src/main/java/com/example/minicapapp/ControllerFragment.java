@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -94,11 +95,20 @@ public class ControllerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
 
+        int textColor = ThemeManager.getTextColor(requireContext());
+        int buttonColor = ThemeManager.getButtonColor(requireContext());
+        int backgroundColor = ThemeManager.getBackgroundColor(requireContext());
+
+        view.setBackgroundColor(backgroundColor);
+
         mainContent = view.findViewById(R.id.mainContent);
         textViewConnectBluetoothMessage = view.findViewById(R.id.textViewConnectBluetoothMessage);
+        textViewConnectBluetoothMessage.setTextColor(textColor);
 
         // Define the Bluetooth Status button
         buttonBluetoothStatus = view.findViewById(R.id.buttonBluetoothStatus);
+        buttonBluetoothStatus.setBackgroundColor(buttonColor);
+        buttonBluetoothStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
         updateBluetoothStatusButton();
 
         buttonBluetoothStatus.setOnClickListener(v -> {
@@ -114,6 +124,9 @@ public class ControllerFragment extends Fragment {
 
         // Define and set the behaviour of the UI elements in ths fragment
         imageButtonHelpController = view.findViewById(R.id.imageButtonHelpController);
+        imageButtonHelpController.setBackgroundResource(R.drawable.circular_button_background);
+        imageButtonHelpController.setColorFilter(buttonColor);
+        imageButtonHelpController.getBackground().setTint(buttonColor);
         imageButtonHelpController.setOnClickListener(v -> {
             HelpFragment helpFragment = HelpFragment.newInstance("Controller");
             helpFragment.show(requireActivity().getSupportFragmentManager(), "HelpDialogue");
@@ -122,21 +135,22 @@ public class ControllerFragment extends Fragment {
         // Session Parameters
         // Session Name
         editTextSessionName = view.findViewById(R.id.editTextSessionName);
-        editTextSessionName.setTextColor(getResources().getColor(R.color.black, null));
+        editTextSessionName.setTextColor(textColor);
         // Initial Length of the Material Object
         editTextInitialLength = view.findViewById(R.id.editTextInitialLength);
-        editTextInitialLength.setTextColor(getResources().getColor(R.color.black, null));
+        editTextInitialLength.setTextColor(textColor);
         // Initial Cross-Sectional Area of the Material Object
         editTextInitialArea = view.findViewById(R.id.editTextInitialArea);
-        editTextInitialArea.setTextColor(getResources().getColor(R.color.black, null));
+        editTextInitialArea.setTextColor(textColor);
 
         // Motor Control Elements
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
         textViewMotorControls.setText(R.string.motor_controls);
+        textViewMotorControls.setTextColor(textColor);
 
         buttonMotorForward = view.findViewById(R.id.buttonMotorForward);
         buttonMotorForward.setText(R.string.move_forward);
-        buttonMotorForward.setBackgroundColor(getResources().getColor(R.color.button_colour));
+        buttonMotorForward.setBackgroundColor(buttonColor);
         buttonMotorForward.setEnabled(false);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -156,7 +170,7 @@ public class ControllerFragment extends Fragment {
 
         buttonMotorBackward = view.findViewById(R.id.buttonMotorBackward);
         buttonMotorBackward.setText(R.string.move_backward);
-        buttonMotorBackward.setBackgroundColor(getResources().getColor(R.color.button_colour));
+        buttonMotorBackward.setBackgroundColor(buttonColor);
         buttonMotorBackward.setEnabled(false);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -174,6 +188,7 @@ public class ControllerFragment extends Fragment {
         });
 
         buttonStartStop = view.findViewById(R.id.buttonStartStop);
+        buttonStartStop.setBackgroundColor(buttonColor);
 
         buttonStartStop.setOnClickListener(v -> {
             if (!isListening) { //Stop if Started
@@ -226,6 +241,10 @@ public class ControllerFragment extends Fragment {
         textViewDistance = view.findViewById(R.id.textDistanceValue);
         textViewPressure = view.findViewById(R.id.textPressureValue);
         textViewTemperature = view.findViewById(R.id.textTemperatureValue);
+
+        textViewDistance.setTextColor(textColor);
+        textViewPressure.setTextColor(textColor);
+        textViewTemperature.setTextColor(textColor);
 
         showSessionInputsIfConnected();
 

@@ -27,6 +27,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 
+import com.google.android.material.card.MaterialCardView;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -264,6 +266,10 @@ public class BluetoothFragment extends Fragment {
 
         buttonConnect.setBackgroundTintList(ColorStateList.valueOf(ThemeManager.getButtonColor(requireContext())));
         buttonConnect.setTextColor(ThemeManager.getTextColor(requireContext()));
+
+        MaterialCardView cardView = view.findViewById(R.id.cardViewBluetooth);
+        cardView.setStrokeColor(ThemeManager.getButtonColor(requireContext()));
+        cardView.setCardBackgroundColor(ThemeManager.getBackgroundColor(requireContext()));
 
         textViewConnectionStatus.setTextColor(ThemeManager.getTextColor(requireContext()));
 

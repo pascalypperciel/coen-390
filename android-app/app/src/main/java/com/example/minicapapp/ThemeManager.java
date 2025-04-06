@@ -29,7 +29,7 @@ public class ThemeManager {
     public static int getTextColor(Context context) {
         switch (getTheme(context)) {
             case DARK: return Color.WHITE;
-            case SUNSET: return Color.parseColor("#4B2E39");
+            case SUNSET: return Color.parseColor("#FF10F0");
             default: return Color.parseColor("#2B313B"); // DEFAULT
         }
     }
@@ -37,7 +37,7 @@ public class ThemeManager {
     public static int getButtonColor(Context context) {
         switch (getTheme(context)) {
             case DARK: return Color.parseColor("#6666FF");
-            case SUNSET: return Color.parseColor("#FF7E57");
+            case SUNSET: return Color.parseColor("#FF10F0");
             default: return Color.parseColor("#F39B53"); // DEFAULT
         }
     }
@@ -45,7 +45,7 @@ public class ThemeManager {
     public static int getNavbarColor(Context context) {
         switch (getTheme(context)) {
             case DARK: return Color.parseColor("#333333");
-            case SUNSET: return Color.parseColor("#AB3E5B");
+            case SUNSET: return Color.parseColor("#FF10F0");
             default: return Color.parseColor("#157A5D"); // DEFAULT
         }
     }
@@ -53,7 +53,7 @@ public class ThemeManager {
     public static int getBackgroundColor(Context context) {
         switch (getTheme(context)) {
             case DARK: return Color.parseColor("#121212");
-            case SUNSET: return Color.parseColor("#FFF3E0");
+            case SUNSET: return Color.parseColor("#FF10F0");
             default: return Color.parseColor("#DCF9F1"); // DEFAULT
         }
     }
