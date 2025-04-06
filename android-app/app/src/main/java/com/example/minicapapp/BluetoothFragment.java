@@ -224,7 +224,7 @@ public class BluetoothFragment extends Fragment {
         buttonConnectMac.setBackgroundTintList(ColorStateList.valueOf(ThemeManager.getButtonColor(requireContext())));
         buttonConnectMac.setTextColor(ThemeManager.getTextColor(requireContext()));
 
-        if (Build.VERSION.SDK_INT < 36) {
+        if (Build.VERSION.SDK_INT < 31) {
             buttonScan.setVisibility(View.GONE);
             cardViewBluetooth.setVisibility(View.GONE);
             macAddressLayout.setVisibility(View.VISIBLE);
