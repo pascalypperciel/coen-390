@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Base64;
 import android.util.Log;
@@ -46,6 +48,7 @@ public class SessionDetailsFragment extends Fragment {
     private TableLayout tableLayout;
     private ProgressBar progressBar;
     private Button toggleTableButton;
+    private Button backButton;
 
     private boolean isTableVisible = false;
 
@@ -77,6 +80,24 @@ public class SessionDetailsFragment extends Fragment {
         MaterialCardView graphCard = view.findViewById(R.id.graphCard);
         graphCard.setCardBackgroundColor(backgroundColor);
         graphCard.setStrokeColor(buttonColor);
+
+        backButton = view.findViewById(R.id.backButton);
+        backButton.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
+        backButton.setTextColor(textColor);
+        backButton.setOnClickListener(v -> {
+            if (isAdded()) {  // Ensure the fragment is still attached
+                // Create an instance of the RecordedDataFragment
+                RecordedDataFragment recordedDataFragment = new RecordedDataFragment();
+
+                // Replace the current fragment with RecordedDataFragment
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.frameLayoutActivityContent, recordedDataFragment); // Replace with your container ID
+                transaction.addToBackStack(null); // Optional: Add to back stack to allow back navigation
+                transaction.commit();
+            } else {
+                Log.w("SessionDetailsFragment", "Fragment is not attached. Button click ignored.");
+            }
+        });
 
         tableLayout = view.findViewById(R.id.rawDataTable);
         progressBar = view.findViewById(R.id.graphLoadingSpinner);
