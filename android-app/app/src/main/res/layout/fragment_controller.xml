@@ -95,8 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                android:theme="@style/Theme.FragmentCard">
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -106,12 +105,12 @@
                     android:background="@drawable/cardview_border_button_colored">
 
                     <TextView
+                        android:id="@+id/textViewSession"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Session"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
                         android:layout_marginBottom="8dp"
                         android:background="@android:color/transparent" />
 
@@ -177,6 +176,7 @@
                         android:layout_width="match_parent">
 
                         <TextView
+                            android:id="@+id/textViewDistanceTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Distance"
@@ -204,6 +204,7 @@
                         android:layout_width="match_parent">
 
                         <TextView
+                            android:id="@+id/textViewPressureTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Pressure"
@@ -231,6 +232,7 @@
                         android:layout_width="match_parent">
 
                         <TextView
+                            android:id="@+id/textViewTemperatureTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Temperature"
@@ -282,8 +284,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:background="@color/white">
+                        android:orientation="horizontal">
 
                         <Button
                             android:id="@+id/buttonMotorForward"

@@ -48,8 +48,7 @@
                 android:layout_weight="1"
                 android:text="Not Connected"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+                android:textStyle="bold"/>
         </LinearLayout>
 
         <Button
@@ -58,7 +57,6 @@
             android:layout_height="wrap_content"
             android:text="Scan Devices"
             android:backgroundTint="@color/button_colour"
-            android:textColor="@android:color/white"
             android:layout_marginBottom="12dp" />
 
         <com.google.android.material.card.MaterialCardView
@@ -88,7 +86,6 @@
             android:layout_height="wrap_content"
             android:text="Connect/Disconnect"
             android:backgroundTint="@color/button_colour"
-            android:textColor="@android:color/white"
             android:layout_marginTop="12dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

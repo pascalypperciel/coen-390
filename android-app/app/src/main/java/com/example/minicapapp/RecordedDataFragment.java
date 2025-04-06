@@ -116,6 +116,7 @@ public class RecordedDataFragment extends Fragment {
         // Spinner
         // Define the spinner logic
         spinnerDataFilter = view.findViewById(R.id.spinnerDataFilter);
+        spinnerDataFilter.setBackgroundColor(buttonColor);
         spinnerDataFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

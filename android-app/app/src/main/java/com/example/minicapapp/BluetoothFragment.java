@@ -171,7 +171,20 @@ public class BluetoothFragment extends Fragment {
             imageViewBluetoothStatus.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
         }
 
-        deviceListAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_single_choice);
+        deviceListAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_single_choice) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+
+                TextView text = view.findViewById(android.R.id.text1);
+                if (text != null) {
+                    text.setTextColor(ThemeManager.getTextColor(requireContext()));
+                }
+
+                return view;
+            }
+        };
         listViewDevices.setAdapter(deviceListAdapter);
         listViewDevices.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
@@ -209,7 +222,7 @@ public class BluetoothFragment extends Fragment {
         listViewDevices.setOnItemClickListener((parent, view1, position, id) -> {
             BluetoothDevice selectedDevice = discoveredDevices.get(position);
             btManager.setSelectedDevice(selectedDevice);
-            textViewConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
+            textViewConnectionStatus.setTextColor(ThemeManager.getTextColor(requireContext()));
             textViewConnectionStatus.setText(getString(R.string.selected) + selectedDevice.getName());
             buttonConnect.setEnabled(true);
         });

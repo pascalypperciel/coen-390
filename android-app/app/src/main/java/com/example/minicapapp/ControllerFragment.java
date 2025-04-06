@@ -51,7 +51,7 @@ public class ControllerFragment extends Fragment {
         public float initialArea;
     }
     // Internal Attributes
-    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature, textViewConnectBluetoothMessage;
+    protected TextView textViewMotorControls, textViewDistance, textViewPressure, textViewTemperature, textViewConnectBluetoothMessage, textViewSession, textViewDistanceTitle, textViewPressureTitle, textViewTemperatureTitle;
     private LinearLayout mainContent;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
     protected Button buttonMotorForward, buttonMotorBackward, buttonStartStop, buttonBluetoothStatus;
@@ -108,7 +108,7 @@ public class ControllerFragment extends Fragment {
         // Define the Bluetooth Status button
         buttonBluetoothStatus = view.findViewById(R.id.buttonBluetoothStatus);
         buttonBluetoothStatus.setBackgroundColor(buttonColor);
-        buttonBluetoothStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
+        buttonBluetoothStatus.setTextColor(textColor);
         updateBluetoothStatusButton();
 
         buttonBluetoothStatus.setOnClickListener(v -> {
@@ -133,17 +133,30 @@ public class ControllerFragment extends Fragment {
         });
 
         // Session Parameters
+        // Session Container
+        CardView cardViewSession = view.findViewById(R.id.sessionCard);
+        cardViewSession.setCardBackgroundColor(backgroundColor);
+        // Session Title
+        textViewSession = view.findViewById(R.id.textViewSession);
+        textViewSession.setTextColor(textColor);
+        textViewSession.setHintTextColor(textColor);
         // Session Name
         editTextSessionName = view.findViewById(R.id.editTextSessionName);
         editTextSessionName.setTextColor(textColor);
+        editTextSessionName.setHintTextColor(textColor);
         // Initial Length of the Material Object
         editTextInitialLength = view.findViewById(R.id.editTextInitialLength);
         editTextInitialLength.setTextColor(textColor);
+        editTextInitialLength.setHintTextColor(textColor);
         // Initial Cross-Sectional Area of the Material Object
         editTextInitialArea = view.findViewById(R.id.editTextInitialArea);
         editTextInitialArea.setTextColor(textColor);
+        editTextInitialArea.setHintTextColor(textColor);
 
         // Motor Control Elements
+        CardView cardViewController = view.findViewById(R.id.controllerCard);
+        cardViewController.setCardBackgroundColor(backgroundColor);
+
         textViewMotorControls = view.findViewById(R.id.textViewMotorControls);
         textViewMotorControls.setText(R.string.motor_controls);
         textViewMotorControls.setTextColor(textColor);
@@ -245,6 +258,15 @@ public class ControllerFragment extends Fragment {
         textViewDistance.setTextColor(textColor);
         textViewPressure.setTextColor(textColor);
         textViewTemperature.setTextColor(textColor);
+
+
+        textViewDistanceTitle = view.findViewById(R.id.textViewDistanceTitle);
+        textViewPressureTitle = view.findViewById(R.id.textViewPressureTitle);
+        textViewTemperatureTitle = view.findViewById(R.id.textViewTemperatureTitle);
+
+        textViewDistanceTitle.setTextColor(textColor);
+        textViewPressureTitle.setTextColor(textColor);
+        textViewTemperatureTitle.setTextColor(textColor);
 
         showSessionInputsIfConnected();
 

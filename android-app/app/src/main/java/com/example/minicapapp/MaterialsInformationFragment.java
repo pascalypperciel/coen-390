@@ -48,10 +48,10 @@ public class MaterialsInformationFragment extends Fragment {
         webViewMaterialsInformationPage.loadUrl("file:///android_asset/info-page.html");
 
         int backgroundColor = ThemeManager.getBackgroundColor(requireContext());
-        int textColor = ThemeManager.getTextColor(requireContext());
+        int buttonColor = ThemeManager.getButtonColor(requireContext());
 
         view.setBackgroundColor(backgroundColor);
-        imageButtonHelpMaterialsInformation.setColorFilter(textColor);
+        imageButtonHelpMaterialsInformation.setColorFilter(buttonColor);
 
         MaterialCardView card = view.findViewById(R.id.webViewCard);
         card.setStrokeColor(ThemeManager.getButtonColor(requireContext()));

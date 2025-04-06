@@ -33,10 +33,13 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
         private TextView textViewRecordedDataLisItemTimestamp;
         private ImageButton  imageButtonMoreDetails;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
             textViewRecordedDataListItemName = itemView.findViewById(R.id.textViewListItemName);
+            int textColor = ThemeManager.getTextColor(context);
+            textViewRecordedDataListItemName.setTextColor(textColor);
             textViewRecordedDataLisItemTimestamp = itemView.findViewById(R.id.textViewListItemTimestamp);
+            textViewRecordedDataLisItemTimestamp.setTextColor(textColor);
             imageButtonMoreDetails = itemView.findViewById(R.id.imageButtonMoreDetails);
         }
 
@@ -63,7 +66,7 @@ public class RecordedDataRecyclerViewAdapter extends RecyclerView.Adapter<Record
     @Override
     public RecordedDataRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, parent.getContext());
     }
 
     // This method will bind the Recorded Data List item to its holder.
