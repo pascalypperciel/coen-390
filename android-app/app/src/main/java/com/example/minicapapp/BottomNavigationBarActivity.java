@@ -88,6 +88,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
     private void setAppTheme() {
         int backgroundColor = ThemeManager.getBackgroundColor(this);
         int navbarColor = ThemeManager.getNavbarColor(this);
+        int textColor = ThemeManager.getTextColor(this);
+        int buttonColor = ThemeManager.getButtonColor(this);
 
         getWindow().getDecorView().setBackgroundColor(backgroundColor);
 
@@ -98,8 +100,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
 
         if (bottomNavigationViewPersistentNavbar != null) {
             bottomNavigationViewPersistentNavbar.setBackgroundColor(navbarColor);
-            bottomNavigationViewPersistentNavbar.setItemIconTintList(ColorStateList.valueOf(ThemeManager.getTextColor(this)));
-            bottomNavigationViewPersistentNavbar.setItemTextColor(ColorStateList.valueOf(ThemeManager.getTextColor(this)));
+            bottomNavigationViewPersistentNavbar.setItemIconTintList(ColorStateList.valueOf(textColor));
+            bottomNavigationViewPersistentNavbar.setItemTextColor(ColorStateList.valueOf(textColor));
+            bottomNavigationViewPersistentNavbar.setItemActiveIndicatorColor(ColorStateList.valueOf(buttonColor));
         }
     }
 
