@@ -128,9 +128,26 @@ public class SessionDetailsFragment extends Fragment {
 
                 JSONArray graphArray = jsonResponse.getJSONArray("Graph");
 
+                String[] graphTitles = {
+                        "Engineering Stress vs Strain",
+                        "True Stress vs True Strain",
+                        "Displacement vs Force",
+                        "Load vs Time",
+                        "Displacement vs Time"
+                };
+
                 requireActivity().runOnUiThread(() -> {
                     for (int i = 0; i < graphArray.length(); i++) {
                         try {
+                            TextView graphTitle = new TextView(requireContext());
+                            graphTitle.setText(graphTitles[i]);
+                            graphTitle.setTextSize(18);
+                            graphTitle.setTextColor(getResources().getColor(R.color.black));
+                            graphTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+                            graphTitle.setPadding(0, 24, 0, 8);
+                            graphTitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                            graphContainer.addView(graphTitle);
+
                             String base64 = graphArray.getString(i);
                             byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
                             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -138,7 +155,7 @@ public class SessionDetailsFragment extends Fragment {
                             imageView.setImageBitmap(bitmap);
                             imageView.setAdjustViewBounds(true);
                             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                            imageView.setPadding(0, 32, 0, 32);
+                            imageView.setPadding(0, 0, 0, 32);
                             graphContainer.addView(imageView);
                         } catch (Exception e) {
                             e.printStackTrace();
