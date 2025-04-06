@@ -47,16 +47,17 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
-            
+
             <ImageView
-                android:id="@+id/imageViewLogoController"
+                android:id="@+id/imageViewLogoBluetooth"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@drawable/cattesterlogo"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"
+                android:contentDescription="CAT Tester Logo" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
