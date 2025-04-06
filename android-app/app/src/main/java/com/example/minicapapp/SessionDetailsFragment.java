@@ -23,6 +23,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Button;
 
+import android.content.res.ColorStateList;
+
+import com.google.android.material.card.MaterialCardView;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,6 +52,8 @@ public class SessionDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    private int buttonColor, backgroundColor, textColor;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,10 +66,22 @@ public class SessionDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_session_details, container, false);
 
+        buttonColor = ThemeManager.getButtonColor(requireContext());
+        backgroundColor = ThemeManager.getBackgroundColor(requireContext());
+        textColor = ThemeManager.getTextColor(requireContext());
+        
+        view.setBackgroundColor(backgroundColor);
+
         graphContainer = view.findViewById(R.id.graphContainer);
+        MaterialCardView graphCard = view.findViewById(R.id.graphCard);
+        graphCard.setCardBackgroundColor(backgroundColor);
+        graphCard.setStrokeColor(buttonColor);
+
         tableLayout = view.findViewById(R.id.rawDataTable);
         progressBar = view.findViewById(R.id.graphLoadingSpinner);
         toggleTableButton = view.findViewById(R.id.toggleTableButton);
+        toggleTableButton.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
+        toggleTableButton.setTextColor(textColor);
 
         toggleTableButton.setOnClickListener(v -> {
             isTableVisible = !isTableVisible;
@@ -117,7 +135,7 @@ public class SessionDetailsFragment extends Fragment {
                         progressBar.setVisibility(View.GONE);
                         TextView errorText = new TextView(requireContext());
                         errorText.setText("Error: " + errorMessage);
-                        errorText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                        errorText.setTextColor(textColor);
                         errorText.setPadding(32, 64, 32, 32);
                         errorText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                         errorText.setTextSize(16);
@@ -141,6 +159,7 @@ public class SessionDetailsFragment extends Fragment {
                         try {
                             TextView graphTitle = new TextView(requireContext());
                             graphTitle.setText(graphTitles[i]);
+                            graphTitle.setTextColor(textColor);
                             graphTitle.setTextSize(18);
                             graphTitle.setTextColor(getResources().getColor(R.color.black));
                             graphTitle.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -245,6 +264,7 @@ public class SessionDetailsFragment extends Fragment {
     private void addCellToRow(TableRow row, String text) {
         TextView cell = new TextView(requireContext());
         cell.setText(text);
+        cell.setTextColor(ThemeManager.getTextColor(requireContext()));
         cell.setPadding(16, 8, 16, 8);
         row.addView(cell);
     }
