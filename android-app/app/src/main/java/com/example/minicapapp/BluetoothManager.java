@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -51,13 +52,13 @@ public class BluetoothManager {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "Bluetooth permission not granted", Toast.LENGTH_SHORT).show();
             Log.e("BluetoothManager", "Missing BLUETOOTH_CONNECT permission");
-            return;
+            return false;
         }}
         else
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "Bluetooth permission not granted but for mac address version", Toast.LENGTH_SHORT).show();
             Log.e("BluetoothManager", "Missing BLUETOOTH_CONNECT permission");
-            return;
+            return false;
         }
 
         try {
