@@ -1,5 +1,7 @@
 package com.example.minicapapp;
 
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -53,12 +55,25 @@ public class RecordedDataFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_recorded_data, container, false);
 
+        // Theme
+        int backgroundColor = ThemeManager.getBackgroundColor(requireContext());
+        int textColor = ThemeManager.getTextColor(requireContext());
+        int buttonColor = ThemeManager.getButtonColor(requireContext());
+
+        view.setBackgroundColor(backgroundColor);
+
+        TextView sortLabel = view.findViewById(R.id.textViewSortLabel);
+        sortLabel.setTextColor(textColor);
+
         // Define and set the behaviour of the UI elements in ths fragment
         // Logo
         imageViewLogo = view.findViewById(R.id.imageViewLogo);
+        imageViewLogo.setBackgroundColor(backgroundColor);
 
         // Help Button
         imageButtonHelpRecordedData = view.findViewById(R.id.imageButtonHelpRecordedData);
+        imageButtonHelpRecordedData.setColorFilter(buttonColor);
+        imageButtonHelpRecordedData.getBackground().setTint(buttonColor);
         imageButtonHelpRecordedData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +93,7 @@ public class RecordedDataFragment extends Fragment {
 
             // Define and initialize the RecyclerView.
             recyclerViewRecordedData = view.findViewById(R.id.recyclerViewRecordedData);
+            recyclerViewRecordedData.setBackgroundColor(backgroundColor);
             recyclerViewRecordedData.setLayoutManager(linearLayoutManager);
             recyclerViewRecordedData.setAdapter(recordedDataRecyclerViewAdapter);
 
@@ -89,6 +105,9 @@ public class RecordedDataFragment extends Fragment {
         // Spinner
         // Define the spinner logic
         spinnerDataFilter = view.findViewById(R.id.spinnerDataFilter);
+        GradientDrawable spinnerBackground = (GradientDrawable) spinnerDataFilter.getBackground();
+        spinnerBackground.setStroke(2, ThemeManager.getButtonColor(requireContext()));
+        spinnerDataFilter.setPopupBackgroundDrawable(new ColorDrawable(backgroundColor));
         spinnerDataFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
