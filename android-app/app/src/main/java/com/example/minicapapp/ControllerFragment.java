@@ -225,7 +225,7 @@ public class ControllerFragment extends Fragment {
                 }
 
             } else { //Start if Stopped
-                stopSessionRecording();
+                stopSessionRecording("Stop button pushed");
             }
         });
 
@@ -252,12 +252,14 @@ public class ControllerFragment extends Fragment {
         return view;
     }
 
-    private void stopSessionRecording() {
+    private void stopSessionRecording(String reason) {
         if (isListening) {
             isListening = false;
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(requireContext(), "Test stopped: " + reason, Toast.LENGTH_LONG).show();
+
                     buttonStartStop.setText(R.string.start_new_session);
 
                     // Re-enable the session input fields
@@ -471,13 +473,7 @@ public class ControllerFragment extends Fragment {
             if ((distance < minDistanceRange) && !testFinished) {
                 testFinished = true;
 
-                if(isAdded()) {
-                    requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Test stopped: Minimum distance reached", Toast.LENGTH_LONG).show()
-                    );
-                }
-
-                stopSessionRecording();
+                stopSessionRecording("Minimum distance reached");
             }
         } catch (NumberFormatException e) {
             Log.e("BT", "Error parsing distance: " + e.getMessage());
@@ -528,13 +524,7 @@ public class ControllerFragment extends Fragment {
 
         // Check if differences exceed thresholds
         if (distanceDifference > maxDistanceRange || pressureDifference > maxPressureRange) {
-            if(isAdded()) {
-                requireActivity().runOnUiThread(() ->
-                    Toast.makeText(requireContext(), "Test stopped: Data variation too large", Toast.LENGTH_LONG).show()
-                );
-            }
-
-            stopSessionRecording();
+            stopSessionRecording("Data variation too large");
         }
     }
     private void monitorYoungModulus() {
@@ -570,13 +560,7 @@ public class ControllerFragment extends Fragment {
         // Calculate the percentage difference
         double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
         if (percDiff > youngModulusThreshold) {
-            if(isAdded()) {
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Test stopped: Young Modulus threshold reached", Toast.LENGTH_LONG).show()
-                );
-            }
-
-            stopSessionRecording();
+            stopSessionRecording("Young Modulus threshold reached");
         }
     }
     private double calculateYoungModulus(List<ControllerFragment.Record> records) {
@@ -752,12 +736,7 @@ public class ControllerFragment extends Fragment {
 
     @Override
     public void onPause() {
-        if(isAdded()) {
-            requireActivity().runOnUiThread(() ->
-                    Toast.makeText(requireContext(), "Test stopped: Fragment was left", Toast.LENGTH_LONG).show()
-            );
-        }
-        stopSessionRecording();
+        stopSessionRecording("Fragment was left");
         super.onPause();
     }
 }
