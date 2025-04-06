@@ -60,20 +60,34 @@ public class ThresholdsFragment extends Fragment {
         buttonSave.setTextColor(textColor);
         buttonSave.setOnClickListener(v -> {
             try {
-                float maxPressure = Float.parseFloat(inputMaxPressure.getText().toString());
-                float maxDistance = Float.parseFloat(inputMaxDistance.getText().toString());
-                float minDistance = Float.parseFloat(inputMinDistance.getText().toString());
-                double youngModulus = Double.parseDouble(inputYoungModulus.getText().toString());
+                String maxPressureStr = inputMaxPressure.getText().toString().trim();
+                String maxDistanceStr = inputMaxDistance.getText().toString().trim();
+                String minDistanceStr = inputMinDistance.getText().toString().trim();
+                String youngModulusStr = inputYoungModulus.getText().toString().trim();
+
+                // Validate all fields
+                if (maxPressureStr.isEmpty() || maxDistanceStr.isEmpty() || minDistanceStr.isEmpty() || youngModulusStr.isEmpty()) {
+                    throw new NumberFormatException("Empty field");
+                }
+
+                float maxPressure = Float.parseFloat(maxPressureStr);
+                float maxDistance = Float.parseFloat(maxDistanceStr);
+                float minDistance = Float.parseFloat(minDistanceStr);
+                double youngModulus = Double.parseDouble(youngModulusStr);
 
                 ThresholdsManager.setThresholds(requireContext(), maxPressure, maxDistance, minDistance, youngModulus);
 
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Thresholds successfully set", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Thresholds successfully set", Toast.LENGTH_SHORT).show()
                     );
                 }
-            } catch (NumberFormatException ignored) {
-                //ignore
+            } catch (NumberFormatException e) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(requireContext(), "Thresholds not saved: Please enter valid values in all fields", Toast.LENGTH_LONG).show()
+                    );
+                }
             }
         });
 

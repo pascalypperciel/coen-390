@@ -65,8 +65,7 @@
                     android:id="@+id/editTextMaxPressure"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:hint="1000.0" />
+                    android:inputType="numberDecimal" />
 
                 <TextView
                     android:text="Max Distance Range (cm)"
@@ -80,8 +79,7 @@
                     android:id="@+id/editTextMaxDistance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:hint="15.0" />
+                    android:inputType="numberDecimal" />
 
                 <TextView
                     android:text="Min Distance Range (cm)"
@@ -95,8 +93,7 @@
                     android:id="@+id/editTextMinDistance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:hint="0.0" />
+                    android:inputType="numberDecimal" />
 
                 <TextView
                     android:text="Young Modulus % Threshold"
@@ -110,8 +107,7 @@
                     android:id="@+id/editTextYoungModulus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:hint="1000.0" />
+                    android:inputType="numberDecimal" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
