@@ -39,7 +39,7 @@ public class MaterialsInformationFragment extends Fragment {
         // Help Button
         imageButtonHelpMaterialsInformation = view.findViewById(R.id.imageButtonHelpMaterialsInformation);
         imageButtonHelpMaterialsInformation.setOnClickListener(v -> {
-            HelpFragment helpFragment = new HelpFragment();
+            HelpFragment helpFragment = HelpFragment.newInstance("MaterialsInformation");
             helpFragment.show(requireActivity().getSupportFragmentManager(), "HelpDialogue");
         });
 

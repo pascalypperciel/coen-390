@@ -53,13 +53,38 @@ public class HelpFragment extends DialogFragment {
         // Set the help text dynamically based on the page key
         switch (pageKey) {
             case "Controller":
-                helpTextView.setText("This page contains controls for the CAT Strength Tester. Use the buttons to control the motor and start/stop recording data.");
+                helpTextView.setText("This page contains controls for the CAT Strength Tester.\n" +
+                        "\nFirst, use the button on the top left to connect your device via Bluetooth.\n" +
+                        "\nThen, populate the fields with your test's name and the dimensions of your test sample." +
+                        "Make sure you remember the test name; You'll need it later!\n" +
+                        "\nOnce the test is started, you can let the device do its thing. " +
+                        "In the event of an error, use the buttons to control the motor or to stop the test manually.\n" +
+                        "\nWARNING: This device can apply a great deal of force onto the test sample. " +
+                        "Please keep away from the device while a test is in progress.\n\n\n" +
+                        "Thank you!");
                 break;
             case "RecordedData":
-                helpTextView.setText("This page displays all recorded data from the CAT Strength Tester. Use the settings to customize the display.");
+                helpTextView.setText("This page displays all recorded data from the CAT Strength Tester. \n\n" +
+                        "To find your test, select the session name from the list on this page. " +
+                        "Once selected, you will have access to all the data from the test " +
+                        "as well as graphs demonstrating the testing process.\n\n" +
+                        "We have prepared five graphs to describe the test outcome:\n\n" +
+                        "Engineering Stress/Strain Curve: Using the industry-standard offset test, the reaction" +
+                        "of the test sample under load. We find the yield point, which is where the material begins to" +
+                        "permanently deform.\n\n" +
+                        "True Stress/Strain Curve: This is instantaneous change instead of change relative to initial" +
+                        "parameters. Measuring the same thing two different ways.\n\n" +
+                        "Displacement vs. Force: Shows the amount that the sample is 'squished' as it undergoes load.\n\n" +
+                        "Load vs. Time: Shows the rate of motor loading onto the sample. " +
+                        "Should be linear or nearly linear until yield.\n\n" +
+                        "Displacement vs Time: The rate at which the object is compressed. Too fast? Let us know!\n\n\n" +
+                        "Thank you!");
                 break;
             case "Settings":
                 helpTextView.setText("This page allows you to configure the app settings, including data display preferences.");
+                break;
+            case "MaterialsInformation":
+                helpTextView.setText("ooga booga");
                 break;
             default:
                 helpTextView.setText("This is the help page. Use this section to understand the functionality of the app.");

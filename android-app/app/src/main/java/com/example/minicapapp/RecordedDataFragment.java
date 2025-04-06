@@ -47,6 +47,7 @@ public class RecordedDataFragment extends Fragment {
 
 
 
+
     public RecordedDataFragment() {
         // Required empty public constructor
     }
@@ -88,7 +89,7 @@ public class RecordedDataFragment extends Fragment {
         imageButtonHelpRecordedData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HelpFragment helpFragment = new HelpFragment();
+                HelpFragment helpFragment = HelpFragment.newInstance("RecordedData");
                 helpFragment.show(getActivity().getSupportFragmentManager(), "HelpDialogue");
             }
         });
