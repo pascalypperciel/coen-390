@@ -7,6 +7,17 @@
     android:layout_height="match_parent"
     android:background="@color/background_colour">
 
+    <ImageView
+        android:id="@+id/imageViewLogoBluetooth"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/cattesterlogo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:contentDescription="CAT Tester Logo" />
+
     <!-- Settings Title -->
     <TextView
         android:id="@+id/settingsTitle"
@@ -17,8 +28,7 @@
         android:textStyle="bold"
         android:textColor="?android:attr/textColorPrimary"
         android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/imageViewLogoBluetooth" />
 
     <!-- Card-style container -->
     <androidx.cardview.widget.CardView
