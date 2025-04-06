@@ -28,7 +28,7 @@ def batch_process_records():
                 parsed_timestamp = datetime.fromisoformat(record["Timestamp"])
                 timestamp_str = parsed_timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3] 
                 
-                valid = bool(record["Valid"])
+                valid = record["Valid"].lower() == "true"
             except (ValueError, TypeError) as e:
                 return jsonify({"error": f"Invalid data type in record: {str(e)}"}), 400
 
