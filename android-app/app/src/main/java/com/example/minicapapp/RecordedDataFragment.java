@@ -4,6 +4,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -62,6 +63,16 @@ public class RecordedDataFragment extends Fragment {
 
         view.setBackgroundColor(backgroundColor);
 
+        CardView unifiedBorderCard = view.findViewById(R.id.unifiedBorderCard);
+        GradientDrawable borderDrawable = new GradientDrawable();
+        borderDrawable.setColor(backgroundColor);
+        borderDrawable.setCornerRadius(24);
+        borderDrawable.setStroke(4, buttonColor);
+        unifiedBorderCard.setBackground(borderDrawable);
+
+        View divider = view.findViewById(R.id.dividerBetweenSpinnerAndList);
+        divider.setBackgroundColor(ThemeManager.getButtonColor(requireContext()));
+
         TextView sortLabel = view.findViewById(R.id.textViewSortLabel);
         sortLabel.setTextColor(textColor);
 
@@ -105,9 +116,6 @@ public class RecordedDataFragment extends Fragment {
         // Spinner
         // Define the spinner logic
         spinnerDataFilter = view.findViewById(R.id.spinnerDataFilter);
-        GradientDrawable spinnerBackground = (GradientDrawable) spinnerDataFilter.getBackground();
-        spinnerBackground.setStroke(2, ThemeManager.getButtonColor(requireContext()));
-        spinnerDataFilter.setPopupBackgroundDrawable(new ColorDrawable(backgroundColor));
         spinnerDataFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

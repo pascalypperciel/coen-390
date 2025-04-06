@@ -22,11 +22,11 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/cattesterlogo"
+            android:layout_marginTop="8dp"
+            android:contentDescription="CAT Tester Logo"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"
-            android:contentDescription="CAT Tester Logo" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageButton
             android:id="@+id/imageButtonHelpRecordedData"
@@ -43,48 +43,57 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Summary & Filter -->
-    <TextView
-        android:id="@+id/textViewSortLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Select a sorting option:"
-        android:textColor="@color/text_colour"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/constraintLayout2"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="16dp" />
-
-    <Spinner
-        android:id="@+id/spinnerDataFilter"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:background="@drawable/spinner_background"
-        android:popupBackground="@android:color/white"
-        android:spinnerMode="dropdown"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/textViewSortLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewRecordedData"
-        android:layout_width="match_parent"
+    <!-- Unified CardView Border Container -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/unifiedBorderCard"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="4dp"
-        android:clipToPadding="false"
-        android:background="@drawable/recyclerview_border_highlight"
-        app:layout_constraintTop_toBottomOf="@id/spinnerDataFilter"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@id/constraintLayout2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <LinearLayout
+            android:id="@+id/borderContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/textViewSortLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select a sorting option:"
+                android:textColor="@color/text_colour"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerDataFilter"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:gravity="center_vertical" />
+
+            <View
+                android:id="@+id/dividerBetweenSpinnerAndList"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/button_colour" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewRecordedData"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
