@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Base64;
@@ -264,7 +265,8 @@ public class SessionDetailsFragment extends Fragment {
     private void addCellToRow(TableRow row, String text) {
         TextView cell = new TextView(requireContext());
         cell.setText(text);
-        cell.setTextColor(ThemeManager.getTextColor(requireContext()));
+        //cell.setTextColor(ThemeManager.getTextColor(requireContext()));
+        cell.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
         cell.setPadding(16, 8, 16, 8);
         row.addView(cell);
     }
