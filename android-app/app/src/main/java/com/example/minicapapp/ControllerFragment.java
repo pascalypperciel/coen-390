@@ -458,14 +458,14 @@ public class ControllerFragment extends Fragment {
     }
 
     private void displayRecord(Record newMessage) {
+        if (!isListening || !isAdded()) return;
+
         // Update the UI on the main thread
-        if (isAdded()) {
-            requireActivity().runOnUiThread(() -> {
-                textViewDistance.setText(newMessage.distance + " cm");
-                textViewPressure.setText(newMessage.pressure + " kg");
-                textViewTemperature.setText(newMessage.temperature + "°C");
-            });
-        }
+        requireActivity().runOnUiThread(() -> {
+            textViewDistance.setText(newMessage.distance + " cm");
+            textViewPressure.setText(newMessage.pressure + " kg");
+            textViewTemperature.setText(newMessage.temperature + "°C");
+        });
 
         // Stop if the sensor detects "too close" or "too far"
         try {
