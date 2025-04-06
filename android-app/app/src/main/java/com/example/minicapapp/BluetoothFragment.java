@@ -12,8 +12,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
 
@@ -139,8 +137,6 @@ public class BluetoothFragment extends Fragment {
         Button buttonScan = view.findViewById(R.id.buttonScan);
         Button buttonConnect = view.findViewById(R.id.buttonConnect);
 
-        EditText editTextMacAddress = view.findViewById(R.id.editTextMacAddress);
-
         BluetoothManager btManager = BluetoothManager.getInstance();
 
         if (btManager.isConnected()) {
@@ -202,31 +198,9 @@ public class BluetoothFragment extends Fragment {
         });
 
         if (Build.VERSION.SDK_INT >= 31) {
-            editTextMacAddress.setVisibility(View.GONE);
         } else {
-            editTextMacAddress.setVisibility(View.VISIBLE);
             buttonScan.setVisibility(View.GONE);
             listViewDevices.setVisibility(View.GONE);
-
-            editTextMacAddress.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    String input = s.toString().trim();
-                    if (!input.isEmpty() && input.matches("([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}")) {
-                        buttonConnect.setEnabled(true);
-                        listViewDevices.clearChoices();
-                        btManager.setSelectedDevice(null);
-                    } else {
-                        buttonConnect.setEnabled(false);
-                    }
-                }
-            });
         }
 
         listViewDevices.setOnItemClickListener((parent, view1, position, id) -> {
@@ -241,14 +215,6 @@ public class BluetoothFragment extends Fragment {
             if (!btManager.isConnected()) {
                 buttonConnect.setText("Connecting");
                 buttonConnect.setEnabled(false);
-
-                if (editTextMacAddress.getVisibility() == View.VISIBLE) {
-                    String mac = editTextMacAddress.getText().toString().trim().toUpperCase();
-                    if (!mac.isEmpty()) {
-                        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(mac);
-                        btManager.setSelectedDevice(device);
-                    }
-                }
 
                 buttonConnect.post(() -> {
                     btManager.connect(requireContext());
