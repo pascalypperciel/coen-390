@@ -37,10 +37,8 @@ import java.util.List;
 
 public class ControllerFragment extends Fragment {
     //Values to tweak
-    private final float THRESHOLD_MAX_PRESSURE_RANGE = 1000.0f;
-    private final float THRESHOLD_MAX_DISTANCE_RANGE = 15.0f;
-    private final float THRESHOLD_MIN_DISTANCE_RANGE = 0.0f;
-    private final double THRESHOLD_PERCENTAGE_DIFF_YOUNG_MODULUS = 1000.0f;
+    float maxPressureRange, maxDistanceRange, minDistanceRange;
+    double youngModulusThreshold;
 
     public static class Record {
         public String distance;
@@ -99,6 +97,11 @@ public class ControllerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
+
+        maxPressureRange = ThresholdsManager.getMaxPressure(requireContext());
+        maxDistanceRange = ThresholdsManager.getMaxDistance(requireContext());
+        minDistanceRange = ThresholdsManager.getMinDistance(requireContext());
+        youngModulusThreshold = ThresholdsManager.getYoungModulus(requireContext());
 
         int textColor = ThemeManager.getTextColor(requireContext());
         int buttonColor = ThemeManager.getButtonColor(requireContext());
@@ -466,7 +469,7 @@ public class ControllerFragment extends Fragment {
         // Stop if the sensor detects "too close" or "too far"
         try {
             float distance = Float.parseFloat(newMessage.distance.trim());
-            if ((distance < THRESHOLD_MIN_DISTANCE_RANGE) && !testFinished) {
+            if ((distance < youngModulusThreshold) && !testFinished) {
                 testFinished = true;
 
                 if(isAdded()) {
@@ -525,7 +528,7 @@ public class ControllerFragment extends Fragment {
         double pressureDifference = Math.abs(avgPressureLastFive - avgPressureFirstFive);
 
         // Check if differences exceed thresholds
-        if (distanceDifference > THRESHOLD_MAX_DISTANCE_RANGE || pressureDifference > THRESHOLD_MAX_PRESSURE_RANGE) {
+        if (distanceDifference > maxDistanceRange || pressureDifference > maxPressureRange) {
             if(isAdded()) {
                 requireActivity().runOnUiThread(() ->
                     Toast.makeText(requireContext(), "Test stopped: Data variation too large", Toast.LENGTH_LONG).show()
@@ -567,7 +570,7 @@ public class ControllerFragment extends Fragment {
 
         // Calculate the percentage difference
         double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
-        if (percDiff > THRESHOLD_PERCENTAGE_DIFF_YOUNG_MODULUS) {
+        if (percDiff > youngModulusThreshold) {
             if(isAdded()) {
                 requireActivity().runOnUiThread(() ->
                         Toast.makeText(requireContext(), "Test stopped: Young Modulus threshold reached", Toast.LENGTH_LONG).show()
