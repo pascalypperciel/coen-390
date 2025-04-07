@@ -36,14 +36,14 @@ public class SettingsFragment extends Fragment {
         cardBorderWrapper.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
 
         LinearLayout bluetoothSettingsRow = view.findViewById(R.id.bluetoothSettingsRow);
-        bluetoothSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager() //Navigation logic to bluetooth page
+        bluetoothSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager() //Nav logic to bluetooth page
                 .beginTransaction()
                 .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
                 .addToBackStack(null)
                 .commit());
         tintRow(bluetoothSettingsRow, textColor);
 
-        LinearLayout themesSettingsRow = view.findViewById(R.id.themesSettingsRow); //Nav to settings
+        LinearLayout themesSettingsRow = view.findViewById(R.id.themesSettingsRow); //Nav to theme settings
         themesSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frameLayoutActivityContent, new ThemesFragment())

@@ -8,7 +8,7 @@ public class ThemeManager {
     private static final String PREF_NAME = "theme_prefs";
     private static final String KEY_THEME = "selected_theme";
 
-    public enum Theme {
+    public enum Theme { //These are our theme options.
         DEFAULT,
         DARK,
         MODERN,
@@ -19,6 +19,7 @@ public class ThemeManager {
 
     public static void setTheme(Context context, Theme theme) {
         SharedPreferences.Editor editor = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit();
+        //The key here is the theme will be passed to this method based on the button the user selects.
         editor.putString(KEY_THEME, theme.name());
         editor.apply();
     }
@@ -34,6 +35,8 @@ public class ThemeManager {
         }
     }
 
+    //These are the colours associated with each theme.
+    //Each theme is a text colour, a button colour, the navbar colour, and the background colour
     public static int getTextColor(Context context) {
         switch (getTheme(context)) {
             case DARK: return Color.WHITE;
