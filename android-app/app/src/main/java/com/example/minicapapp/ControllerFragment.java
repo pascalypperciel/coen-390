@@ -171,7 +171,7 @@ public class ControllerFragment extends Fragment {
         buttonMotorForward = view.findViewById(R.id.buttonMotorForward);
         buttonMotorForward.setText(R.string.move_forward);
         buttonMotorForward.setBackgroundColor(buttonColor);
-        buttonMotorForward.setEnabled(false);
+        buttonMotorForward.setEnabled(true);
         buttonMotorForward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 BluetoothManager btManager = BluetoothManager.getInstance();
@@ -191,7 +191,7 @@ public class ControllerFragment extends Fragment {
         buttonMotorBackward = view.findViewById(R.id.buttonMotorBackward);
         buttonMotorBackward.setText(R.string.move_backward);
         buttonMotorBackward.setBackgroundColor(buttonColor);
-        buttonMotorBackward.setEnabled(false);
+        buttonMotorBackward.setEnabled(true);
         buttonMotorBackward.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 BluetoothManager btManager = BluetoothManager.getInstance();
@@ -459,9 +459,9 @@ public class ControllerFragment extends Fragment {
 
     private void displayRecord(Record newMessage) {
         if (!isListening || !isAdded()) return;
-
         // Update the UI on the main thread
         requireActivity().runOnUiThread(() -> {
+            //Toast.makeText(requireContext(),"insode displayrecodrd",Toast.LENGTH_SHORT).show();
             textViewDistance.setText(newMessage.distance + " cm");
             textViewPressure.setText(newMessage.pressure + " kg");
             textViewTemperature.setText(newMessage.temperature + "°C");
@@ -690,7 +690,7 @@ public class ControllerFragment extends Fragment {
 
                     BluetoothManager btManager = BluetoothManager.getInstance();
                     if (btManager.isConnected()) {
-                        btManager.sendCommand("Motor_BWD");
+                        btManager.sendCommand("Starting");
                     }
 
                     Session session = new Session();

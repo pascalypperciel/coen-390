@@ -60,13 +60,7 @@ void TaskBluetooth(void *pvParameters) {
   while (1) {
     // Weight Sensor
     weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
-    weight = (weight < 5) ? 0 : weight;
-
-    // Distance Sensor
-    // double* distances = HCSR04.measureDistanceCm(); // in cm
-    // float distance = (distances != nullptr) ? distances[0] : NAN;
-    // distance=10.55-distance;
-   
+    weight = (weight < 5) ? NAN : weight;
 
     // Temperature Sensor
     float temperature = mlx.readObjectTempC(); // in C
@@ -82,34 +76,43 @@ void TaskBluetooth(void *pvParameters) {
 
 void TaskIOControl(void *pvParameters) {
   while (1) {
-    if (Bluetooth.available()) {
-      String command = Bluetooth.readStringUntil('\n');
-      command.trim();
-      if (command == "Motor_FWD") {
-        if(weight_cnt){
-         scale.tare();
-         weight_cnt=false; 
-        }
-        digitalWrite(FWD, HIGH);
-        digitalWrite(BWD, LOW);
-      }else if(command == "Motor_BWD"){
-          if(weight_cnt){
-         scale.tare();
-         weight_cnt=false; 
-        }
+    if(weight>=10000){//if to much pressure then stop
+       digitalWrite(FWD, LOW);
+       digitalWrite(BWD, LOW);
+    }
+      if (Bluetooth.available()) {
+         String command = Bluetooth.readStringUntil('\n');
+         command.trim();
+         if (command == "Motor_FWD") {
+           if(weight_cnt){
+             scale.tare();
+             weight_cnt=false; 
+           }
+           digitalWrite(FWD, HIGH);
+           digitalWrite(BWD, LOW);
+        }else if(command == "Motor_BWD"){
+            if(weight_cnt){
+               scale.tare();
+               weight_cnt=false; 
+            }
         digitalWrite(BWD, HIGH);
         digitalWrite(FWD, LOW);
-      }
-      else if (command == "Motor_OFF") {
-        weight_cnt=true; 
+        }else if (command == "Motor_OFF") {
+           weight_cnt=true; 
+           digitalWrite(FWD, LOW);
+           digitalWrite(BWD, LOW);
+        }else if(command == "Starting"){
+           //calibrate rotary encoder
+           counter=1;
+           if(weight_cnt){
+               scale.tare();
+               weight_cnt=false; 
+            }
+        digitalWrite(BWD, HIGH);
         digitalWrite(FWD, LOW);
-        digitalWrite(BWD, LOW);
+        }
       }
-      if(weight>=1500){
-        digitalWrite(FWD, LOW);
-        digitalWrite(BWD, LOW);
-      }
-    }
+    
     vTaskDelay(100 / portTICK_PERIOD_MS); // non-blocking delay
   }
 }
@@ -156,5 +159,4 @@ void setup() {
 }
 
 void loop() {
-  //unneeded
 }

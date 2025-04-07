@@ -161,8 +161,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintTop_toBottomOf="@id/sessionCard"
                     app:layout_constraintBottom_toTopOf="@id/controllerCard"
                     app:layout_constraintStart_toStartOf="parent"
@@ -181,7 +181,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Distance"
-                            android:textSize="16sp"
+                            android:textSize="8sp"
                             android:textStyle="bold"
                             android:textColor="@color/black" />
 
@@ -292,7 +292,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Forward"
+                            android:text="Up"
                             android:theme="@color/button_colour" />
 
                         <Button
@@ -300,7 +300,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Backward"
+                            android:text="Down"
                             android:layout_marginStart="8dp"
                             android:theme="@color/button_colour" />
                     </LinearLayout>

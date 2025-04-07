@@ -19,7 +19,7 @@ public class ThresholdsManager {
     }
 
     public static float getMinDistance(Context context) {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getFloat(MIN_DISTANCE, 0.0f);
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getFloat(MIN_DISTANCE, -10f);
     }
 
     public static double getYoungModulus(Context context) {
