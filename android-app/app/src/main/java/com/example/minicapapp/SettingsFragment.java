@@ -26,24 +26,24 @@ public class SettingsFragment extends Fragment {
 
         view.setBackgroundColor(backgroundColor);
 
-        TextView settingsTitle = view.findViewById(R.id.settingsTitle);
+        TextView settingsTitle = view.findViewById(R.id.settingsTitle); //From .xml file
         settingsTitle.setTextColor(textColor);
 
-        CardView settingsCard = view.findViewById(R.id.settingsCard);
+        CardView settingsCard = view.findViewById(R.id.settingsCard); //Also from .xml
         settingsCard.setCardBackgroundColor(backgroundColor);
 
-        View cardBorderWrapper = settingsCard.getChildAt(0);
+        View cardBorderWrapper = settingsCard.getChildAt(0); //This is the little background around the options bar
         cardBorderWrapper.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
 
         LinearLayout bluetoothSettingsRow = view.findViewById(R.id.bluetoothSettingsRow);
-        bluetoothSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
+        bluetoothSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager() //Navigation logic to bluetooth page
                 .beginTransaction()
                 .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
                 .addToBackStack(null)
                 .commit());
         tintRow(bluetoothSettingsRow, textColor);
 
-        LinearLayout themesSettingsRow = view.findViewById(R.id.themesSettingsRow);
+        LinearLayout themesSettingsRow = view.findViewById(R.id.themesSettingsRow); //Nav to settings
         themesSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frameLayoutActivityContent, new ThemesFragment())
@@ -51,24 +51,16 @@ public class SettingsFragment extends Fragment {
                 .commit());
         tintRow(themesSettingsRow, textColor);
 
-        LinearLayout thresholdsSettingsRow = view.findViewById(R.id.thresholdsSettingsRow);
-        thresholdsSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameLayoutActivityContent, new ThresholdsFragment())
-                .addToBackStack(null)
-                .commit());
-        tintRow(thresholdsSettingsRow, textColor);
-
         return view;
     }
 
-    private void tintRow(LinearLayout rowLayout, int textColor) {
+    private void tintRow(LinearLayout rowLayout, int textColor) { //Changes the background colour of the row
         for (int i = 0; i < rowLayout.getChildCount(); i++) {
             View child = rowLayout.getChildAt(i);
             if (child instanceof TextView) {
-                ((TextView) child).setTextColor(textColor);
+                ((TextView) child).setTextColor(textColor); //This one does text
             } else if (child instanceof ImageView) {
-                ((ImageView) child).setColorFilter(textColor);
+                ((ImageView) child).setColorFilter(textColor); //This one does background image. Hope this helps lmaoo
             }
         }
     }

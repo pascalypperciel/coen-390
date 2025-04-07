@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 
 public class ThemesFragment extends Fragment {
 
-    @Nullable
+    @Nullable //Means explicitly can be null
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -26,12 +26,13 @@ public class ThemesFragment extends Fragment {
         int textColor = ThemeManager.getTextColor(requireContext());
         int buttonColor = ThemeManager.getButtonColor(requireContext());
 
-        ScrollView scrollView = (ScrollView) view;
+        ScrollView scrollView = (ScrollView) view; //ScrollView in case we have more themes than fit on screen. very ambitious
         scrollView.setBackgroundColor(backgroundColor);
 
         TextView title = view.findViewById(R.id.themeTitleTextView);
         title.setTextColor(textColor);
 
+        //Selectable buttons to change theme
         Button btnDefault = view.findViewById(R.id.themeDefaultButton);
         Button btnDark = view.findViewById(R.id.themeDarkButton);
         Button btnModern = view.findViewById(R.id.themeModernButton);
@@ -46,6 +47,7 @@ public class ThemesFragment extends Fragment {
         styleButton(btnSunriseBlush, buttonColor, textColor);
         styleButton(btnForestTech, buttonColor, textColor);
 
+        //On click, set it to be the appt theme
         btnDefault.setOnClickListener(v -> applyTheme(ThemeManager.Theme.DEFAULT));
         btnDark.setOnClickListener(v -> applyTheme(ThemeManager.Theme.DARK));
         btnModern.setOnClickListener(v -> applyTheme(ThemeManager.Theme.MODERN));
@@ -62,7 +64,10 @@ public class ThemesFragment extends Fragment {
     }
 
     private void applyTheme(ThemeManager.Theme theme) {
+        //ThemeManager holds the actual theme change logic, where loading another fragment is in the correct theme
         ThemeManager.setTheme(requireContext(), theme);
+
+        //recreate() updates the UI in real time. It returns you to the the Controller fragment
         requireActivity().recreate();
     }
 }
