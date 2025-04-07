@@ -13,11 +13,12 @@
 // #define DIST_ECHO_PIN     12
 #define CLK_PIN 25 // ESP32 pin GPIO25 connected to the rotary encoder's CLK pin
 #define DT_PIN  26 // ESP32 pin GPIO26 connected to the rotary encoder's DT pin
-int counter = 0;
-int CLK_state;
-int new_CLK_state;
-int prev_CLK_state;
-float distance = 0;
+volatile int counter = 0;
+volatile int CLK_state;
+volatile int new_CLK_state;
+volatile int prev_CLK_state;
+volatile float distance = 0;
+hw_timer_t *My_timer = NULL;
 
 // Weight Sensor
 #define LOADCELL_DOUT_PIN 4
@@ -34,6 +35,24 @@ bool weight_cnt = true;
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 HX711 scale;
 BluetoothSerial Bluetooth;
+
+//timer interupt for rotary encoder
+void IRAM_ATTR onTimer(){
+     CLK_state = digitalRead(CLK_PIN);
+    
+     if (CLK_state != prev_CLK_state && CLK_state == HIGH) {
+     // if the DT state is HIGH
+     // the encoder is rotating in counter-clockwise direction => decrease the counter
+       if (digitalRead(DT_PIN) == HIGH) {
+         counter--;
+       } else {
+         // the encoder is rotating in clockwise direction => increase the counter
+         counter++;
+       }
+     }
+     distance=counter;
+     prev_CLK_state = CLK_state;
+}
 
 
 void TaskBluetooth(void *pvParameters) {
@@ -53,7 +72,7 @@ void TaskBluetooth(void *pvParameters) {
 
     // Format message in standardized format
     char message[128];
-    snprintf(message, sizeof(message), "%.2f;%.2f;%.2f", distance, temperature, weight);
+    snprintf(message, sizeof(message), "%.2f; %.2f;%.2f", distance, temperature, weight);
     Bluetooth.println(message);
 
     vTaskDelay(200 / portTICK_PERIOD_MS); // non-blocking delay
@@ -62,27 +81,6 @@ void TaskBluetooth(void *pvParameters) {
 
 void TaskIOControl(void *pvParameters) {
   while (1) {
-     distance = 0;
-     new_CLK_state = digitalRead(CLK_PIN);
-     delay(1);
-     //double read to debounce
-     CLK_state = digitalRead(CLK_PIN);
-     if (CLK_state != new_CLK_state){
-       CLK_state=prev_CLK_state;
-     }
-     if (CLK_state != prev_CLK_state && CLK_state == HIGH) {
-       // if the DT state is HIGH
-       // the encoder is rotating in counter-clockwise direction => decrease the counter
-       if (digitalRead(DT_PIN) == HIGH) {
-         counter--;
-       } else {
-         // the encoder is rotating in clockwise direction => increase the counter
-         counter++;
-       }
-    }
-    distance=counter;
-    prev_CLK_state = CLK_state;
-    
     if (Bluetooth.available()) {
       String command = Bluetooth.readStringUntil('\n');
       command.trim();
@@ -129,6 +127,17 @@ void setup() {
   pinMode(CLK_PIN, INPUT);
   pinMode(DT_PIN, INPUT);
   prev_CLK_state = digitalRead(CLK_PIN);
+
+
+  // Set timer frequency to 1Mhz
+  My_timer = timerBegin(1000000);
+
+  // Attach onTimer function to our timer.
+  timerAttachInterrupt(My_timer, &onTimer);
+
+  // Set alarm to call onTimer function every 1 milliseconds (value in microseconds).
+  // Repeat the alarm (third parameter) with unlimited count = 0 (fourth parameter).
+  timerAlarm(My_timer, 1000, true, 0);
 
   // Motor Controller
   pinMode(FWD, OUTPUT);
