@@ -371,13 +371,15 @@ public class ControllerFragment extends Fragment {
             }
 
             // Stop the machine if there a significant drop in pressure
-            float currentPressure = Float.parseFloat(record.pressure);
-            if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
-                BluetoothManager btManager = BluetoothManager.getInstance();
-                btManager.sendCommand("Motor_OFF");
-                lastRecordPressure = -1;
-            } else {
-                lastRecordPressure = currentPressure;
+            if (!record.pressure.equalsIgnoreCase("nan")) {
+                float currentPressure = Float.parseFloat(record.pressure);
+                if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
+                    BluetoothManager btManager = BluetoothManager.getInstance();
+                    btManager.sendCommand("Motor_OFF");
+                    lastRecordPressure = -1;
+                } else {
+                    lastRecordPressure = currentPressure;
+                }
             }
         }
 
