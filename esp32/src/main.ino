@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include <Adafruit_MLX90614.h>
 #include "HX711.h"
-#include <HCSR04.h>
 #include <BluetoothSerial.h>
 #include <cmath>
 
@@ -10,12 +9,21 @@
 #define TEMP_I2C_SCL      22
 
 // Distance Sensor
-#define DIST_TRIG_PIN     13
-#define DIST_ECHO_PIN     12
+// #define DIST_TRIG_PIN     13
+// #define DIST_ECHO_PIN     12
+#define CLK_PIN 25 // ESP32 pin GPIO25 connected to the rotary encoder's CLK pin
+#define DT_PIN  26 // ESP32 pin GPIO26 connected to the rotary encoder's DT pin
+volatile int counter = 0;
+volatile int CLK_state;
+volatile int new_CLK_state;
+volatile int prev_CLK_state;
+volatile float distance = 0;
+hw_timer_t *My_timer = NULL;
 
 // Weight Sensor
 #define LOADCELL_DOUT_PIN 4
 #define LOADCELL_SCK_PIN  5
+volatile float weight=0;
 
 // Motor Control
 #define FWD 2
@@ -23,25 +31,45 @@
 
 #define BAUD    115200
 
-bool weight_cnt =true;
+bool weight_cnt = true;
 
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 HX711 scale;
 BluetoothSerial Bluetooth;
 
+//timer interupt for rotary encoder
+void IRAM_ATTR onTimer(){
+     CLK_state = digitalRead(CLK_PIN);
+    
+     if (CLK_state != prev_CLK_state && CLK_state == HIGH) {
+     // if the DT state is HIGH
+     // the encoder is rotating in counter-clockwise direction => decrease the counter
+       if (digitalRead(DT_PIN) == HIGH) {
+         counter--;
+       } else {
+         // the encoder is rotating in clockwise direction => increase the counter
+         counter++;
+       }
+     }
+     distance=counter*0.0942;
+     prev_CLK_state = CLK_state;
+}
+
+
 void TaskBluetooth(void *pvParameters) {
   while (1) {
+    // Weight Sensor
+    weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
+    weight = (weight < 5) ? 0 : weight;
+
     // Distance Sensor
-    double* distances = HCSR04.measureDistanceCm(); // in cm
-    float distance = (distances != nullptr) ? distances[0] : NAN;
-    distance=10.55-distance;
+    // double* distances = HCSR04.measureDistanceCm(); // in cm
+    // float distance = (distances != nullptr) ? distances[0] : NAN;
+    // distance=10.55-distance;
+   
 
     // Temperature Sensor
     float temperature = mlx.readObjectTempC(); // in C
-
-    // Weight Sensor
-    float weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
-    weight = (weight < 5) ? NAN : weight;
 
     // Format message in standardized format
     char message[128];
@@ -77,6 +105,10 @@ void TaskIOControl(void *pvParameters) {
         digitalWrite(FWD, LOW);
         digitalWrite(BWD, LOW);
       }
+      if(weight>=1500){
+        digitalWrite(FWD, LOW);
+        digitalWrite(BWD, LOW);
+      }
     }
     vTaskDelay(100 / portTICK_PERIOD_MS); // non-blocking delay
   }
@@ -96,10 +128,23 @@ void setup() {
   scale.set_offset(51322);
   scale.tare();
 
-  // Distance Sensor
-  HCSR04.begin(DIST_TRIG_PIN, DIST_ECHO_PIN);
+  // Rotary Encoder Setup
+  pinMode(CLK_PIN, INPUT);
+  pinMode(DT_PIN, INPUT);
+  prev_CLK_state = digitalRead(CLK_PIN);
 
-  //Motor Controller
+
+  // Set timer frequency to 1Mhz
+  My_timer = timerBegin(1000000);
+
+  // Attach onTimer function to our timer.
+  timerAttachInterrupt(My_timer, &onTimer);
+
+  // Set alarm to call onTimer function every 1 milliseconds (value in microseconds).
+  // Repeat the alarm (third parameter) with unlimited count = 0 (fourth parameter).
+  timerAlarm(My_timer, 1000, true, 0);
+
+  // Motor Controller
   pinMode(FWD, OUTPUT);
   digitalWrite(FWD, LOW);
   pinMode(BWD, OUTPUT);
