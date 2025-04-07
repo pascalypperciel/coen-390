@@ -35,10 +35,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ControllerFragment extends Fragment {
-    //Values to tweak
-    float maxPressureRange, maxDistanceRange, minDistanceRange;
-    double youngModulusThreshold;
-
+    double youngModulusThreshold = 15; //percent
     public static class Record {
         public String distance;
         public String temperature;
@@ -96,11 +93,6 @@ public class ControllerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
-
-        maxPressureRange = ThresholdsManager.getMaxPressure(requireContext());
-        maxDistanceRange = ThresholdsManager.getMaxDistance(requireContext());
-        minDistanceRange = ThresholdsManager.getMinDistance(requireContext());
-        youngModulusThreshold = ThresholdsManager.getYoungModulus(requireContext());
 
         int textColor = ThemeManager.getTextColor(requireContext());
         int buttonColor = ThemeManager.getButtonColor(requireContext());
@@ -389,10 +381,6 @@ public class ControllerFragment extends Fragment {
             sendBatchData(recordList);
             lastBatchSentTime = currentTime;
 
-            // Analyze the last batch of data
-            analyzeStopData();
-            monitorYoungModulus();
-
             // Clear the record list for the next batch
             recordList.clear();
         }
@@ -490,136 +478,6 @@ public class ControllerFragment extends Fragment {
             textViewPressure.setText(newMessage.pressure + " kg");
             textViewTemperature.setText(newMessage.temperature + "°C");
         });
-
-        // Stop if the sensor detects "too close" or "too far"
-        try {
-            float distance = Float.parseFloat(newMessage.distance.trim());
-            if ((distance < minDistanceRange) && !testFinished) {
-                testFinished = true;
-
-                stopSessionRecording("Minimum distance reached");
-            }
-        } catch (NumberFormatException e) {
-            Log.e("BT", "Error parsing distance: " + e.getMessage());
-        }
-    }
-
-    private void analyzeStopData() {
-        if (recordList.size() < 10) {
-            return; // Not enough data to analyze
-        }
-
-        // Extract the last 10 records
-        List<Record> lastTenRecords = recordList.subList(recordList.size() - 10, recordList.size());
-
-        for (Record r : lastTenRecords) {
-            if (r.valid.equals("False")) {
-                Log.w("ANALYZE", "Skipping variation analysis due to invalid data");
-                return; // One or more of the values were NaN
-            }
-        }
-
-        double sumDistanceFirstFive = 0.0, sumDistanceLastFive = 0.0;
-        double sumPressureFirstFive = 0.0, sumPressureLastFive = 0.0;
-
-        for (int i = 0; i < 5; i++) {
-            try {
-                // Get distance and pressure for the first five records
-                sumDistanceFirstFive += Double.parseDouble(lastTenRecords.get(i).distance.trim());
-                sumPressureFirstFive += Double.parseDouble(lastTenRecords.get(i).pressure.trim());
-
-                // Get distance and pressure for the last five records
-                sumDistanceLastFive += Double.parseDouble(lastTenRecords.get(i + 5).distance.trim());
-                sumPressureLastFive += Double.parseDouble(lastTenRecords.get(i + 5).pressure.trim());
-            } catch (NumberFormatException e) {
-                Log.e("ANALYZE", "Invalid number format in record: " + e.getMessage());
-                return; // Exit if invalid data is encountered
-            }
-        }
-
-        // Calculate averages & differences
-        double avgDistanceFirstFive = sumDistanceFirstFive / 5;
-        double avgDistanceLastFive = sumDistanceLastFive / 5;
-        double avgPressureFirstFive = sumPressureFirstFive / 5;
-        double avgPressureLastFive = sumPressureLastFive / 5;
-
-        double distanceDifference = Math.abs(avgDistanceLastFive - avgDistanceFirstFive);
-        double pressureDifference = Math.abs(avgPressureLastFive - avgPressureFirstFive);
-
-        // Check if differences exceed thresholds
-        if (distanceDifference > maxDistanceRange || pressureDifference > maxPressureRange) {
-            stopSessionRecording("Data variation too large");
-        }
-    }
-    private void monitorYoungModulus() {
-        if (recordList.size() < 10) {
-            return; // Not enough data to calculate Young's modulus
-        }
-
-        List<Record> recentRecords = recordList.subList(recordList.size() - 10, recordList.size());
-
-        for (Record r : recentRecords) {
-            if (r.valid.equals("False")) {
-                Log.w("YOUNG_MODULUS", "Skipping Young Modulus calc due to invalid data");
-                return; // One or more of the values were NaN
-            }
-        }
-
-        // Calculate the initial Young's modulus if not already calculated
-        if (youngModulus == -1) {
-            youngModulus = calculateYoungModulus(recordList);
-            if (youngModulus == -1) {
-                Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
-                return;
-            }
-        }
-
-        // Calculate the current Young's modulus
-        double currentYoungModulus = calculateYoungModulus(recordList.subList(recordList.size() - 10, recordList.size()));
-        if (currentYoungModulus == -1) {
-            Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
-            return;
-        }
-
-        // Calculate the percentage difference
-        double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
-        if (percDiff > youngModulusThreshold) {
-            stopSessionRecording("Young Modulus threshold reached");
-        }
-    }
-    private double calculateYoungModulus(List<ControllerFragment.Record> records) {
-        try {
-            double totalStress = 0.0;
-            double totalStrain = 0.0;
-
-            // Calculate total stress and strain
-            for (ControllerFragment.Record record : records) {
-                double pressure = Double.parseDouble(record.pressure);
-                double distance = Double.parseDouble(record.distance);
-                double force = pressure / 1000 * GRAVITY;
-
-                double stress = force / initialArea; // Stress = Force / Area
-                double strain = (distance - initialLength) / initialLength; // Strain = ΔL / L₀
-                totalStress += stress;
-                totalStrain += strain;
-            }
-
-            // Calculate averages
-            double avgStress = totalStress / records.size();
-            double avgStrain = totalStrain / records.size();
-
-            // Check for division by zero
-            if (avgStrain == 0) {
-                Log.e("YOUNG_MODULUS", "Strain is zero, cannot calculate Young's modulus.");
-                return -1; // Return -1 to indicate failure
-            }
-
-            // Calculate Young's modulus (Stress / Strain)
-            return avgStress / avgStrain;
-        } catch (Exception e) {
-            Log.e("YOUNG_MODULUS", "Error calculating Young's modulus: " + e.getMessage());
-            return -1; // Return -1 to indicate failure
-        }
     }
 
     private void createSession(long sessionID, String sessionName, float initialLength, float initialArea, Runnable onSuccess) {
@@ -685,7 +543,6 @@ public class ControllerFragment extends Fragment {
             }
         }).start();
     }
-
 
     private void checkSessionParameters(String nameString, String lengthString, String areaString) {
         if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {

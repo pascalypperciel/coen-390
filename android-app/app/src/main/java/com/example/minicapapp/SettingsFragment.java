@@ -51,14 +51,6 @@ public class SettingsFragment extends Fragment {
                 .commit());
         tintRow(themesSettingsRow, textColor);
 
-        LinearLayout thresholdsSettingsRow = view.findViewById(R.id.thresholdsSettingsRow);
-        thresholdsSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameLayoutActivityContent, new ThresholdsFragment())
-                .addToBackStack(null)
-                .commit());
-        tintRow(thresholdsSettingsRow, textColor);
-
         return view;
     }
 
