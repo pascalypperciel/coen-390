@@ -32,9 +32,12 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ControllerFragment extends Fragment {
     double youngModulusThreshold = 0.15; //percent
+    int youngModulusQueueSize = 5;
     public static class Record {
         public String distance;
         public String temperature;
@@ -60,7 +63,7 @@ public class ControllerFragment extends Fragment {
     ArrayList<ControllerFragment.Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
     private volatile boolean isListening = false;
-    private float lastRecordPressure = -1;
+    private LinkedList<Float> lastRecordPressure;
 
     // The UI elements present in the Controller Fragment
 
@@ -279,7 +282,7 @@ public class ControllerFragment extends Fragment {
             }
 
             // Reset this for pressure drop check
-            lastRecordPressure = -1;
+            lastRecordPressure.clear();
         }
     }
 
@@ -342,7 +345,16 @@ public class ControllerFragment extends Fragment {
         }).start();
     }
 
-
+    private boolean isExceedingPressureQueue() {
+        float initialPressure = lastRecordPressure.element();
+        int trueCounter = 0;
+        for (int i = 1; i < youngModulusQueueSize; i++) {
+            if (lastRecordPressure.get(i) < initialPressure * (1 - youngModulusThreshold)) {
+                trueCounter++;
+            }
+        }
+        return trueCounter == youngModulusQueueSize - 1;
+    }
 
     private void processBluetoothData(String incoming, String sessionID) throws JSONException {
         String[] values = incoming.split(";");
@@ -375,12 +387,14 @@ public class ControllerFragment extends Fragment {
             // Stop the machine if there a significant drop in pressure
             if (!record.pressure.equalsIgnoreCase("nan")) {
                 float currentPressure = Float.parseFloat(record.pressure);
-                if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
-                    stopSessionRecording("Significant drop in pressure detected");
-                    lastRecordPressure = -1;
-                } else {
-                    lastRecordPressure = currentPressure;
+                lastRecordPressure.add(currentPressure);
+                if (lastRecordPressure.size() > youngModulusQueueSize) {
+                    lastRecordPressure.remove();
                 }
+            }
+            if (lastRecordPressure.size() == youngModulusQueueSize && isExceedingPressureQueue()) {
+                stopSessionRecording("Young's modulus threshold met");
+                lastRecordPressure.clear();
             }
         }
 
