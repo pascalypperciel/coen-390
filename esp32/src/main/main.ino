@@ -23,6 +23,7 @@ hw_timer_t *My_timer = NULL;
 // Weight Sensor
 #define LOADCELL_DOUT_PIN 4
 #define LOADCELL_SCK_PIN  5
+volatile float weight=0;
 
 // Motor Control
 #define FWD 2
@@ -50,7 +51,7 @@ void IRAM_ATTR onTimer(){
          counter++;
        }
      }
-     distance=counter;
+     distance=counter*0.0942;
      prev_CLK_state = CLK_state;
 }
 
@@ -58,7 +59,7 @@ void IRAM_ATTR onTimer(){
 void TaskBluetooth(void *pvParameters) {
   while (1) {
     // Weight Sensor
-    float weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
+    weight = scale.get_units(5); // averages 5 readings, tweak with it. In g.
     weight = (weight < 5) ? 0 : weight;
 
     // Distance Sensor
@@ -72,7 +73,7 @@ void TaskBluetooth(void *pvParameters) {
 
     // Format message in standardized format
     char message[128];
-    snprintf(message, sizeof(message), "%.2f; %.2f;%.2f", distance, temperature, weight);
+    snprintf(message, sizeof(message), "%.2f;%.2f;%.2f", distance, temperature, weight);
     Bluetooth.println(message);
 
     vTaskDelay(200 / portTICK_PERIOD_MS); // non-blocking delay
@@ -101,6 +102,10 @@ void TaskIOControl(void *pvParameters) {
       }
       else if (command == "Motor_OFF") {
         weight_cnt=true; 
+        digitalWrite(FWD, LOW);
+        digitalWrite(BWD, LOW);
+      }
+      if(weight>=1500){
         digitalWrite(FWD, LOW);
         digitalWrite(BWD, LOW);
       }
