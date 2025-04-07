@@ -111,6 +111,8 @@ def find_best_interval(x_data, y_data):
             r2 = 1 - (ss_residual / ss_total)  # R-squared
     
         if r2 >= best_r2:
+            if(m<0):
+                continue
             if start>=window_size and abs(y_data[start-2]-y_data[start+2])>margin:
                 continue
             else:
@@ -154,7 +156,7 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
 
     ax.scatter(engr_strain[Elend-1],engr_stress[Elend-1], color='red',s=200)#yield
 
-    if engr_slope<0:
+    if engr_slope<=0:
         ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
     ax.text(0.98, 0.05, f" Yield: {engr_strain[Elend-1]:.5f}, {engr_stress[Elend-1]:.5f} \n Young's Modulus: {engr_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
@@ -192,7 +194,7 @@ def create_graphs(distances, weights, temperatures, timestamps, session_id, init
 
     ax.scatter(true_strain[Tlend-1],true_stress[Tlend-1], color='red',s=200)#yield
     
-    if true_slope<0:
+    if true_slope<=0:
         ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
     ax.text(0.98, 0.05, f" Yield: {true_strain[Tlend-1]:.5f}, {true_stress[Tlend-1]:.5f} \n Young's Modulus: {true_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))

@@ -76,10 +76,10 @@ void TaskBluetooth(void *pvParameters) {
 
 void TaskIOControl(void *pvParameters) {
   while (1) {
-    if(weight>=1500){//if to much pressure then reverse
-        digitalWrite(FWD, HIGH);
-        digitalWrite(BWD, LOW);
-    }else{
+    if(weight>=10000){//if to much pressure then reverse
+       digitalWrite(FWD, LOW);
+       digitalWrite(BWD, LOW);
+    }
       if (Bluetooth.available()) {
          String command = Bluetooth.readStringUntil('\n');
          command.trim();
@@ -112,7 +112,7 @@ void TaskIOControl(void *pvParameters) {
         digitalWrite(FWD, LOW);
         }
       }
-    }
+    
     vTaskDelay(100 / portTICK_PERIOD_MS); // non-blocking delay
   }
 }
