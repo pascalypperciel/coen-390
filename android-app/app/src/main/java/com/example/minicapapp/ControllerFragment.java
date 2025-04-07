@@ -32,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class ControllerFragment extends Fragment {
     double youngModulusThreshold = 15; //percent
@@ -54,18 +53,14 @@ public class ControllerFragment extends Fragment {
     private LinearLayout mainContent;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
     protected Button buttonMotorForward, buttonMotorBackward, buttonStartStop, buttonBluetoothStatus;
-    private boolean testFinished = false;
 
     //definitions from old controller activity
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<ControllerFragment.Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
-    private double youngModulus = -1;
-    private static final double GRAVITY = 9.81;
-    private float initialLength = 0.0f;
-    private float initialArea = 0.0f;
     private volatile boolean isListening = false;
+    private float lastRecordPressure = -1;
 
     // The UI elements present in the Controller Fragment
 
@@ -283,8 +278,6 @@ public class ControllerFragment extends Fragment {
                     Log.e("StopButton", "Failed to send final batch", e);
                 }
             }
-
-            disableInputStream();
         }
     }
 
@@ -464,16 +457,11 @@ public class ControllerFragment extends Fragment {
             }
         }).start();
     }
-    private void disableInputStream() {
-        // Update the UI on the main thread
-        testFinished = false;
-    }
 
     private void displayRecord(Record newMessage) {
         if (!isListening || !isAdded()) return;
         // Update the UI on the main thread
         requireActivity().runOnUiThread(() -> {
-            //Toast.makeText(requireContext(),"insode displayrecodrd",Toast.LENGTH_SHORT).show();
             textViewDistance.setText(newMessage.distance + " cm");
             textViewPressure.setText(newMessage.pressure + " kg");
             textViewTemperature.setText(newMessage.temperature + "°C");
@@ -556,10 +544,6 @@ public class ControllerFragment extends Fragment {
 
                 // Verify that the conditions for the length and area variables are met.
                 if ((length > 0.0f) && (area > 0.0f)) {
-                    // If this value is true, the motor controls will appear below the preliminary session parameters.
-                    initialLength = length;
-                    initialArea = area;
-
                     // Make the motor controls section visible.
                     textViewMotorControls.setEnabled(true);
                     buttonMotorForward.setEnabled(true);
