@@ -164,7 +164,6 @@ public class ControllerFragment extends Fragment {
                     btManager.sendCommand("Motor_FWD");
                 }
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-
                 BluetoothManager btManager = BluetoothManager.getInstance();
                 if (btManager.isConnected()) {
                     btManager.sendCommand("Motor_OFF");
@@ -377,8 +376,7 @@ public class ControllerFragment extends Fragment {
             if (!record.pressure.equalsIgnoreCase("nan")) {
                 float currentPressure = Float.parseFloat(record.pressure);
                 if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
-                    BluetoothManager btManager = BluetoothManager.getInstance();
-                    btManager.sendCommand("Motor_OFF");
+                    stopSessionRecording("Significant drop in pressure detected");
                     lastRecordPressure = -1;
                 } else {
                     lastRecordPressure = currentPressure;
