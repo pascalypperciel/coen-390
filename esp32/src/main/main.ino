@@ -76,7 +76,7 @@ void TaskBluetooth(void *pvParameters) {
 
 void TaskIOControl(void *pvParameters) {
   while (1) {
-    if(weight>=10000){//if to much pressure then reverse
+    if(weight>=10000){//if to much pressure then stop
        digitalWrite(FWD, LOW);
        digitalWrite(BWD, LOW);
     }
