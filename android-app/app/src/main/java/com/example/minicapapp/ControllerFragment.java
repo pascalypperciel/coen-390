@@ -320,6 +320,9 @@ public class ControllerFragment extends Fragment {
                 while (btManager.isConnected() && isListening) {
                     bytes = inputStream.read(buffer);
                     String incomingData = new String(buffer, 0, bytes);
+                    if (incomingData.equals("StopTest")) {
+                        stopSessionRecording("Stopped automatically by ESP32");
+                    }
                     dataBuffer.append(incomingData);
 
                     int endOfLineIndex;
