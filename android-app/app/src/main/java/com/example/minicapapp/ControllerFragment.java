@@ -398,9 +398,22 @@ public class ControllerFragment extends Fragment {
         }
     }
 
+    private void invalidateBatch(JSONArray jsonArray) throws JSONException {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+            try {
+                obj.put("Valid", "False");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     private void sendBatchData(ArrayList<Record> recordList) throws JSONException {
         // Create a JSONArray to hold all the records
         JSONArray jsonArray = new JSONArray();
+
+        int invalidCounter = 0;
 
         for (Record record : recordList) {
             // Convert each Record object to a JSONObject
@@ -410,10 +423,21 @@ public class ControllerFragment extends Fragment {
             jsonRecord.put("Pressure", record.pressure);
             jsonRecord.put("SessionID", record.sessionID);
             jsonRecord.put("Timestamp", record.timestamp);
-            jsonRecord.put("Valid", record.valid);
+
+            String recordValid = record.valid;
+            jsonRecord.put("Valid", recordValid);
+
+            if (recordValid == "False") {
+                invalidCounter++;
+            }
 
             // Add the JSONObject to the JSONArray
             jsonArray.put(jsonRecord);
+        }
+
+        // Invalidate whole batch if most (80%) of records in it are invalid
+        if (invalidCounter >= (int) (recordList.size() * 0.8)) {
+            invalidateBatch(jsonArray);
         }
 
         new Thread(() -> {
