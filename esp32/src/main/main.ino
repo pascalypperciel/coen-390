@@ -49,7 +49,7 @@ void IRAM_ATTR onTimer(){
        }
      }
      //436 conuter for 2cm
-     if(weight!=NAN){
+     if(!(isnan(weight))){
      distance=counter*0.004587;
      }else{
       distance=NAN;
