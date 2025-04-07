@@ -9,8 +9,6 @@
 #define TEMP_I2C_SCL      22
 
 // Distance Sensor
-// #define DIST_TRIG_PIN     13
-// #define DIST_ECHO_PIN     12
 #define CLK_PIN 25 // ESP32 pin GPIO25 connected to the rotary encoder's CLK pin
 #define DT_PIN  26 // ESP32 pin GPIO26 connected to the rotary encoder's DT pin
 volatile int counter = 0;
@@ -24,14 +22,13 @@ hw_timer_t *My_timer = NULL;
 #define LOADCELL_DOUT_PIN 4
 #define LOADCELL_SCK_PIN  5
 volatile float weight=0;
+bool weight_cnt = true;
 
 // Motor Control
 #define FWD 2
 #define BWD 15
 
 #define BAUD    115200
-
-bool weight_cnt = true;
 
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 HX711 scale;
@@ -51,7 +48,13 @@ void IRAM_ATTR onTimer(){
          counter++;
        }
      }
-     distance=counter*0.0942;
+     //436 conuter for 2cm
+     if(!(isnan(weight))){
+     distance=counter*0.004587;
+     }else{
+      distance=NAN;
+      counter=0;
+     }
      prev_CLK_state = CLK_state;
 }
 
@@ -79,7 +82,9 @@ void TaskIOControl(void *pvParameters) {
     if(weight>=10000){//if to much pressure then stop
        digitalWrite(FWD, LOW);
        digitalWrite(BWD, LOW);
+       Bluetooth.println("StopTest");
     }
+    //motor control sent from app
       if (Bluetooth.available()) {
          String command = Bluetooth.readStringUntil('\n');
          command.trim();
@@ -103,7 +108,7 @@ void TaskIOControl(void *pvParameters) {
            digitalWrite(BWD, LOW);
         }else if(command == "Starting"){
            //calibrate rotary encoder
-           counter=1;
+           counter=0;
            if(weight_cnt){
                scale.tare();
                weight_cnt=false; 
@@ -140,7 +145,7 @@ void setup() {
   // Set timer frequency to 1Mhz
   My_timer = timerBegin(1000000);
 
-  // Attach onTimer function to our timer.
+  // Attach onTimer function to timer.
   timerAttachInterrupt(My_timer, &onTimer);
 
   // Set alarm to call onTimer function every 1 milliseconds (value in microseconds).
