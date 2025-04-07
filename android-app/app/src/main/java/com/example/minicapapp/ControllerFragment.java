@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ControllerFragment extends Fragment {
-    double youngModulusThreshold = 15; //percent
+    double youngModulusThreshold = 0.15; //percent
     public static class Record {
         public String distance;
         public String temperature;
@@ -266,11 +266,13 @@ public class ControllerFragment extends Fragment {
                 });
             }
 
+            // Stop the CAT Tester
             BluetoothManager btManager = BluetoothManager.getInstance();
             if (btManager.isConnected()) {
                 btManager.sendCommand("Motor_OFF");
             }
 
+            // Send remaining records to the database
             if (!recordList.isEmpty()) {
                 try {
                     sendBatchData(recordList);
@@ -278,6 +280,9 @@ public class ControllerFragment extends Fragment {
                     Log.e("StopButton", "Failed to send final batch", e);
                 }
             }
+
+            // Reset this for pressure drop check
+            lastRecordPressure = -1;
         }
     }
 
@@ -365,6 +370,16 @@ public class ControllerFragment extends Fragment {
             // Update the UI on the main thread
             if (isAdded()) { // Ensure the fragment is attached to an activity
                 requireActivity().runOnUiThread(() -> displayRecord(record));
+            }
+
+            // Stop the machine if there a significant drop in pressure
+            float currentPressure = Float.parseFloat(record.pressure);
+            if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
+                BluetoothManager btManager = BluetoothManager.getInstance();
+                btManager.sendCommand("Motor_OFF");
+                lastRecordPressure = -1;
+            } else {
+                lastRecordPressure = currentPressure;
             }
         }
 
