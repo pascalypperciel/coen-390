@@ -32,13 +32,9 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class ControllerFragment extends Fragment {
-    //Values to tweak
-    float maxPressureRange, maxDistanceRange, minDistanceRange;
-    double youngModulusThreshold;
-
+    double youngModulusThreshold = 0.15; //percent
     public static class Record {
         public String distance;
         public String temperature;
@@ -57,18 +53,14 @@ public class ControllerFragment extends Fragment {
     private LinearLayout mainContent;
     protected EditText editTextSessionName, editTextInitialLength, editTextInitialArea;
     protected Button buttonMotorForward, buttonMotorBackward, buttonStartStop, buttonBluetoothStatus;
-    private boolean testFinished = false;
 
     //definitions from old controller activity
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<ControllerFragment.Record> recordList = new ArrayList<>();
     private long lastBatchSentTime = System.currentTimeMillis();
-    private double youngModulus = -1;
-    private static final double GRAVITY = 9.81;
-    private float initialLength = 0.0f;
-    private float initialArea = 0.0f;
     private volatile boolean isListening = false;
+    private float lastRecordPressure = -1;
 
     // The UI elements present in the Controller Fragment
 
@@ -97,11 +89,6 @@ public class ControllerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_controller, container, false);
 
-        maxPressureRange = ThresholdsManager.getMaxPressure(requireContext());
-        maxDistanceRange = ThresholdsManager.getMaxDistance(requireContext());
-        minDistanceRange = ThresholdsManager.getMinDistance(requireContext());
-        youngModulusThreshold = ThresholdsManager.getYoungModulus(requireContext());
-
         int textColor = ThemeManager.getTextColor(requireContext());
         int buttonColor = ThemeManager.getButtonColor(requireContext());
         int backgroundColor = ThemeManager.getBackgroundColor(requireContext());
@@ -119,14 +106,12 @@ public class ControllerFragment extends Fragment {
         updateBluetoothStatusButton();
 
         buttonBluetoothStatus.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
-                        .addToBackStack(null)
-                        .commit();
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
+                    .addToBackStack(null)
+                    .commit();
 
-                ((BottomNavigationBarActivity) requireActivity()).setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
-            }
+            ((BottomNavigationBarActivity) requireActivity()).setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
         });
 
         // Define and set the behaviour of the UI elements in ths fragment
@@ -279,11 +264,13 @@ public class ControllerFragment extends Fragment {
                 });
             }
 
+            // Stop the CAT Tester
             BluetoothManager btManager = BluetoothManager.getInstance();
             if (btManager.isConnected()) {
                 btManager.sendCommand("Motor_OFF");
             }
 
+            // Send remaining records to the database
             if (!recordList.isEmpty()) {
                 try {
                     sendBatchData(recordList);
@@ -292,7 +279,8 @@ public class ControllerFragment extends Fragment {
                 }
             }
 
-            disableInputStream();
+            // Reset this for pressure drop check
+            lastRecordPressure = -1;
         }
     }
 
@@ -381,6 +369,18 @@ public class ControllerFragment extends Fragment {
             if (isAdded()) { // Ensure the fragment is attached to an activity
                 requireActivity().runOnUiThread(() -> displayRecord(record));
             }
+
+            // Stop the machine if there a significant drop in pressure
+            if (!record.pressure.equalsIgnoreCase("nan")) {
+                float currentPressure = Float.parseFloat(record.pressure);
+                if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
+                    BluetoothManager btManager = BluetoothManager.getInstance();
+                    btManager.sendCommand("Motor_OFF");
+                    lastRecordPressure = -1;
+                } else {
+                    lastRecordPressure = currentPressure;
+                }
+            }
         }
 
         long currentTime = System.currentTimeMillis();
@@ -389,18 +389,27 @@ public class ControllerFragment extends Fragment {
             sendBatchData(recordList);
             lastBatchSentTime = currentTime;
 
-            // Analyze the last batch of data
-            analyzeStopData();
-            monitorYoungModulus();
-
             // Clear the record list for the next batch
             recordList.clear();
+        }
+    }
+
+    private void invalidateBatch(JSONArray jsonArray) throws JSONException {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+            try {
+                obj.put("Valid", "False");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private void sendBatchData(ArrayList<Record> recordList) throws JSONException {
         // Create a JSONArray to hold all the records
         JSONArray jsonArray = new JSONArray();
+
+        int invalidCounter = 0;
 
         for (Record record : recordList) {
             // Convert each Record object to a JSONObject
@@ -410,10 +419,21 @@ public class ControllerFragment extends Fragment {
             jsonRecord.put("Pressure", record.pressure);
             jsonRecord.put("SessionID", record.sessionID);
             jsonRecord.put("Timestamp", record.timestamp);
-            jsonRecord.put("Valid", record.valid);
+
+            String recordValid = record.valid;
+            jsonRecord.put("Valid", recordValid);
+
+            if (recordValid == "False") {
+                invalidCounter++;
+            }
 
             // Add the JSONObject to the JSONArray
             jsonArray.put(jsonRecord);
+        }
+
+        // Invalidate whole batch if most (80%) of records in it are invalid
+        if (invalidCounter >= (int) (recordList.size() * 0.8)) {
+            invalidateBatch(jsonArray);
         }
 
         new Thread(() -> {
@@ -452,150 +472,15 @@ public class ControllerFragment extends Fragment {
             }
         }).start();
     }
-    private void disableInputStream() {
-        // Update the UI on the main thread
-        testFinished = false;
-    }
 
     private void displayRecord(Record newMessage) {
         if (!isListening || !isAdded()) return;
         // Update the UI on the main thread
         requireActivity().runOnUiThread(() -> {
-            //Toast.makeText(requireContext(),"insode displayrecodrd",Toast.LENGTH_SHORT).show();
             textViewDistance.setText(newMessage.distance + " cm");
             textViewPressure.setText(newMessage.pressure + " kg");
             textViewTemperature.setText(newMessage.temperature + "°C");
         });
-
-        // Stop if the sensor detects "too close" or "too far"
-        try {
-            float distance = Float.parseFloat(newMessage.distance.trim());
-            if ((distance < minDistanceRange) && !testFinished) {
-                testFinished = true;
-
-                stopSessionRecording("Minimum distance reached");
-            }
-        } catch (NumberFormatException e) {
-            Log.e("BT", "Error parsing distance: " + e.getMessage());
-        }
-    }
-
-    private void analyzeStopData() {
-        if (recordList.size() < 10) {
-            return; // Not enough data to analyze
-        }
-
-        // Extract the last 10 records
-        List<Record> lastTenRecords = recordList.subList(recordList.size() - 10, recordList.size());
-
-        for (Record r : lastTenRecords) {
-            if (r.valid.equals("False")) {
-                Log.w("ANALYZE", "Skipping variation analysis due to invalid data");
-                return; // One or more of the values were NaN
-            }
-        }
-
-        double sumDistanceFirstFive = 0.0, sumDistanceLastFive = 0.0;
-        double sumPressureFirstFive = 0.0, sumPressureLastFive = 0.0;
-
-        for (int i = 0; i < 5; i++) {
-            try {
-                // Get distance and pressure for the first five records
-                sumDistanceFirstFive += Double.parseDouble(lastTenRecords.get(i).distance.trim());
-                sumPressureFirstFive += Double.parseDouble(lastTenRecords.get(i).pressure.trim());
-
-                // Get distance and pressure for the last five records
-                sumDistanceLastFive += Double.parseDouble(lastTenRecords.get(i + 5).distance.trim());
-                sumPressureLastFive += Double.parseDouble(lastTenRecords.get(i + 5).pressure.trim());
-            } catch (NumberFormatException e) {
-                Log.e("ANALYZE", "Invalid number format in record: " + e.getMessage());
-                return; // Exit if invalid data is encountered
-            }
-        }
-
-        // Calculate averages & differences
-        double avgDistanceFirstFive = sumDistanceFirstFive / 5;
-        double avgDistanceLastFive = sumDistanceLastFive / 5;
-        double avgPressureFirstFive = sumPressureFirstFive / 5;
-        double avgPressureLastFive = sumPressureLastFive / 5;
-
-        double distanceDifference = Math.abs(avgDistanceLastFive - avgDistanceFirstFive);
-        double pressureDifference = Math.abs(avgPressureLastFive - avgPressureFirstFive);
-
-        // Check if differences exceed thresholds
-        if (distanceDifference > maxDistanceRange || pressureDifference > maxPressureRange) {
-            stopSessionRecording("Data variation too large");
-        }
-    }
-    private void monitorYoungModulus() {
-        if (recordList.size() < 10) {
-            return; // Not enough data to calculate Young's modulus
-        }
-
-        List<Record> recentRecords = recordList.subList(recordList.size() - 10, recordList.size());
-
-        for (Record r : recentRecords) {
-            if (r.valid.equals("False")) {
-                Log.w("YOUNG_MODULUS", "Skipping Young Modulus calc due to invalid data");
-                return; // One or more of the values were NaN
-            }
-        }
-
-        // Calculate the initial Young's modulus if not already calculated
-        if (youngModulus == -1) {
-            youngModulus = calculateYoungModulus(recordList);
-            if (youngModulus == -1) {
-                Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
-                return;
-            }
-        }
-
-        // Calculate the current Young's modulus
-        double currentYoungModulus = calculateYoungModulus(recordList.subList(recordList.size() - 10, recordList.size()));
-        if (currentYoungModulus == -1) {
-            Log.e("YOUNG_MODULUS", "Invalid Young Modulus value");
-            return;
-        }
-
-        // Calculate the percentage difference
-        double percDiff = Math.abs((youngModulus - currentYoungModulus) / youngModulus) * 100;
-        if (percDiff > youngModulusThreshold) {
-            stopSessionRecording("Young Modulus threshold reached");
-        }
-    }
-    private double calculateYoungModulus(List<ControllerFragment.Record> records) {
-        try {
-            double totalStress = 0.0;
-            double totalStrain = 0.0;
-
-            // Calculate total stress and strain
-            for (ControllerFragment.Record record : records) {
-                double pressure = Double.parseDouble(record.pressure);
-                double distance = Double.parseDouble(record.distance);
-                double force = pressure / 1000 * GRAVITY;
-
-                double stress = force / initialArea; // Stress = Force / Area
-                double strain = (distance - initialLength) / initialLength; // Strain = ΔL / L₀
-                totalStress += stress;
-                totalStrain += strain;
-            }
-
-            // Calculate averages
-            double avgStress = totalStress / records.size();
-            double avgStrain = totalStrain / records.size();
-
-            // Check for division by zero
-            if (avgStrain == 0) {
-                Log.e("YOUNG_MODULUS", "Strain is zero, cannot calculate Young's modulus.");
-                return -1; // Return -1 to indicate failure
-            }
-
-            // Calculate Young's modulus (Stress / Strain)
-            return avgStress / avgStrain;
-        } catch (Exception e) {
-            Log.e("YOUNG_MODULUS", "Error calculating Young's modulus: " + e.getMessage());
-            return -1; // Return -1 to indicate failure
-        }
     }
 
     private void createSession(long sessionID, String sessionName, float initialLength, float initialArea, Runnable onSuccess) {
@@ -662,7 +547,6 @@ public class ControllerFragment extends Fragment {
         }).start();
     }
 
-
     private void checkSessionParameters(String nameString, String lengthString, String areaString) {
         if (!(nameString.isBlank() || lengthString.isBlank() || areaString.isBlank())) {
             isListening = true;
@@ -675,10 +559,6 @@ public class ControllerFragment extends Fragment {
 
                 // Verify that the conditions for the length and area variables are met.
                 if ((length > 0.0f) && (area > 0.0f)) {
-                    // If this value is true, the motor controls will appear below the preliminary session parameters.
-                    initialLength = length;
-                    initialArea = area;
-
                     // Make the motor controls section visible.
                     textViewMotorControls.setEnabled(true);
                     buttonMotorForward.setEnabled(true);

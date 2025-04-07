@@ -52,7 +52,7 @@ public class ThemeManager {
             case MODERN_COASTAL: return Color.parseColor("#3498DB");
             case SUNRISE_BLUSH: return Color.parseColor("#FF7043");
             case FOREST_TECH: return Color.parseColor("#66BB6A");
-            default: return Color.parseColor("#F39B53"); // DEFAULT
+            default: return Color.parseColor("#DA537B"); // DEFAULT
         }
     }
 
