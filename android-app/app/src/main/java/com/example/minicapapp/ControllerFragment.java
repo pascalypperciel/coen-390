@@ -106,14 +106,12 @@ public class ControllerFragment extends Fragment {
         updateBluetoothStatusButton();
 
         buttonBluetoothStatus.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
-                        .addToBackStack(null)
-                        .commit();
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameLayoutActivityContent, new BluetoothFragment())
+                    .addToBackStack(null)
+                    .commit();
 
-                ((BottomNavigationBarActivity) requireActivity()).setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
-            }
+            ((BottomNavigationBarActivity) requireActivity()).setBottomNavSelectedItemWithoutTriggering(R.id.action_load_settings);
         });
 
         // Define and set the behaviour of the UI elements in ths fragment
