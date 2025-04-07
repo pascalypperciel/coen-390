@@ -53,13 +53,13 @@ public class HelpFragment extends DialogFragment {
         // Set the help text dynamically based on the page key
         switch (pageKey) {
             case "Controller":
-                helpTextView.setText("This page contains controls for the CAT Strength Tester.\n" +
-                        "\nFirst, use the button on the top left to connect your device via Bluetooth.\n" +
-                        "\nThen, populate the fields with your test's name and the dimensions of your test sample." +
-                        "Make sure you remember the test name; You'll need it later!\n" +
-                        "\nOnce the test is started, you can let the device do its thing. " +
-                        "In the event of an error, use the buttons to control the motor or to stop the test manually.\n" +
-                        "\nWARNING: This device can apply a great deal of force onto the test sample. " +
+                helpTextView.setText("This page contains controls for the CAT Strength Tester.\n\n" +
+                        "First, use the button on the top left to connect your device via Bluetooth.\n\n" +
+                        "Then, populate the fields with your test's name and the dimensions of your test sample. " +
+                        "Make sure you remember the test name; You'll need it later!\n\n" +
+                        "Once the test is started, you can let the device do its thing. " +
+                        "In the event of an error, use the buttons to control the motor or to stop the test manually.\n\n" +
+                        "WARNING: This device can apply a great deal of force onto the test sample. " +
                         "Please keep away from the device while a test is in progress.\n\n\n" +
                         "Thank you!");
                 break;
@@ -69,10 +69,10 @@ public class HelpFragment extends DialogFragment {
                         "Once selected, you will have access to all the data from the test " +
                         "as well as graphs demonstrating the testing process.\n\n" +
                         "We have prepared five graphs to describe the test outcome:\n\n" +
-                        "Engineering Stress/Strain Curve: Using the industry-standard offset test, the reaction" +
-                        "of the test sample under load. We find the yield point, which is where the material begins to" +
+                        "Engineering Stress/Strain Curve: Using the industry-standard offset test, the reaction " +
+                        "of the test sample under load. We find the yield point, which is where the material begins to " +
                         "permanently deform.\n\n" +
-                        "True Stress/Strain Curve: This is instantaneous change instead of change relative to initial" +
+                        "True Stress/Strain Curve: This is instantaneous change instead of change relative to initial " +
                         "parameters. Measuring the same thing two different ways.\n\n" +
                         "Displacement vs. Force: Shows the amount that the sample is 'squished' as it undergoes load.\n\n" +
                         "Load vs. Time: Shows the rate of motor loading onto the sample. " +
@@ -81,13 +81,27 @@ public class HelpFragment extends DialogFragment {
                         "Thank you!");
                 break;
             case "Settings":
-                helpTextView.setText("This page allows you to configure the app settings, including data display preferences.");
+                helpTextView.setText("This page allows you to configure the app settings.\n\n" +
+                        "The first tab allows you to connect your device to the CAT via Bluetooth." +
+                        "Simply select 'Scan Devices' and wait for the CAT to appear. " +
+                        "Once connected, navigate to the Controller page using the icon on the bottom left to begin testing.\n\n" +
+                        "The second tab allows you to change the color scheme of the app. " +
+                        "Try them out! Our favourite alts are Dark Theme and Forest Tech Theme.\n\n" +
+                        "When you want the test to stop itself, you can try the Threshold Settings. " +
+                        "When the CAT reads a value that exceeds a threshold, it will automatically cease functioning.\n\n\n" +
+                        "Thank you!");
                 break;
             case "MaterialsInformation":
-                helpTextView.setText("ooga booga");
+                helpTextView.setText("This is our explainer for the physical theory behind the CAT. " +
+                        "It's a little much for us to fit on this dialogue box, so we made a page for it here.\n\n" +
+                        "Not interested? No problem! Nothing in this section is necessary to know in order to use the device. " +
+                        "We just thought it was important that this information should be accessible for those who wanted it.\n\n" +
+                        "You can navigate directly to tests by selecting the Controller icon on the bottom right, " +
+                        "or connect to Bluetooth on the Sessings page.\n\n\n" +
+                        "Thank you!");
                 break;
             default:
-                helpTextView.setText("This is the help page. Use this section to understand the functionality of the app.");
+                helpTextView.setText("How did you get here? Why are you seeing this? That's not supposed to happen >:(");
                 break;
         }
 

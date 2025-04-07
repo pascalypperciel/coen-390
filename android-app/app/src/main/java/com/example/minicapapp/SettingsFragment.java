@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 public class SettingsFragment extends Fragment {
+
+    protected ImageButton imageButtonHelpSettings;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -34,6 +37,15 @@ public class SettingsFragment extends Fragment {
 
         View cardBorderWrapper = settingsCard.getChildAt(0);
         cardBorderWrapper.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
+
+        imageButtonHelpSettings = view.findViewById(R.id.imageButtonHelpSettings);
+        imageButtonHelpSettings.setBackgroundResource(R.drawable.circular_button_background);
+        imageButtonHelpSettings.setColorFilter(buttonColor);
+        imageButtonHelpSettings.getBackground().setTint(buttonColor);
+        imageButtonHelpSettings.setOnClickListener(v -> {
+            HelpFragment helpFragment = HelpFragment.newInstance("Settings");
+            helpFragment.show(requireActivity().getSupportFragmentManager(), "HelpDialogue");
+        });
 
         LinearLayout bluetoothSettingsRow = view.findViewById(R.id.bluetoothSettingsRow);
         bluetoothSettingsRow.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
