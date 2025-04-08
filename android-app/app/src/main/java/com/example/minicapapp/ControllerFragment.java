@@ -1,7 +1,6 @@
 package com.example.minicapapp;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -34,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ControllerFragment extends Fragment {
-    double youngModulusThreshold = 0.15; //percent
     public static class Record {
         public String distance;
         public String temperature;
@@ -58,9 +56,8 @@ public class ControllerFragment extends Fragment {
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<ControllerFragment.Record> recordList = new ArrayList<>();
-    private long lastBatchSentTime = System.currentTimeMillis();
+    private long lastBatchSentTime = -1;
     private volatile boolean isListening = false;
-    private float lastRecordPressure = -1;
 
     // The UI elements present in the Controller Fragment
 
@@ -277,9 +274,6 @@ public class ControllerFragment extends Fragment {
                     Log.e("StopButton", "Failed to send final batch", e);
                 }
             }
-
-            // Reset this for pressure drop check
-            lastRecordPressure = -1;
         }
     }
 
@@ -371,22 +365,11 @@ public class ControllerFragment extends Fragment {
             if (isAdded()) { // Ensure the fragment is attached to an activity
                 requireActivity().runOnUiThread(() -> displayRecord(record));
             }
-
-            // Stop the machine if there a significant drop in pressure
-            if (!record.pressure.equalsIgnoreCase("nan")) {
-                float currentPressure = Float.parseFloat(record.pressure);
-                if (lastRecordPressure != -1 && currentPressure < lastRecordPressure * (1 - youngModulusThreshold)) {
-                    stopSessionRecording("Significant drop in pressure detected");
-                    lastRecordPressure = -1;
-                } else {
-                    lastRecordPressure = currentPressure;
-                }
-            }
         }
 
         long currentTime = System.currentTimeMillis();
 
-        if (recordList.size() >= BATCH_SIZE || (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
+        if (recordList.size() >= BATCH_SIZE || lastBatchSentTime != -1 && (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
             sendBatchData(recordList);
             lastBatchSentTime = currentTime;
 
