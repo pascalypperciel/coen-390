@@ -462,8 +462,8 @@ public class ControllerFragment extends Fragment {
         // Update the UI on the main thread
         requireActivity().runOnUiThread(() -> {
             textViewDistance.setText(newMessage.distance + " cm");
-            textViewPressure.setText(newMessage.pressure + " kg");
-            textViewTemperature.setText(newMessage.temperature + "°C");
+            textViewPressure.setText(newMessage.pressure.split("\\.")[0] + " g");
+            textViewTemperature.setText(newMessage.temperature.split("\\.")[0] + "°C");
         });
     }
 
