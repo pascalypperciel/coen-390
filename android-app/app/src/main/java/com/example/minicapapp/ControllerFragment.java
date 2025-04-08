@@ -56,7 +56,7 @@ public class ControllerFragment extends Fragment {
     private static final int BATCH_SIZE = 10;
     private static final long BATCH_TIMEOUT_MS = 3000;
     ArrayList<ControllerFragment.Record> recordList = new ArrayList<>();
-    private long lastBatchSentTime = System.currentTimeMillis();
+    private long lastBatchSentTime = -1;
     private volatile boolean isListening = false;
 
     // The UI elements present in the Controller Fragment
@@ -369,7 +369,7 @@ public class ControllerFragment extends Fragment {
 
         long currentTime = System.currentTimeMillis();
 
-        if (recordList.size() >= BATCH_SIZE || (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
+        if (recordList.size() >= BATCH_SIZE || lastBatchSentTime != -1 && (currentTime - lastBatchSentTime) >= BATCH_TIMEOUT_MS) {
             sendBatchData(recordList);
             lastBatchSentTime = currentTime;
 
