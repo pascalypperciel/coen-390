@@ -86,6 +86,7 @@ public class HelpFragment extends DialogFragment {
                         "The first tab allows you to connect your device to the CAT via Bluetooth." +
                         "Simply select 'Scan Devices' and wait for the CAT to appear. " +
                         "Once connected, navigate to the Controller page using the icon on the bottom left to begin testing.\n\n" +
+                        "If your phone is older than API 31, you need the MAC address of the CAT.\n\n" +
                         "The second tab allows you to change the color scheme of the app. " +
                         "Try them out! Our favourite alts are Dark Theme and Forest Tech Theme.\n\n" +
                         "When you want the test to stop itself, you can try the Threshold Settings. " +
