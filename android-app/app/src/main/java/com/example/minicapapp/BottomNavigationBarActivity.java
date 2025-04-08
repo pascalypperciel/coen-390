@@ -46,7 +46,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity {
         setAppTheme();
         
         // Set an invalid menu ID to clear the initial selection
-        replaceFragment(new ControllerFragment(), false);
+        if(savedInstanceState == null) {
+            replaceFragment(new ControllerFragment(), false);
+        }
 
         // Handle all of the possible input when the different icons of the persistent navbar are pressed
         bottomNavigationViewPersistentNavbar.setOnItemSelectedListener(item -> {

@@ -54,6 +54,8 @@
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:theme="@style/Theme.FragmentCard"
+            android:background="@android:color/white"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeWidth="2dp"
@@ -61,8 +63,7 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:background="@android:color/white">
+            app:layout_constraintEnd_toEndOf="parent" >
 
             <FrameLayout
                 android:layout_width="match_parent"
