@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,8 +27,17 @@ public class SettingsFragment extends Fragment {
 
         view.setBackgroundColor(backgroundColor);
 
-        TextView settingsTitle = view.findViewById(R.id.settingsTitle);
-        settingsTitle.setTextColor(textColor);
+        ImageButton imageButtonHelpSettings = view.findViewById(R.id.imageButtonHelpSettings);
+        imageButtonHelpSettings.setBackgroundResource(R.drawable.circular_button_background);
+        imageButtonHelpSettings.setColorFilter(buttonColor);
+        imageButtonHelpSettings.getBackground().setTint(buttonColor);
+        imageButtonHelpSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HelpFragment helpFragment = HelpFragment.newInstance("Settings");
+                helpFragment.show(requireActivity().getSupportFragmentManager(), "HelpDialogue");
+            }
+        });
 
         CardView settingsCard = view.findViewById(R.id.settingsCard);
         settingsCard.setCardBackgroundColor(backgroundColor);
