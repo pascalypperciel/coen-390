@@ -168,23 +168,12 @@ public class SessionDetailsFragment extends Fragment {
 
                 JSONArray graphArray = jsonResponse.getJSONArray("Graph");
 
-                String[] graphTitles = {
-                        "Stress vs Strain",
-                        "True Stress vs True Strain",
-                        "Displacement vs Force",
-                        "Time vs Force",
-                        "Time vs Displacement"
-                };
 
                 requireActivity().runOnUiThread(() -> {
-                    int titleIndex = 0;
-                    if (graphArray.length() == 3) {
-                        titleIndex = 2;
-                    }
+                  
                     for (int i = 0; i < graphArray.length(); i++) {
                         try {
                             TextView graphTitle = new TextView(requireContext());
-                            graphTitle.setText(graphTitles[titleIndex]);
                             graphTitle.setTextColor(textColor);
                             graphTitle.setTextSize(18);
                             graphTitle.setTextColor(getResources().getColor(R.color.black));
@@ -192,7 +181,6 @@ public class SessionDetailsFragment extends Fragment {
                             graphTitle.setPadding(0, 24, 0, 8);
                             graphTitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                             graphContainer.addView(graphTitle);
-                            titleIndex++;
 
                             String base64 = graphArray.getString(i);
                             byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
