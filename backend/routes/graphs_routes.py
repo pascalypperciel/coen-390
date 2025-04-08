@@ -95,10 +95,6 @@ def find_best_interval(x_data, y_data):
         numerator = np.sum((x_subset - x_mean) * (y_subset - y_mean))
         denominator = np.sum((x_subset - x_mean) ** 2)
 
-
-        if denominator == 0: #prevents division by 0
-            return (-1, -1), -1, -1
-
         m = numerator / denominator  # slope
         b = y_mean - m * x_mean     # intercept
 
@@ -145,37 +141,36 @@ def create_graphs(displacements, weights, temperatures, timestamps, session_id, 
     #get linear interval of dataset
     (Elstart, Elend), engr_slope, engr_intercept=find_best_interval(engr_strain,engr_stress)
 
-    if engr_slope != -1 and engr_intercept != -1:
 
-        engr_strain_subset = engr_strain[Elstart:Elend] # a subset of strain for calculating intercept change
-        engr_actual_offset = offset * (engr_strain_subset.max() - engr_strain_subset.min())
-        engr_offset_intercept = engr_intercept + engr_actual_offset
+    engr_strain_subset = engr_strain[Elstart:Elend] # a subset of strain for calculating intercept change
+    engr_actual_offset = offset * (engr_strain_subset.max() - engr_strain_subset.min())
+    engr_offset_intercept = engr_intercept + engr_actual_offset
 
-        engr_range = np.linspace(0, engr_strain.max(), len(engr_stress))
-        engr_offset_line = engr_slope * engr_range + engr_offset_intercept # remember y = mx + b?
+    engr_range = np.linspace(0, engr_strain.max(), len(engr_stress))
+    engr_offset_line = engr_slope * engr_range + engr_offset_intercept # remember y = mx + b?
 
-        fig, ax = plt.subplots()
-        ax.plot(engr_strain, engr_stress, 'o-', label="Engineering Stress vs Strain")
-        ax.plot(engr_range, engr_offset_line, '--k', label="Offset Line")
+    fig, ax = plt.subplots()
+    ax.plot(engr_strain, engr_stress, 'o-', label="Engineering Stress vs Strain")
+    ax.plot(engr_range, engr_offset_line, '--k', label="Offset Line")
 
-        ax.scatter(engr_strain[Elend-1],engr_stress[Elend-1], color='red',s=200)#yield
+    ax.scatter(engr_strain[Elend-1],engr_stress[Elend-1], color='red',s=200)#yield
 
-        if engr_slope<0:
-            ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+    if engr_slope<0:
+        ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
-        ax.text(0.98, 0.05, f" Yield: {engr_strain[Elend-1]:.5f}, {engr_stress[Elend-1]:.5f} \n Young's Modulus: {engr_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
-        ax.text(0.02, 0.98, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
-        ax.set_xlabel("Strain")
-        ax.set_ylabel("Stress (Pa)")
-        ax.legend()
+    ax.text(0.98, 0.05, f" Yield: {engr_strain[Elend-1]:.5f}, {engr_stress[Elend-1]:.5f} \n Young's Modulus: {engr_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
+    ax.text(0.02, 0.98, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
+    ax.set_xlabel("Strain")
+    ax.set_ylabel("Stress (Pa)")
+    ax.legend()
 
-        img_buf = io.BytesIO()
-        plt.savefig(img_buf, format='png')
-        img_buf.seek(0)
-        engr_stress_strain = base64.b64encode(img_buf.read()).decode('utf-8')
-        plt.close()
+    img_buf = io.BytesIO()
+    plt.savefig(img_buf, format='png')
+    img_buf.seek(0)
+    engr_stress_strain = base64.b64encode(img_buf.read()).decode('utf-8')
+    plt.close()
 
-        graphs_list.append(engr_stress_strain)
+    graphs_list.append(engr_stress_strain)
 
     #------true stress and strain graph-------
     true_strain=np.log(1+engr_strain)    
@@ -183,39 +178,37 @@ def create_graphs(displacements, weights, temperatures, timestamps, session_id, 
 
     (Tlstart, Tlend), true_slope, true_intercept=find_best_interval(true_strain,true_stress)
 
-    if true_slope != -1 and true_intercept != -1:
+    true_strain_subset = true_strain[Tlstart:Tlend]
+    true_stress_subset = true_stress[Tlstart:Tlend]
 
-        true_strain_subset = true_strain[Tlstart:Tlend]
-        true_stress_subset = true_stress[Tlstart:Tlend]
+    true_actual_offset = offset * (true_strain_subset.max() - true_strain_subset.min())
+    true_offset_intercept = true_intercept + true_actual_offset
 
-        true_actual_offset = offset * (true_strain_subset.max() - true_strain_subset.min())
-        true_offset_intercept = true_intercept + true_actual_offset
+    true_range = np.linspace(0, true_strain.max(), len(true_stress))
+    true_offset_line = true_slope * true_range + true_offset_intercept
+    
+    fig, ax = plt.subplots()
+    ax.plot(true_strain, true_stress, 'o-', label="True Stress vs Strain")
+    ax.plot(true_range, true_offset_line, '--k', label="Offset Line")
 
-        true_range = np.linspace(0, true_strain.max(), len(true_stress))
-        true_offset_line = true_slope * true_range + true_offset_intercept
-        
-        fig, ax = plt.subplots()
-        ax.plot(true_strain, true_stress, 'o-', label="True Stress vs Strain")
-        ax.plot(true_range, true_offset_line, '--k', label="Offset Line")
+    ax.scatter(true_strain[Tlend-1],true_stress[Tlend-1], color='red',s=200)#yield
+    
+    if true_slope<0:
+        ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
 
-        ax.scatter(true_strain[Tlend-1],true_stress[Tlend-1], color='red',s=200)#yield
-        
-        if true_slope<0:
-            ax.text(0.02, 0.65, f"Invalid Data", transform=ax.transAxes, fontsize=12, color='red', ha='left', va='top')
+    ax.text(0.98, 0.05, f" Yield: {true_strain[Tlend-1]:.5f}, {true_stress[Tlend-1]:.5f} \n Young's Modulus: {true_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
+    ax.text(0.02, 0.98, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
+    ax.set_xlabel("True Strain")
+    ax.set_ylabel("True Stress (Pa)")
+    ax.legend()
 
-        ax.text(0.98, 0.05, f" Yield: {true_strain[Tlend-1]:.5f}, {true_stress[Tlend-1]:.5f} \n Young's Modulus: {true_slope:.5f} \n Avg Temp: {avg_temperature:.2f}°C", transform=ax.transAxes, fontsize=10, verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
-        ax.text(0.02, 0.98, f"Session ID: {session_id}", transform=ax.transAxes, fontsize=12, color='green', ha='left', va='top')
-        ax.set_xlabel("True Strain")
-        ax.set_ylabel("True Stress (Pa)")
-        ax.legend()
+    img_buf = io.BytesIO()
+    plt.savefig(img_buf, format='png')
+    img_buf.seek(0)
+    true_stress_strain = base64.b64encode(img_buf.read()).decode('utf-8')
+    plt.close()
 
-        img_buf = io.BytesIO()
-        plt.savefig(img_buf, format='png')
-        img_buf.seek(0)
-        true_stress_strain = base64.b64encode(img_buf.read()).decode('utf-8')
-        plt.close()
-
-        graphs_list.append(true_stress_strain)
+    graphs_list.append(true_stress_strain)
 
     # --- Displacement vs Force Plot ---
     fig, ax = plt.subplots()
